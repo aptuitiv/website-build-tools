@@ -34,6 +34,12 @@ const defaultConfig = {
     },
     // An array of file globs and their destination folder
     copy: [],
+    fonts: {
+        // The folder for the fonts within the theme build folder. (config.build.theme)
+        build: 'fonts',
+        // The source files for the fonts within the root source folder. (config.src)
+        src: 'fonts'
+    },
     // The root folder for all the project files. If the user needs to change this they should put
     // it as the absolute path to the root of their project.
     root: process.cwd(),

@@ -6,6 +6,7 @@ import { globSync } from 'glob';
 // Build scripts
 import { copyWatchFile } from './copy.js';
 import { processCss } from './css.js';
+import { copyFontSrcToBuild, removeFontFileFromBuild } from './font.js';
 import { deleteFile, deployFile } from './ftp.js';
 import { prefixPath, removePrefix } from './helpers.js';
 import { copyTemplateSrcToBuild, removeTemplateFileFromBuild } from './template.js';
@@ -36,6 +37,17 @@ const watchHandler = async (config) => {
     chokidar
         .watch(cssFolder, { ignoreInitial: true })
         .on('all', () => { processCss(config) });
+
+    // Watch for any font changes
+    const fontSrcFolder = prefixPath(config.fonts.src, config.src);
+    const rootFontFolder = `${prefixPath(fontSrcFolder, config.root)}/`;
+    const fontFolder = `${rootFontFolder}**/*`;
+    fancyLog(chalk.magenta('Watching for changes in the font folder'), chalk.cyan(fontSrcFolder));
+    chokidar
+        .watch(fontFolder, { ignoreInitial: true })
+        .on('add', (path) => { copyFontSrcToBuild(config, removePrefix(path, rootFontFolder)); })
+        .on('change', (path) => { copyFontSrcToBuild(config, removePrefix(path, rootFontFolder)); })
+        .on('unlink', (path) => { removeFontFileFromBuild(config, removePrefix(path, rootFontFolder)); });
 
     // Watch for any template changes
     const templateSrcFolder = prefixPath(config.templates.src, config.src);

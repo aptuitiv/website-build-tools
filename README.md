@@ -12,6 +12,7 @@ Build tools to help with building and deploying websites at Aptuitiv.
     - [Process a specific file](#process-a-specific-file)
     - [Lint CSS files with stylelint](#lint-css-files-with-stylelint)
   - [Export action](#export-action)
+  - [Font action](#font-action)
   - [FTP upload actions](#ftp-upload-actions)
     - [Upload all files in the build directory](#upload-all-files-in-the-build-directory)
     - [Upload the theme files in the build theme directory](#upload-the-theme-files-in-the-build-theme-directory)
@@ -218,6 +219,14 @@ You can export the site source files to make it easier to copy them to another s
 
 ```bash
 aptuitiv-build export
+```
+
+## Font action
+
+You can copy the fonts from the source folder to the build folder.
+
+```bash
+aptuitiv-build copy-fonts
 ```
 
 ## FTP upload actions

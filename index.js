@@ -10,6 +10,7 @@ import getConfig from './src/config.js';
 import { copyHandler } from './src/copy.js';
 import { cssHandler } from './src/css.js';
 import exportHandler from './src/export.js';
+import fontHandler from './src/font.js';
 import ftpHander from './src/ftp.js';
 import { templateHandler } from './src/template.js';
 import watchHandler from './src/watch.js';
@@ -63,6 +64,18 @@ program
     .action(async (args) => {
         cssHandler(await getConfiguration(args), 'lint', args);
     });
+
+/**
+ * Font commands 
+ */
+program
+    .command('copy-fonts')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        fontHandler(await getConfiguration(args), 'copyAll');
+    });
+
 /**
  * FTP commands
  */
