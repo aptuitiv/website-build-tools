@@ -4,7 +4,7 @@
     Functions to work with template files
 =========================================================================== */
 
-import fs, { copy } from 'fs-extra';
+import fs from 'fs-extra';
 import chalk from 'chalk';
 import fancyLog from 'fancy-log';
 import logSymbols from 'log-symbols';
