@@ -15,6 +15,7 @@ import { getGlob, prefixPath } from './helpers.js';
 /**
  * Get the source path and make sure it starts with the correct root path
  *
+ * @param {object} config The configuration object
  * @param {string} sourcePath The source path
  * @returns {string}
  */
@@ -26,6 +27,7 @@ const getSourcePath = (config, sourcePath) => {
 /**
  * Parse the path to make sure that it does not start with the correct build folder value
  *
+ * @param {object} config The configuration object
  * @param {string} remotePath The file/folder path
  * @returns {string}
  */
@@ -45,8 +47,8 @@ const getRemotePath = (config, remotePath) => {
 /**
  * Delete the file from the FTP server
  *
- * @param {string} filePath The path to the file to delete
  * @param {object} config The configuration object
+ * @param {string} filePath The path to the file to delete
  */
 export async function deleteFile(config, filePath) {
     // Remove the file from the dist folder
@@ -78,8 +80,8 @@ export async function deleteFile(config, filePath) {
 /**
  * Deploy the file to the server
  *
- * @param {string} filePath The file path to upload
  * @param {object} config The configuration object
+ * @param {string} filePath The file path to upload
  */
 export async function deployFile(config, filePath) {
     let srcPath = getSourcePath(config, filePath)
@@ -116,8 +118,8 @@ export async function deployFile(config, filePath) {
 /**
  * Download a file from the server
  *
- * @param {string} filePath The file path to downlpad
  * @param {object} config The configuration object
+ * @param {string} filePath The file path to downlpad
  */
 async function downloadFile(config, filePath) {
     let srcPath = getSourcePath(config, filePath)
@@ -151,8 +153,8 @@ async function downloadFile(config, filePath) {
 /**
  * Delete all files in a directory
  *
- * @param {string} dir The directory path to delete
  * @param {object} config The configuration object
+ * @param {string} dir The directory path to delete
  */
 export async function deleteDir(config, dir) {
     let srcPath = getSourcePath(config, dir);
@@ -178,8 +180,8 @@ export async function deleteDir(config, dir) {
 /**
  * Deploy all files in a directory
  *
- * @param {string} dir The directory path to upload from
  * @param {object} config The configuration object
+ * @param {string} dir The directory path to upload from
  */
 async function deployDir(config, dir) {
     const srcPath = getSourcePath(config, dir);
@@ -209,8 +211,8 @@ async function deployDir(config, dir) {
 /**
  * Download a folder of files via FTP to the dist folder
  *
- * @param {string} dir The directory path to upload from
  * @param {object} config The configuration object
+ * @param {string} dir The directory path to upload from
  */
 async function downloadDir(config, dir) {
     const localPath = getSourcePath(config, dir);
