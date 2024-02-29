@@ -10,6 +10,7 @@ import getConfig from './src/config.js';
 import { cssHandler } from './src/css.js';
 import ftpHander from './src/ftp.js';
 import templateHandler from './src/template.js';
+import watchHandler from './src/watch.js';
 
 /**
  * Get the configuration object
@@ -75,6 +76,8 @@ program
 program
     .command('delete')
     .option('-p, --path <filePath>', 'Delete a file, a folder, or a glob')
+    .addOption(configFileOption)
+    .addOption(rootOption)
     .action(async (args) => {
         ftpHander(await getConfiguration(args), 'delete', args);
     });
@@ -95,4 +98,16 @@ program.command('push-template')
         templateHandler(await getConfiguration(args), { push: true });
     });
 
+/**
+ * Watch command
+ */
+program
+    .command('watch')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        watchHandler(await getConfiguration(args));
+    });
+
+// Parse the command line arguments
 program.parse();

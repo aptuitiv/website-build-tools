@@ -56,6 +56,20 @@ export const prefixPath = (path, basePath, baseFolder) => {
 }
 
 /**
+ * Removes the prefix from the path
+ * 
+ * @param {string} path The file path
+ * @param {string} prefix The file path prefix to remove
+ * @returns {string}
+ */
+export const removePrefix = (path, prefix) => {
+    if (path.startsWith(prefix)) {
+        return path.slice(prefix.length);
+    }
+    return path;
+}
+
+/**
  * Returns if the value is an object
  *
  * @link https://attacomsian.com/blog/javascript-check-variable-is-object

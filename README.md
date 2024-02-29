@@ -26,6 +26,7 @@ Build tools to help with building and deploying websites at Aptuitiv.
   - [Template actions](#template-actions)
     - [Pull template files](#pull-template-files)
     - [Push template files](#push-template-files)
+  - [Watch action](#watch-action)
 
 ## Calling the script
 
@@ -42,22 +43,22 @@ The first, and recommended way is to call this from the `scripts` section of you
 }
 ```
 
-The other way is using the command line and `npx`.
+The other way is using the command line.
 
 ```bash
-npx aptuitiv-build pull-template
+aptuitiv-build pull-template
 ```
 
 If you're not calling the script from the base directory of your project then you must pass the `--root` argument so that the correct folders paths are used.
 
 ```bash
-npx aptuitiv-build pull-template --root path/to/my/project/root
+aptuitiv-build pull-template --root path/to/my/project/root
 ```
 
 Or you can do a relative path to the root from the current directory.
 
 ```bash
-npx aptuitiv-build pull-template --root ../../
+aptuitiv-build pull-template --root ../../
 ```
 
 ## Configuration
@@ -314,4 +315,12 @@ Copy the template files from the source folder to the build folder.
 
 ```bash
 aptuitiv-build push-template
+```
+
+## Watch action
+
+Watch all files for changes.
+
+```bash
+aptuitiv-build watch
 ```
