@@ -1,0 +1,33 @@
+{
+  "name": "@aptuitiv/website-build-scripts",
+  "version": "1.0.0",
+  "description": "Build scripts to help with building and deploying websites at Aptuitiv",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aptuitiv/website-build-scripts.git"
+  },
+  "author": "Eric Tompkins",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/aptuitiv/website-build-scripts/issues"
+  },
+  "homepage": "https://github.com/aptuitiv/website-build-scripts#readme",
+  "bin": {
+    "aptuitiv-build": "./index.js"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "cosmiconfig": "^9.0.0",
+    "deepmerge": "^4.3.1",
+    "fancy-log": "^2.0.0",
+    "fs-extra": "^11.2.0",
+    "log-symbols": "^6.0.0",
+    "resolve-from": "^5.0.0"
+  },
+  "type": "module"
+}
