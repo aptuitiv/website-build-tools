@@ -29,7 +29,7 @@ export const removeThemeFileFromBuild = (path) => {
 }
 
 /**
- * Process the export request
+ * Process the theme request
  * 
  * @param {string} action The action to take
  */

@@ -28,7 +28,7 @@ export const removeFontFileFromBuild = (path) => {
 }
 
 /**
- * Process the export request
+ * Process the font request
  */
 export const fontHandler = async (action) => {
     if (action === 'pull') {
