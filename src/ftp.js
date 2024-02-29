@@ -70,7 +70,7 @@ export async function deleteFile(config, filePath) {
             password: process.env.FTP_ENVIRONMENT === 'live' ? process.env.FTP_PASSWORD : process.env.FTP_DEV_PASSWORD,
         });
         await client.remove(removePath);
-        fancyLog(logSymbols.success, chalk.green(`File deleted: ${filePath}`));
+        fancyLog(logSymbols.success, chalk.green(`File deleted from server: ${filePath}`));
     } catch (err) {
         fancyLog(chalk.red(err));
     }
@@ -170,7 +170,7 @@ export async function deleteDir(config, dir) {
             password: process.env.FTP_ENVIRONMENT === 'live' ? process.env.FTP_PASSWORD : process.env.FTP_DEV_PASSWORD,
         });
         await client.removeDir(removePath);
-        fancyLog(logSymbols.success, chalk.green(`Directory deleted: ${dir}`));
+        fancyLog(logSymbols.success, chalk.green(`Directory deleted from server: ${dir}`));
     } catch (err) {
         fancyLog(chalk.red(err));
     }
