@@ -1,21 +1,21 @@
 {
-  "name": "@aptuitiv/website-build-scripts",
+  "name": "@aptuitiv/website-build-tools",
   "version": "1.0.0",
-  "description": "Build scripts to help with building and deploying websites at Aptuitiv",
+  "description": "Build tools to help with building and deploying websites at Aptuitiv",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aptuitiv/website-build-scripts.git"
+    "url": "git+https://github.com/aptuitiv/website-build-tools.git"
   },
   "author": "Eric Tompkins",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/aptuitiv/website-build-scripts/issues"
+    "url": "https://github.com/aptuitiv/website-build-tools/issues"
   },
-  "homepage": "https://github.com/aptuitiv/website-build-scripts#readme",
+  "homepage": "https://github.com/aptuitiv/website-build-tools#readme",
   "bin": {
     "aptuitiv-build": "./index.js"
   },

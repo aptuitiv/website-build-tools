@@ -1,5 +1,5 @@
-# Aptuitiv website build scripts
+# Aptuitiv website build tools
 
-Build scripts to help with building and deploying websites at Aptuitiv.
+Build tools to help with building and deploying websites at Aptuitiv.
 
 ## Calling the script
