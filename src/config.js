@@ -6,7 +6,7 @@ import resolveFrom from 'resolve-from';
 import { isAbsolute, join, resolve } from 'path';
 import deepmerge from 'deepmerge';
 import { cosmiconfig } from 'cosmiconfig';
-import { type } from 'os';
+import dotenv from 'dotenv';
 
 import { isObjectWithValues } from './helpers.js';
 
@@ -114,6 +114,11 @@ const getConfig = async (configFile, rootFolder) => {
     if (overrideRoot) {
         config.root = root;
     }
+
+    // Load the .env file from the root folder for the project
+    // The .env file is used to set environment variables for the project
+    // such as the FTP credentials.
+    dotenv.config({ path: resolve(cwd, '.env') });
 
     return config;
 }
