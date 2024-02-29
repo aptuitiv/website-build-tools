@@ -25,10 +25,12 @@ const defaultConfig = {
         theme: 'dist/theme/custom'
     },
     css: {
-        // The base CSS file(s) that import the other CSS files. This is used when building the files.
-        base: 'src/css/*.css',
+        // The base path to the CSS files
+        base: 'src/css',
+        // The glob for CSS file(s) that import the other CSS files. This is used when building the files.
+        buildFiles: 'src/css/*.css',
         // The glob for all CSS files. This is used when linting CSS files.
-        src: 'src/css/**/*.css'
+        files: 'src/css/**/*.css'
     },
     copy: [],
     // The root folder for the source files. If the user needs to change this they should put

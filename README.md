@@ -6,6 +6,10 @@ Build tools to help with building and deploying websites at Aptuitiv.
   - [Calling the script](#calling-the-script)
   - [Configuration](#configuration)
     - [Default configuration](#default-configuration)
+  - [CSS actions](#css-actions)
+    - [Process all CSS files](#process-all-css-files)
+    - [Process a specific file](#process-a-specific-file)
+    - [Lint CSS files with stylelint](#lint-css-files-with-stylelint)
   - [FTP upload actions](#ftp-upload-actions)
     - [Upload all files in the build directory](#upload-all-files-in-the-build-directory)
     - [Upload the theme files in the build theme directory](#upload-the-theme-files-in-the-build-theme-directory)
@@ -110,6 +114,58 @@ Below is the default configuration.
         src: 'src/theme'
     }
 }
+```
+
+## CSS actions
+
+### Process all CSS files
+
+```bash
+aptuitiv-build css
+```
+
+Don't lint while processing.
+
+```bash
+aptuitiv-build css --no-lint
+```
+
+### Process a specific file
+
+```bash
+aptuitiv-build css -f main.css
+aptuitiv-build css --file main.css
+```
+
+The `file` argument should be the path to the CSS file within the base CSS folder, which is typically `src/css`.
+
+Don't lint while processing.
+
+```bash
+aptuitiv-build css -f main.css --no-lint
+```
+
+### Lint CSS files with stylelint
+
+`css-lint` and `stylelint` are aliases of each other.
+
+Lint all files.
+
+```bash
+aptuitiv-build css-lint
+aptuitiv-build stylelint
+```
+
+Lint a specific file.
+
+```bash
+aptuitiv-build stylelint -p 'src/css/base/typography.css'
+```
+
+Lint a glob of files.
+
+```bash
+aptuitiv-build stylelint -p 'src/css/base/*'
 ```
 
 ## FTP upload actions

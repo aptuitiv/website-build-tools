@@ -1,37 +1,14 @@
 /* ===========================================================================
     Process the CSS with PostCSS
     https://github.com/postcss/postcss
-
-    This can be run from the command line.
-
-    Process all files:
-    node css.js -a
-
-    Run stylelint on all files:
-    node css.js -l
-
-    Lint a specific file
-    (The path must be within the config.css.base path)
-    node css.js -l path/to/file.css
-
-    Lint a glob of files
-    (The path must be within the config.css.base path)
-    node css.js -l path/to/*.css
-
-    Process a specific file:
-    (The path must be within the config.css.base path)
-    node css.js -f main.css
-    or
-    node css.js -f src/css/main.css
 =========================================================================== */
 
 import fs from 'fs-extra';
-import { Command } from 'commander';
 import chalk from 'chalk';
 import { globSync } from 'glob';
 import fancyLog from 'fancy-log';
 import logSymbols from 'log-symbols';
-import * as path from 'path';
+import { dirname, parse } from 'path';
 import postcss from 'postcss';
 import stylelint from 'stylelint';
 
@@ -43,7 +20,6 @@ import postcssImport from 'postcss-import';
 import postcssReporter from 'postcss-reporter';
 
 // Build scripts
-import config from './config.js';
 import { getGlob, prefixPath } from './helpers.js';
 
 /**
@@ -52,9 +28,9 @@ import { getGlob, prefixPath } from './helpers.js';
  * @param {string} filePath The source path
  * @returns {string}
  */
-const getSrcPath = (filePath) => {
-    const basePath = path.dirname(config.css.base);
-    return prefixPath(filePath, basePath);
+const getSrcPath = (config, filePath) => {
+    const basePath = prefixPath(config.css.base, config.root);
+    return prefixPath(filePath, basePath, config.css.base);
 }
 
 /**
@@ -74,15 +50,23 @@ function areFilesDifferent(sourceFile, targetPath) {
 
 /**
  * Run stylelint on the css files
+ * 
+ * @param {object} config The configuration object
+ * @param {string} [fileGlob] The file glob to lint
  */
-const runStylelint = async (fileGlob) => {
-    const filesToLint = fileGlob || config.css.src;
-    fancyLog(chalk.magenta('Stylelint'), chalk.cyan(filesToLint));
-    const results = await stylelint.lint({
+const runStylelint = async (config, fileGlob) => {
+    const filesToLint = fileGlob || config.css.files;
+    let options = {
         files: filesToLint,
         formatter: "string"
-    });
-    console.log(results.output);
+    }
+    options = { ...options, ...config.stylelint };
+
+    fancyLog(chalk.magenta('Stylelint'), chalk.cyan(filesToLint));
+    const results = await stylelint.lint(options);
+    if (results.report.length > 0) {
+        console.log(results.report);
+    }
     if (results.errored) {
         process.exit(2);
     }
@@ -92,10 +76,11 @@ const runStylelint = async (fileGlob) => {
 /**
  * Run PostCSS on the file
  *
+ * @param {object} config The configuration object
  * @param {string} filePath The path of the CSS file to process
  */
-const runPostCss = (filePath) => {
-    const { base: fileName } = path.parse(filePath);
+const runPostCss = (config, filePath) => {
+    const { base: fileName } = parse(filePath);
     const destDir = `${config.build.theme}/css`;
     const dest = `${destDir}/${fileName}`;
     // Make sure that the destination directory exists
@@ -136,53 +121,50 @@ const runPostCss = (filePath) => {
 
 /**
  * Process all the CSS files
+ * 
+ * @param {object} config The configuration object
+ * @param {boolean} lint Whether to lint the CSS files
  */
-const processCss = () => {
-    runStylelint()
-        .then(() => {
-            const paths = globSync(config.css.base);
-            paths.forEach((filePath) => {
-                runPostCss(filePath);
-            })
-        });
-}
-
-/**
- * Parse the command lines arguments and call the correct deploy function
- */
-const program = new Command();
-program
-    .option('-a, --all', 'Process all CSS files')
-    .option('-l, --lint [fileGlob]', 'Lint CSS files. By default it lints all files. If you pass a file glob then only those files will be linted.')
-    .option('-f, --file <filePath>', 'Process a specific file')
-
-program.parse();
-const options = program.opts();
-
-if (Object.keys(options).length > 0) {
-    if (options.all) {
-        // Process all css files
-        processCss();
-    } else if (typeof options.file === 'string') {
-        // Process a specific file
-        const filePath = getSrcPath(options.file);
-        if (options.lint) {
-            runStylelint().then(() => {
-                runPostCss(filePath);
+export const processCss = (config, lint = true) => {
+    const paths = globSync(config.css.buildFiles);
+    if (lint) {
+        runStylelint(config)
+            .then(() => {
+                paths.forEach((filePath) => {
+                    runPostCss(config, filePath);
+                })
             });
-        } else {
-            runPostCss(filePath);
-        }
-    } else if (options.lint) {
-        // Stylelint
-        if (typeof options.lint === 'string') {
-            const lintPath = getGlob(getSrcPath(options.lint));
-            console.log('lintPath: ', lintPath);
-            runStylelint(lintPath);
-        } else {
-            runStylelint();
-        }
+    } else {
+        paths.forEach((filePath) => {
+            runPostCss(config, filePath);
+        })
     }
 }
 
-export default processCss;
+/**
+ * Process the css request
+ * 
+ * @param {object} config The configuration object
+ * @param {string} action The action to take
+ * @param {object} args The command line arguments
+ */
+export const cssHandler = (config, action, args) => {
+    if (action === 'css') {
+        if (typeof args.file === 'string') {
+            if (args.lint) {
+                runStylelint(config);
+            }
+            const filePath = getSrcPath(config, args.file);
+            runPostCss(config, filePath);
+        } else {
+            processCss(config, args.lint);
+        }
+    } else if (action === 'lint') {
+        if (typeof args.path === 'string') {
+            const lintPath = getGlob(getSrcPath(config, args.path));
+            runStylelint(config, lintPath);
+        } else {
+            runStylelint(config);
+        }
+    }
+}

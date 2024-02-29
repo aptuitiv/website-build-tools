@@ -7,6 +7,7 @@
 import { Command, Option } from 'commander';
 
 import getConfig from './src/config.js';
+import { cssHandler } from './src/css.js';
 import ftpHander from './src/ftp.js';
 import templateHandler from './src/template.js';
 
@@ -27,6 +28,27 @@ const program = new Command();
 const configFileOption = new Option('-c, --config <fileName>', 'The configuration file name for aptuitiv-build');
 const rootOption = new Option('--root <folderPath>', 'The root folder of the project');
 
+/**
+ * CSS commands
+ */
+program
+    .command('css')
+    .option('-f, --file <filePath>', 'Process a specific file')
+    .option('--no-lint', 'Whether to lint the CSS files')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        cssHandler(await getConfiguration(args), 'css', args);
+    });
+program
+    .command('stylelint')
+    .alias('css-lint')
+    .option('-p, --path [fileGlob]', 'The glob of files to lint. By default it lints all files. If you pass a file glob then only those files will be linted.')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        cssHandler(await getConfiguration(args), 'lint', args);
+    });
 /**
  * FTP commands
  */
