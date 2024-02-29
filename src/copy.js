@@ -46,8 +46,6 @@ const copyFiles = async () => {
 
 /**
  * Process the copy request
- * 
- * @param {object} config The configuration object
  */
 export const copyHandler = async () => {
     await copyFiles();

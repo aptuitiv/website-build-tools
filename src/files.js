@@ -72,7 +72,6 @@ export const copyBuildToSrc = (srcPath, destPath, type) => {
 /**
  * Copy all the files from the src folder to the build folder
  * 
- * @param {object} config The configuration object
  * @param {string} srcPath The path to the source folder. This is not an absolute path.
  * @param {string} destPath The destination path in the build folder. This is not an absolute path.
  * @param {string} type The type of file being copied

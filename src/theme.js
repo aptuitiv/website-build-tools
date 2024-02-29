@@ -21,7 +21,6 @@ export const copyThemeSrcToBuild = (path) => {
 /**
  * Removes a deleted theme config file from the build directory
  * 
- * @param {object} config The configuration object
  * @param {string} path The file path
  */
 export const removeThemeFileFromBuild = (path) => {
@@ -32,7 +31,7 @@ export const removeThemeFileFromBuild = (path) => {
 /**
  * Process the export request
  * 
- * @param {object} config The configuration object
+ * @param {string} action The action to take
  */
 export const themeHandler = async (action) => {
     if (action === 'pull') {
