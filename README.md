@@ -357,7 +357,7 @@ aptuitiv-build delete --path 'theme/custom/js'
 Copy the template files from the build folder to the source folder. This is typically done after downloading the template files via FTP.
 
 ```bash
-aptuitiv-build pull-template
+aptuitiv-build pull-templates
 ```
 
 ### Push template files
@@ -365,7 +365,7 @@ aptuitiv-build pull-template
 Copy the template files from the source folder to the build folder.
 
 ```bash
-aptuitiv-build push-template
+aptuitiv-build push-templates
 ```
 
 ## Watch action

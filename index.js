@@ -109,14 +109,14 @@ program
 /**
  * Template related commands
  */
-program.command('pull-template')
+program.command('pull-templates')
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
         templateHandler(await getConfiguration(args), { pull: true });
     });
 
-program.command('push-template')
+program.command('push-templates')
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
