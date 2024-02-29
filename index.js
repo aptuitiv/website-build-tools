@@ -6,7 +6,7 @@
 
 import { Command, Option } from 'commander';
 
-import getConfig from './src/config.js';
+import config from './src/config.js';
 import { copyHandler } from './src/copy.js';
 import { cssHandler } from './src/css.js';
 import exportHandler from './src/export.js';
@@ -14,16 +14,6 @@ import fontHandler from './src/font.js';
 import ftpHander from './src/ftp.js';
 import { templateHandler } from './src/template.js';
 import watchHandler from './src/watch.js';
-
-/**
- * Get the configuration object
- * 
- * @param {object} args The arguments object
- * @returns {object} The configuration object
- */
-const getConfiguration = async (args) => {
-    return await getConfig(args.config ?? undefined, args.root ?? undefined);
-}
 
 // Set up the command line options
 const program = new Command();
@@ -40,7 +30,8 @@ program
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
-        copyHandler(await getConfiguration(args));
+        await config.init(args);
+        copyHandler();
     });
 
 /**
@@ -53,7 +44,8 @@ program
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
-        cssHandler(await getConfiguration(args), 'css', args);
+        await config.init(args);
+        cssHandler('css', args);
     });
 program
     .command('stylelint')
@@ -62,18 +54,28 @@ program
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
-        cssHandler(await getConfiguration(args), 'lint', args);
+        await config.init(args);
+        cssHandler('lint', args);
     });
 
 /**
  * Font commands 
  */
 program
-    .command('copy-fonts')
+    .command('push-fonts')
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
-        fontHandler(await getConfiguration(args), 'copyAll');
+        await config.init(args);
+        fontHandler('push');
+    });
+program
+    .command('pull-fonts')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        await config.init(args);
+        fontHandler('pull');
     });
 
 /**
@@ -86,7 +88,8 @@ program
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
-        ftpHander(await getConfiguration(args), 'upload', args);
+        await config.init(args);
+        ftpHander('upload', args);
     });
 
 program
@@ -96,7 +99,8 @@ program
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
-        ftpHander(await getConfiguration(args), 'download', args);
+        await config.init(args);
+        ftpHander('download', args);
     });
 
 program
@@ -105,7 +109,8 @@ program
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
-        ftpHander(await getConfiguration(args), 'delete', args);
+        await config.init(args);
+        ftpHander('delete', args);
     });
 
 /**
@@ -116,7 +121,8 @@ program
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
-        exportHandler(await getConfiguration(args));
+        await config.init(args);
+        exportHandler();
     });
 
 /**
@@ -126,14 +132,16 @@ program.command('pull-templates')
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
-        templateHandler(await getConfiguration(args), { pull: true });
+        await config.init(args);
+        templateHandler({ pull: true });
     });
 
 program.command('push-templates')
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
-        templateHandler(await getConfiguration(args), { push: true });
+        await config.init(args);
+        templateHandler({ push: true });
     });
 
 /**
@@ -144,7 +152,8 @@ program
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
-        watchHandler(await getConfiguration(args));
+        await config.init(args);
+        watchHandler();
     });
 
 // Parse the command line arguments

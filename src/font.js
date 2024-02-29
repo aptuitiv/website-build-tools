@@ -1,62 +1,40 @@
 /* ===========================================================================
-    Copy font files to the build folder
+    Font file actions
 =========================================================================== */
 
-import fs from 'fs-extra';
-import chalk from 'chalk';
-import fancyLog from 'fancy-log';
-import logSymbols from 'log-symbols';
-
 // Build files
-import { copyFile } from './copy.js';
-import { prefixPath } from './helpers.js';
+import config from './config.js';
+import { copyFile, copySrcToBuild, removeFileFromBuild } from './files.js';
+import { prefixRootPath, prefixSrcPath, prefixThemeBuildPath } from './helpers.js';
 
-export const copyFontSrcToBuild = (config, path) => {
-    const srcRoot = prefixPath(prefixPath(config.fonts.src, config.src), config.root);
-    copyFile(config, path, '', srcRoot, prefixPath(config.fonts.build, config.build.theme));
+/**
+ * Copy the font file to the build folder
+ * 
+ * @param {string} path The font file path
+ */
+export const copyFontSrcToBuild = (path) => {
+    const srcRoot = prefixRootPath(prefixSrcPath(config.data.fonts.src));
+    copyFile(path, '', srcRoot, prefixThemeBuildPath(config.data.fonts.build));
 }
 
 /**
  * Removes a deleted font file from the build directory
  * 
- * @param {object} config The configuration object
- * @param {string} path The template file path
+ * @param {string} path The font file path
  */
-export const removeFontFileFromBuild = (config, path) => {
-    const destRoot = prefixPath(prefixPath(config.fonts.build, config.build.theme), config.root);
-    const destPath = prefixPath(path, destRoot);
-    if (fs.existsSync(destPath)) {
-        fs.removeSync(destPath);
-        fancyLog(logSymbols.success, chalk.green('Done removing font file from the build folder'), chalk.cyan(path));
-    } else {
-        fancyLog(logSymbols.warning, chalk.yellow('Nothing to remove because the file does not exist in the build folder'), chalk.cyan(destPath));
-    }
-}
-
-/**
- * Copy all of the font files from the src folder to the build folder
- * 
- * @param {object} config The configuration object
- */
-const copyAllSrcToBuild = (config) => {
-    fancyLog(chalk.magenta('Copying font files to build folder'));
-    const srcPath = prefixPath(prefixPath(config.fonts.src, config.src), config.root);
-    if (fs.existsSync(srcPath)) {
-        fs.copySync(srcPath, prefixPath(prefixPath(config.fonts.build, config.build.theme), config.root))
-        fancyLog(logSymbols.success, chalk.green('Done copying font files to build folder'));
-    } else {
-        fancyLog(logSymbols.warning, chalk.yellow('Nothing to copy because the source folder does not exist'), chalk.cyan(srcPath));
-    }
+export const removeFontFileFromBuild = (path) => {
+    const destRoot = prefixThemeBuildPath(config.data.fonts.build);
+    removeFileFromBuild(path, destRoot, 'font file');
 }
 
 /**
  * Process the export request
- * 
- * @param {object} config The configuration object
  */
-const fontHandler = async (config, action) => {
-    if (action === 'copyAll') {
-        copyAllSrcToBuild(config);
+const fontHandler = async (action) => {
+    if (args.pull) {
+        copyBuildToSrc(prefixThemeBuildPath(config.data.fonts.build), prefixSrcPath(config.data.fonts.src), 'fonts');
+    } else if (action === 'push') {
+        copySrcToBuild(prefixSrcPath(config.data.fonts.src), prefixThemeBuildPath(config.data.fonts.build), 'fonts');
     }
 }
 

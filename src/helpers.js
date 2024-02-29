@@ -2,6 +2,8 @@
     Helper functions for the build scripts
 =========================================================================== */
 
+import config from './config.js';
+
 /**
  * Get the processed glob path
  *
@@ -53,6 +55,46 @@ export const prefixPath = (path, basePath, baseFolder) => {
         returnValue = `${base}/${returnValue}`;
     }
     return returnValue;
+}
+
+/**
+ * Prefix the build path
+ * 
+ * @param {string} path The file/glob path
+ * @returns {string}
+ */
+export const prefixBuildPath = (path) => {
+    return prefixPath(path, config.data.build.base);
+}
+
+/**
+ * Prefix the root path
+ * 
+ * @param {string} path The file/glob path
+ * @returns {string}
+ */
+export const prefixRootPath = (path) => {
+    return prefixPath(path, config.data.root);
+}
+
+/**
+ * Prefix the src path
+ * 
+ * @param {string} path The file/glob path
+ * @returns {string}
+ */
+export const prefixSrcPath = (path) => {
+    return prefixPath(path, config.data.src);
+}
+
+/**
+ * Prefix the theme build path
+ * 
+ * @param {string} path The file/glob path
+ * @returns {string}
+ */
+export const prefixThemeBuildPath = (path) => {
+    return prefixPath(path, config.data.build.theme);
 }
 
 /**

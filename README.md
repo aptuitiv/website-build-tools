@@ -40,8 +40,8 @@ The first, and recommended way is to call this from the `scripts` section of you
 ```json
 "scripts": {
     "start": "npm run watch",
-    "pull-template": "aptuitiv-build pull-template",
-    "push-template": "aptuitiv-build push-template",
+    "pull-templates": "aptuitiv-build pull-templates",
+    "push-templates": "aptuitiv-build push-templates",
     "watch": "aptuitiv-build watch"
 }
 ```
@@ -226,7 +226,7 @@ aptuitiv-build export
 You can copy the fonts from the source folder to the build folder.
 
 ```bash
-aptuitiv-build copy-fonts
+aptuitiv-build push-fonts
 ```
 
 ## FTP upload actions

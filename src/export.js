@@ -5,16 +5,15 @@
 import { globSync } from 'glob';
 
 // Build files
-import { copyFile } from './copy.js';
+import config from './config.js';
+import { copyFile } from './files.js';
 
 /**
  * Copy the files to an export folder
- * 
- * @param {object} config The configuration object
  */
-const exportFiles = async (config) => {
+const exportFiles = async () => {
     const files = [
-        config.src + '/**/*',
+        config.data.src + '/**/*',
         '.editorconfig',
         '.eslintignore',
         '.eslintrc.cjs',
@@ -25,7 +24,7 @@ const exportFiles = async (config) => {
     ];
 
     files.forEach((copy) => {
-        const filesToCopy = globSync(copy.src);
+        const filesToCopy = globSync(copy);
         if (filesToCopy.length > 0) {
             filesToCopy.forEach((file) => {
                 let dest = file;
@@ -34,7 +33,7 @@ const exportFiles = async (config) => {
                     // Set the destination to the root directory
                     dest = '';
                 }
-                copyFile(config, file, dest, config.root, '_export');
+                copyFile(file, dest, config.data.root, '_export');
             });
         }
     });
@@ -42,11 +41,9 @@ const exportFiles = async (config) => {
 
 /**
  * Process the export request
- * 
- * @param {object} config The configuration object
  */
-const exportHandler = async (config) => {
-    exportFiles(config);
+const exportHandler = async () => {
+    exportFiles();
 }
 
 export default exportHandler;
