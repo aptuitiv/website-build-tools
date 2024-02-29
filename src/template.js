@@ -16,7 +16,6 @@ import { prefixRootSrcPath, prefixSrcPath, prefixThemeBuildPath } from './helper
 /**
  * Copy a template file to the build folder
  * 
- * @param {object} config The configuration object
  * @param {string} path The template file path
  */
 export const copyTemplateSrcToBuild = (path) => {
@@ -27,7 +26,6 @@ export const copyTemplateSrcToBuild = (path) => {
 /**
  * Removes a deleted template file from the build directory
  * 
- * @param {object} config The configuration object
  * @param {string} path The template file path
  */
 export const removeTemplateFileFromBuild = (path) => {
@@ -38,15 +36,12 @@ export const removeTemplateFileFromBuild = (path) => {
 /**
  * Processs the template request
  * 
- * @param {object} config The configuration object
- * @param {object} args The command line arguments from calling admin
+ * @param {string} action The action to take
  */
-export const templateHandler = (args) => {
-    if (args.pull) {
+export const templateHandler = (action) => {
+    if (action === 'pull') {
         copyBuildToSrc(prefixThemeBuildPath(config.data.templates.build), prefixSrcPath(config.data.templates.src), 'templates');
-    } else if (args.push) {
+    } else if (action === 'push') {
         copySrcToBuild(prefixSrcPath(config.data.templates.src), prefixThemeBuildPath(config.data.templates.build), 'templates');
-    } else {
-        fancyLog(logSymbols.error, chalk.red('No action specified'));
     }
 }

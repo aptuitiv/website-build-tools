@@ -134,7 +134,7 @@ program.command('pull-templates')
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        templateHandler({ pull: true });
+        templateHandler('pull');
     });
 
 program.command('push-templates')
@@ -142,7 +142,7 @@ program.command('push-templates')
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        templateHandler({ push: true });
+        templateHandler('push');
     });
 
 /**
