@@ -55,6 +55,8 @@ export async function deleteFile(filePath) {
     // Get the remote path for the file to remove.
     let removePath = getRemotePath(filePath);
 
+    fancyLog(chalk.magenta('Deleting file'), chalk.cyan(filePath));
+
     // Get the FTP connection
     const client = new basicFtp.Client();
     client.trackProgress(info => {
@@ -84,7 +86,7 @@ export async function deployFile(filePath) {
     let srcPath = getSourcePath(filePath)
     let remotePath = getRemotePath(filePath);
 
-    fancyLog(`Uploading file: ${filePath}`);
+    fancyLog(chalk.magenta('Uploading file'), chalk.cyan(filePath));
 
     // Get the FTP connection
     const client = new basicFtp.Client();
@@ -120,6 +122,8 @@ export async function deployFile(filePath) {
 async function downloadFile(filePath) {
     let srcPath = getSourcePath(filePath)
     let remotePath = getRemotePath(filePath);
+
+    fancyLog(chalk.magenta('Downloading file'), chalk.cyan(filePath));
 
     // Get the FTP connection
     const client = new basicFtp.Client();
@@ -158,6 +162,8 @@ export async function deleteDir(dir) {
     // Get the FTP connection
     const client = new basicFtp.Client();
 
+    fancyLog(chalk.magenta('Deleting directory'), chalk.cyan(dir));
+
     try {
         await client.access({
             host: process.env.FTP_ENVIRONMENT === 'live' ? process.env.FTP_SERVER : process.env.FTP_DEV_SERVER,
@@ -180,6 +186,8 @@ export async function deleteDir(dir) {
 async function deployDir(dir) {
     const srcPath = getSourcePath(dir);
     const remotePath = getRemotePath(dir);
+
+    fancyLog(chalk.magenta('Uploading directory'), chalk.cyan(dir));
 
     fs.ensureDirSync(srcPath);
     // Get the FTP connection
@@ -210,6 +218,8 @@ async function deployDir(dir) {
 async function downloadDir(dir) {
     const localPath = getSourcePath(dir);
     const remotePath = getRemotePath(dir);
+
+    fancyLog(chalk.magenta('Downloading directory'), chalk.cyan(dir));
 
     // Get the FTP connection
     const client = new basicFtp.Client();
@@ -256,7 +266,6 @@ const ftpHander = (action, args) => {
                 const parsedGlobPath = path.parse(glob);
                 if (parsedGlobPath.ext === '' && parsedGlobPath.name != '*') {
                     // A directory path was set
-                    fancyLog(chalk.green(`Uploading directory: ${args.path}`));
                     deployDir(glob);
                 } else {
                     fancyLog(chalk.green(`Uploading: ${args.path}`));
@@ -271,7 +280,6 @@ const ftpHander = (action, args) => {
                 }
             } else if (args.theme) {
                 // Deploy the theme files
-                fancyLog(chalk.green(`Deploying theme files: ${config.data.build.theme}`));
                 deployDir(config.data.build.theme);
             } else {
                 // No valid command line options were set
@@ -279,7 +287,6 @@ const ftpHander = (action, args) => {
             }
         } else {
             // Upload all files
-            fancyLog(chalk.green(`Deploying all files: ${config.data.build.base}`));
             deployDir(config.data.build.base);
         }
     } else if (action === 'download') {
@@ -288,16 +295,13 @@ const ftpHander = (action, args) => {
             const parsedPath = path.parse(args.path);
             if (parsedPath.ext.length > 0) {
                 // A single file will be downloaded
-                fancyLog(chalk.green(`Downloading file: ${args.path}`));
                 downloadFile(args.path);
             } else {
                 // A directory is set to be downloaded
-                fancyLog(chalk.green(`Downloading directory: ${args.path}`));
                 downloadDir(args.path);
             }
         } else if (args.theme) {
             // Download the theme files
-            fancyLog(chalk.green(`Downloading theme files: ${config.data.build.theme}`));
             downloadDir(config.data.build.theme);
         } else {
             // No valid command line options were set
@@ -309,11 +313,9 @@ const ftpHander = (action, args) => {
             const parsedPath = path.parse(args.path);
             if (parsedPath.ext.length > 0) {
                 // A single file will be deleted
-                fancyLog(chalk.green(`Deleting file: ${args.path}`));
                 deleteFile(args.path);
             } else {
                 // A directory is set to be deleted
-                fancyLog(chalk.green(`Deleting directory: ${args.path}`));
                 deleteDir(args.path);
             }
         } else {
