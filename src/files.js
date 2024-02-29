@@ -26,9 +26,8 @@ export const copyFile = (src, dest, srcRoot, destFolder) => {
     let destPath = prefixPath(dest, destRoot, destFolder);
     const destPathParts = parse(destPath);
     if (destPathParts.ext === '') {
-        // The destination path is a folder so add the source file name to the destination path
-        const pathParts = parse(srcPath);
-        destPath = `${destPath}/${pathParts.base}`;
+        // The destination path is a folder so add the source file to the destination path
+        destPath = `${destPath}/${src}`;
     }
 
     fancyLog(chalk.magenta('Copying'), chalk.cyan(src), chalk.magenta('to'), chalk.cyan(dest));
