@@ -28,15 +28,28 @@ export const getGlob = (glob) => {
  *
  * @param {string} path The file/glob path
  * @param {string} basePath The base path to prefix to 'path' if it doesn't already start with it
+ * @param {string} [baseFolder] The base folder to see if the path equals. This base folder would
+ *      be the ending part of the basePath
  * @returns {string}
  */
-export const prefixPath = (path, basePath) => {
+export const prefixPath = (path, basePath, baseFolder) => {
     let returnValue = path;
     let base = basePath;
     if (base.endsWith('/')) {
         base = base.slice(0, base.length - 1);
     }
-    if (!returnValue.startsWith(`${base}/`) && returnValue !== base) {
+    // First make sure that the path doesn't start with or equal the base folder.
+    // The basePath will end with the base folder so this should be removed
+    // from the path if it is there.
+    if (typeof baseFolder === 'string' && baseFolder.length > 0) {
+        if (returnValue.startsWith(`${baseFolder}/`)) {
+            returnValue = returnValue.slice(baseFolder.length + 1);
+        } else if (returnValue === baseFolder) {
+            returnValue = '';
+        }
+    }
+    // Prepend the base path if the path doesn't already start with it or equal to it
+    if (!returnValue.startsWith(`${base}/`) && returnValue !== base && returnValue !== baseFolder) {
         returnValue = `${base}/${returnValue}`;
     }
     return returnValue;
