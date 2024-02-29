@@ -15,6 +15,8 @@ import { prefixPath } from './helpers.js';
 
 /**
  * Copy all of the theme files from the src folder to the build folder
+ * 
+ * @param {object} config The configuration object
  */
 const copySrcToBuild = (config) => {
     fancyLog(chalk.magenta('Copying template files to build folder'));
@@ -44,6 +46,7 @@ const copyBuildToSrc = (config) => {
 }
 
 /**
+ * Processs the template request
  * 
  * @param {object} config The configuration object
  * @param {object} args The command line arguments from calling admin
