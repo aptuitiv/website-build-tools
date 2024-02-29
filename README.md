@@ -11,6 +11,7 @@ Build tools to help with building and deploying websites at Aptuitiv.
     - [Process all CSS files](#process-all-css-files)
     - [Process a specific file](#process-a-specific-file)
     - [Lint CSS files with stylelint](#lint-css-files-with-stylelint)
+  - [Export action](#export-action)
   - [FTP upload actions](#ftp-upload-actions)
     - [Upload all files in the build directory](#upload-all-files-in-the-build-directory)
     - [Upload the theme files in the build theme directory](#upload-the-theme-files-in-the-build-theme-directory)
@@ -209,6 +210,14 @@ Lint a glob of files.
 
 ```bash
 aptuitiv-build stylelint -p 'src/css/base/*'
+```
+
+## Export action
+
+You can export the site source files to make it easier to copy them to another site. They are exported to the `_export` folder in the project root folder.
+
+```bash
+aptuitiv-build export
 ```
 
 ## FTP upload actions

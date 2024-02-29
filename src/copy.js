@@ -15,7 +15,7 @@ import { parse } from 'path';
 import { prefixPath, removePrefix } from './helpers.js';
 
 /**
- * Copy a single file to the theme build folder
+ * Copy a single file to the destination folder
  * 
  * @param {object} config The configuration object
  * @param {string} src The file source

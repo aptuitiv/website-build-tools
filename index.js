@@ -9,6 +9,7 @@ import { Command, Option } from 'commander';
 import getConfig from './src/config.js';
 import { copyHandler } from './src/copy.js';
 import { cssHandler } from './src/css.js';
+import exportHandler from './src/export.js';
 import ftpHander from './src/ftp.js';
 import { templateHandler } from './src/template.js';
 import watchHandler from './src/watch.js';
@@ -93,6 +94,18 @@ program
     .action(async (args) => {
         ftpHander(await getConfiguration(args), 'delete', args);
     });
+
+/**
+ * Export command
+ */
+program
+    .command('export')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        exportHandler(await getConfiguration(args));
+    });
+
 /**
  * Template related commands
  */

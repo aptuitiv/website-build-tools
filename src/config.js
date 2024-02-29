@@ -34,9 +34,11 @@ const defaultConfig = {
     },
     // An array of file globs and their destination folder
     copy: [],
-    // The root folder for the source files. If the user needs to change this they should put
+    // The root folder for all the project files. If the user needs to change this they should put
     // it as the absolute path to the root of their project.
     root: process.cwd(),
+    // The root folder to the source files.
+    src: 'src',
     // Stylelint configuration options
     // https://stylelint.io/user-guide/options
     // You can set any valid options here
