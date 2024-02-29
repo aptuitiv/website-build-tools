@@ -3,9 +3,9 @@
 =========================================================================== */
 
 import resolveFrom from 'resolve-from';
-import { join } from 'path';
+import { isAbsolute, join, resolve } from 'path';
 import deepmerge from 'deepmerge';
-import { cosmiconfig, cosmiconfigSync } from 'cosmiconfig';
+import { cosmiconfig } from 'cosmiconfig';
 import { type } from 'os';
 
 import { isObjectWithValues } from './helpers.js';
@@ -42,29 +42,60 @@ const defaultConfig = {
 }
 
 /**
- * Loads the configuration file and merges it with the default configuration
+ * Loads the configuration file and merges it with the default configuration.
  * 
- * @param {string|undefined} configFile The name of the configuration file to load
+ * The configuration file can follow the cosmiconfig specification. 
+ * This means it can be a JSON or YAML file, or a JavaScript file that exports the configuration object.
+ * https://github.com/cosmiconfig/cosmiconfig
+ * 
+ * Or, it can be a file that is specified in the "-c" or "--config" command line argument.
+ * 
+ * The path searched will either be:
+ * - A specificed configuration file path
+ * - The root folder of the project
+ * - The working directory
+ * 
+ * This is inspired by the way that stylelint loads its configuration file.
+ * https://github.com/stylelint/stylelint/blob/main/lib/cli.mjs
+ * 
+ * @param {string} [configFile] The name of the configuration file to load
+ * @param {string} [rootFolder] The root folder of the project
  * @returns {object} The merged configuration object
  */
-const getConfig = async (configFile) => {
+const getConfig = async (configFile, rootFolder) => {
     // Set up the config explorer
     const configExplorer = cosmiconfig('aptuitiv-build', {
         transform: (cosmiconfigResult) => {
+            // Merge the default configuration with the configuration file contents
             return deepmerge(defaultConfig, isObjectWithValues(cosmiconfigResult) ? cosmiconfigResult.config : {})
         },
         searchStrategy: 'project',
     });
 
+    // Set the initial configuration as the default configuration
     let config = defaultConfig;
+
+    // Set up the root folder
+    let overrideRoot = false;
+    let root = rootFolder;
+    let cwd = process.cwd();
+    if (typeof root === 'string' && root.length > 0) {
+        if (!isAbsolute(root)) {
+            root = resolve(cwd, root);
+        }
+        cwd = root;
+        overrideRoot = true;
+    }
     // Load the configuration file if it exists
-    if (configFile) {
-        await configExplorer.load(configFile)
+    if (typeof configFile === 'string') {
+        const configPath = resolveFrom.silent(cwd, configFile) || join(cwd, configFile);
+        await configExplorer.load(configPath)
             .then((result) => {
+                // The specified configuration file exists
                 config = result;
             })
             .catch(async (err) => {
-                // The specified configuration file doesn't exist so search for for the configuration file
+                // The specified configuration file doesn't exist so search for for the configuration file based 'aptuitiv-build' in the root folder
                 await configExplorer.search()
                     .then((result) => {
                         config = result;
@@ -72,13 +103,17 @@ const getConfig = async (configFile) => {
                     .catch((err) => false);
             });
     } else {
+        // NO configuration file was specified so search for for the configuration file based 'aptuitiv-build' in the root folder
         await configExplorer.search()
             .then((result) => {
                 config = result;
             });
     }
 
-    config.root = process.cwd();
+    // Override the root folder if it was passed in as an argument
+    if (overrideRoot) {
+        config.root = root;
+    }
 
     return config;
 }
