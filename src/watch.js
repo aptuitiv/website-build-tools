@@ -3,9 +3,10 @@ import chalk from 'chalk';
 import fancyLog from 'fancy-log';
 
 // Build scripts
-import { deleteFile, deployFile } from './ftp.js';
 import { processCss } from './css.js';
+import { deleteFile, deployFile } from './ftp.js';
 import { prefixPath, removePrefix } from './helpers.js';
+import { copyTemplateSrcToBuild, removeTemplateFileFromBuild } from './template.js';
 
 /**
  * Process the watch request
@@ -32,7 +33,17 @@ const watchHandler = async (config) => {
     fancyLog(chalk.magenta('Watching for changes in the CSS folder'), chalk.cyan(config.css.base));
     chokidar
         .watch(cssFolder, { ignoreInitial: true })
-        .on('all', () => { processCss(config) })
+        .on('all', () => { processCss(config) });
+
+    // Watch for any template changes
+    const rootTemplateFolder = `${prefixPath(config.template.src, config.root)}/`;
+    const templateFolder = `${rootTemplateFolder}**/*`;
+    fancyLog(chalk.magenta('Watching for changes in the template folder'), chalk.cyan(config.template.src));
+    chokidar
+        .watch(templateFolder, { ignoreInitial: true })
+        .on('add', (path) => { copyTemplateSrcToBuild(config, removePrefix(path, rootTemplateFolder)); })
+        .on('change', (path) => { copyTemplateSrcToBuild(config, removePrefix(path, rootTemplateFolder)); })
+        .on('unlink', (path) => { removeTemplateFileFromBuild(config, removePrefix(path, rootTemplateFolder)); });
 }
 
 export default watchHandler;

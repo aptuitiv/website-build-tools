@@ -9,7 +9,7 @@ import { Command, Option } from 'commander';
 import getConfig from './src/config.js';
 import { cssHandler } from './src/css.js';
 import ftpHander from './src/ftp.js';
-import templateHandler from './src/template.js';
+import { templateHandler } from './src/template.js';
 import watchHandler from './src/watch.js';
 
 /**
