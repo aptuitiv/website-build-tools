@@ -4,7 +4,7 @@
 
 // Build files
 import config from './config.js';
-import { copyFile, copySrcToBuild, removeFileFromBuild } from './files.js';
+import { copyBuildToSrc, copyFile, copySrcToBuild, removeFileFromBuild } from './files.js';
 import { prefixRootSrcPath, prefixSrcPath, prefixThemeBuildPath } from './helpers.js';
 
 /**
@@ -31,7 +31,7 @@ export const removeFontFileFromBuild = (path) => {
  * Process the export request
  */
 export const fontHandler = async (action) => {
-    if (args.pull) {
+    if (action === 'pull') {
         copyBuildToSrc(prefixThemeBuildPath(config.data.fonts.build), prefixSrcPath(config.data.fonts.src), 'fonts');
     } else if (action === 'push') {
         copySrcToBuild(prefixSrcPath(config.data.fonts.src), prefixThemeBuildPath(config.data.fonts.build), 'fonts');

@@ -35,9 +35,9 @@ export const removeThemeFileFromBuild = (path) => {
  */
 export const themeHandler = async (action) => {
     if (action === 'pull') {
-        copyBuildToSrc(prefixThemeBuildPath(config.data.themeConfig.build), prefixSrcPath(config.data.themeConfig.src), 'themes');
+        copyBuildToSrc(prefixThemeBuildPath(config.data.themeConfig.build), prefixSrcPath(config.data.themeConfig.src), 'theme config files');
     } else if (action === 'push') {
-        copySrcToBuild(prefixSrcPath(config.data.themeConfig.src), prefixThemeBuildPath(config.data.themeConfig.build), 'themes');
+        copySrcToBuild(prefixSrcPath(config.data.themeConfig.src), prefixThemeBuildPath(config.data.themeConfig.build), 'theme config files');
     }
 }
 
