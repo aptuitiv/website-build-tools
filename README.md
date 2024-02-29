@@ -6,6 +6,7 @@ Build tools to help with building and deploying websites at Aptuitiv.
   - [Calling the script](#calling-the-script)
   - [Configuration](#configuration)
     - [Default configuration](#default-configuration)
+  - [Copy file actions](#copy-file-actions)
   - [CSS actions](#css-actions)
     - [Process all CSS files](#process-all-css-files)
     - [Process a specific file](#process-a-specific-file)
@@ -91,6 +92,7 @@ Below is the default configuration.
         // The glob for all CSS files. This is used when linting CSS files.
         src: 'src/css/**/*.css'
     },
+    // An array of file globs and their destination folder
     copy: [],
     // The root folder for the source files. If the user needs to change this they should put
     // it as the absolute path to the root of their project.
@@ -116,6 +118,46 @@ Below is the default configuration.
     }
 }
 ```
+
+## Copy file actions
+
+Often you'll need to copy files from the `node_modules` folder to your build folder to deploy to your website. The easiest way to do this is to set up your own configuration file and set the `copy` value.
+
+Here is an example of a JSON configuration file with the `copy` configuration.
+
+```json
+{
+  "copy": [
+    {
+      "src": [
+        "node_modules/@splidejs/splide/dist/css/splide.min.css",
+        "node_modules/@splidejs/splide/dist/js/splide.min.js",
+        "node_modules/@splidejs/splide-extension-video/dist/js/splide-extension-video.min.js",
+        "node_modules/@splidejs/splide-extension-video/dist/css/splide-extension-video.min.css"
+      ],
+      "dest": "splide"
+    },
+    {
+      "src": "node_modules/just-validate/dist/just-validate.production.min.js",
+      "dest": "just-validate"
+    }
+  ]
+}
+```
+
+Each object in the `copy` array should have a `src` value and a `dest` value.
+
+The `src` value can be a string matching a single file, a string glob, and array of of files, or an array of globs.
+
+The `dest` value is the folder within the theme build folder to copy the files to.
+
+The command line call to copy files is:
+
+```bash
+aptuitiv-build copy
+```
+
+The copy `src` paths will be watched and re-copied if they change while the [watch](#watch-action) process is running.
 
 ## CSS actions
 

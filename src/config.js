@@ -32,6 +32,7 @@ const defaultConfig = {
         // The glob for all CSS files. This is used when linting CSS files.
         files: 'src/css/**/*.css'
     },
+    // An array of file globs and their destination folder
     copy: [],
     // The root folder for the source files. If the user needs to change this they should put
     // it as the absolute path to the root of their project.

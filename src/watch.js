@@ -1,8 +1,10 @@
 import chokidar from 'chokidar';
 import chalk from 'chalk';
 import fancyLog from 'fancy-log';
+import { globSync } from 'glob';
 
 // Build scripts
+import { copyWatchFile } from './copy.js';
 import { processCss } from './css.js';
 import { deleteFile, deployFile } from './ftp.js';
 import { prefixPath, removePrefix } from './helpers.js';
@@ -44,6 +46,34 @@ const watchHandler = async (config) => {
         .on('add', (path) => { copyTemplateSrcToBuild(config, removePrefix(path, rootTemplateFolder)); })
         .on('change', (path) => { copyTemplateSrcToBuild(config, removePrefix(path, rootTemplateFolder)); })
         .on('unlink', (path) => { removeTemplateFileFromBuild(config, removePrefix(path, rootTemplateFolder)); });
+
+    // Watch an "copy" files
+    const copyFilesToWatch = [];
+    const copyFilesMap = {};
+    config.copy.forEach((copy) => {
+        if (typeof copy.dest === 'string' && copy.dest.length > 0) {
+            let filesToCopy = [];
+            if ((typeof copy.src === 'string' && copy.src.length > 0) || (Array.isArray(copy.src) && copy.src.length > 0)) {
+                filesToCopy = globSync(copy.src);
+            }
+            if (filesToCopy.length > 0) {
+                filesToCopy.forEach((file) => {
+                    const sourceFile = prefixPath(file, config.root);
+                    copyFilesToWatch.push(sourceFile);
+                    copyFilesMap[sourceFile] = copy.dest;
+                });
+            }
+        }
+    });
+    if (copyFilesToWatch.length > 0) {
+        fancyLog(chalk.magenta('Watching for changes in the copy configuration source files'));
+        // This is watching individual files so we're only going to process the "change" event.
+        chokidar
+            .watch(copyFilesToWatch, { ignoreInitial: true })
+            .on('change', (path) => {
+                copyWatchFile(config, path, copyFilesMap[path]);
+            });
+    }
 }
 
 export default watchHandler;

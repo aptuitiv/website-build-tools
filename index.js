@@ -7,6 +7,7 @@
 import { Command, Option } from 'commander';
 
 import getConfig from './src/config.js';
+import { copyHandler } from './src/copy.js';
 import { cssHandler } from './src/css.js';
 import ftpHander from './src/ftp.js';
 import { templateHandler } from './src/template.js';
@@ -28,6 +29,17 @@ const program = new Command();
 // Set up shared options
 const configFileOption = new Option('-c, --config <fileName>', 'The configuration file name for aptuitiv-build');
 const rootOption = new Option('--root <folderPath>', 'The root folder of the project');
+
+/**
+ * Copy commands
+ */
+program
+    .command('copy')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        copyHandler(await getConfiguration(args));
+    });
 
 /**
  * CSS commands
