@@ -19,18 +19,18 @@ const defaultConfig = {
     build: {
         // The root build folder for the files to publish to the website. This is used when uploading files via FTP.
         base: 'dist',
-        // The build folder for templates
-        templates: 'dist/theme/custom/templates',
         // The build folder path for all files for the theme. This is used when uploading files via FTP.
         theme: 'dist/theme/custom'
     },
     css: {
-        // The base path to the CSS files
-        base: 'src/css',
-        // The glob for CSS file(s) that import the other CSS files. This is used when building the files.
-        buildFiles: 'src/css/*.css',
+        // The base path for the CSS files within the root source folder. (config.src)
+        base: 'css',
+        // The glob for CSS file(s) that import the other CSS files.  This is used when building the files.
+        // This is within the root source folder. (config.src)
+        buildFiles: 'css/*.css',
         // The glob for all CSS files. This is used when linting CSS files.
-        files: 'src/css/**/*.css'
+        // This is within the root source folder. (config.src)
+        files: 'css/**/*.css'
     },
     // An array of file globs and their destination folder
     copy: [],
@@ -54,9 +54,11 @@ const defaultConfig = {
         // Override to the absolute path to the file in your project if you want to use your own stylelint config file.
         configFile: `${dirname(__dirname)}/.stylelintrc.cjs`
     },
-    // The source files for the theme twig templates
-    template: {
-        src: 'src/theme'
+    templates: {
+        // The folder for the theme twig templates within the theme build folder. (config.build.theme)
+        build: 'templates',
+        // The source files for the theme twig templates within the root source folder. (config.src)
+        src: 'theme'
     }
 }
 

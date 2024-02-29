@@ -29,8 +29,9 @@ import { getGlob, prefixPath } from './helpers.js';
  * @returns {string}
  */
 const getSrcPath = (config, filePath) => {
-    const basePath = prefixPath(config.css.base, config.root);
-    return prefixPath(filePath, basePath, config.css.base);
+    const sourcePath = prefixPath(config.css.base, config.src);
+    const basePath = prefixPath(sourcePath, config.root);
+    return prefixPath(filePath, basePath, sourcePath);
 }
 
 /**
@@ -55,7 +56,7 @@ function areFilesDifferent(sourceFile, targetPath) {
  * @param {string} [fileGlob] The file glob to lint
  */
 const runStylelint = async (config, fileGlob) => {
-    const filesToLint = fileGlob || config.css.files;
+    const filesToLint = fileGlob || prefixPath(config.css.files, config.src);
     let options = {
         files: filesToLint,
         formatter: "string"
@@ -126,7 +127,7 @@ const runPostCss = (config, filePath) => {
  * @param {boolean} lint Whether to lint the CSS files
  */
 export const processCss = (config, lint = true) => {
-    const paths = globSync(config.css.buildFiles);
+    const paths = globSync(prefixPath(config.css.buildFiles, config.src));
     if (lint) {
         runStylelint(config)
             .then(() => {

@@ -20,9 +20,9 @@ import { copyFile } from './copy.js';
  */
 const copyAllSrcToBuild = (config) => {
     fancyLog(chalk.magenta('Copying template files to build folder'));
-    const srcPath = prefixPath(config.template.src, config.root);
+    const srcPath = prefixPath(prefixPath(config.templates.src, config.src), config.root);
     if (fs.existsSync(srcPath)) {
-        fs.copySync(srcPath, prefixPath(config.build.templates, config.root))
+        fs.copySync(srcPath, prefixPath(prefixPath(config.templates.build, config.build.theme), config.root))
         fancyLog(logSymbols.success, chalk.green('Done copying template files to build folder'));
     } else {
         fancyLog(logSymbols.warning, chalk.yellow('Nothing to copy because the source folder does not exist'), chalk.cyan(srcPath));
@@ -36,8 +36,8 @@ const copyAllSrcToBuild = (config) => {
  * @param {string} path The template file path
  */
 export const copyTemplateSrcToBuild = (config, path) => {
-    const srcRoot = prefixPath(config.template.src, config.root);
-    copyFile(config, path, '', srcRoot, config.build.templates);
+    const srcRoot = prefixPath(prefixPath(config.templates.src, config.src), config.root);
+    copyFile(config, path, '', srcRoot, prefixPath(config.templates.build, config.build.theme));
 }
 
 /**
@@ -47,7 +47,7 @@ export const copyTemplateSrcToBuild = (config, path) => {
  * @param {string} path The template file path
  */
 export const removeTemplateFileFromBuild = (config, path) => {
-    const destRoot = prefixPath(config.build.templates, config.root);
+    const destRoot = prefixPath(prefixPath(config.templates.build, config.build.theme), config.root);
     const destPath = prefixPath(path, destRoot);
     if (fs.existsSync(destPath)) {
         fs.removeSync(destPath);
@@ -64,9 +64,9 @@ export const removeTemplateFileFromBuild = (config, path) => {
  */
 const copyAllBuildToSrc = (config) => {
     fancyLog(chalk.magenta('Copying template files from build folder to source folder'));
-    const srcPath = prefixPath(config.build.templates, config.root);
+    const srcPath = prefixPath(prefixPath(config.templates.build, config.build.theme), config.root);
     if (fs.existsSync(srcPath)) {
-        fs.copySync(srcPath, prefixPath(config.template.src, config.root))
+        fs.copySync(srcPath, prefixPath(prefixPath(config.templates.src, config.src), config.root))
         fancyLog(logSymbols.success, chalk.green('Done copying template files from build folder to source folder'));
     } else {
         fancyLog(logSymbols.warning, chalk.yellow('Nothing to copy because the build folder does not exist'), chalk.cyan(srcPath));

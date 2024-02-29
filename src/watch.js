@@ -31,16 +31,17 @@ const watchHandler = async (config) => {
         .on('unlink', (path) => { deleteFile(config, removePrefix(path, rootDistFolder)); });
 
     // Watch for any CSS changes
-    const cssFolder = prefixPath(config.css.files, config.root);
-    fancyLog(chalk.magenta('Watching for changes in the CSS folder'), chalk.cyan(config.css.base));
+    const cssFolder = prefixPath(prefixPath(config.css.files, config.src), config.root);
+    fancyLog(chalk.magenta('Watching for changes in the CSS folder'), chalk.cyan(prefixPath(config.css.base, config.src)));
     chokidar
         .watch(cssFolder, { ignoreInitial: true })
         .on('all', () => { processCss(config) });
 
     // Watch for any template changes
-    const rootTemplateFolder = `${prefixPath(config.template.src, config.root)}/`;
+    const templateSrcFolder = prefixPath(config.templates.src, config.src);
+    const rootTemplateFolder = `${prefixPath(templateSrcFolder, config.root)}/`;
     const templateFolder = `${rootTemplateFolder}**/*`;
-    fancyLog(chalk.magenta('Watching for changes in the template folder'), chalk.cyan(config.template.src));
+    fancyLog(chalk.magenta('Watching for changes in the template folder'), chalk.cyan(templateSrcFolder));
     chokidar
         .watch(templateFolder, { ignoreInitial: true })
         .on('add', (path) => { copyTemplateSrcToBuild(config, removePrefix(path, rootTemplateFolder)); })
