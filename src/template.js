@@ -11,7 +11,7 @@ import logSymbols from 'log-symbols';
 // Build scripts
 import config from './config.js';
 import { copyBuildToSrc, copyFile, copySrcToBuild, removeFileFromBuild } from './files.js';
-import { prefixRootPath, prefixSrcPath, prefixThemeBuildPath } from './helpers.js';
+import { prefixRootSrcPath, prefixSrcPath, prefixThemeBuildPath } from './helpers.js';
 
 /**
  * Copy a template file to the build folder
@@ -20,7 +20,7 @@ import { prefixRootPath, prefixSrcPath, prefixThemeBuildPath } from './helpers.j
  * @param {string} path The template file path
  */
 export const copyTemplateSrcToBuild = (path) => {
-    const srcRoot = prefixRootPath(config.data.templates.src);
+    const srcRoot = prefixRootSrcPath(config.data.templates.src);
     copyFile(path, '', srcRoot, prefixThemeBuildPath(config.data.templates.build));
 }
 

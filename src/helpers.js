@@ -88,6 +88,16 @@ export const prefixSrcPath = (path) => {
 }
 
 /**
+ * Prefix the src and root paths
+ * 
+ * @param {string} path The file/glob path
+ * @returns {string}
+ */
+export const prefixRootSrcPath = (path) => {
+    return prefixRootPath(prefixSrcPath(path));
+}
+
+/**
  * Prefix the theme build path
  * 
  * @param {string} path The file/glob path
