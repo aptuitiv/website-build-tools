@@ -1,52 +1,8 @@
 /**
  * Upload, download, and delete files via FTP
- *
- * Usage:
- *
- * Deploy all files (this includes all files in the distribution folder - typically "dist")
- * node ftp.js --all
- * node ftp.js -a
- *
- * Deploy all theme files (this includes all files in the theme distribution folder - typically "dist/theme/custom")
- * node ftp.js --theme
- * node.ftp.js -t
- *
- * Deploy a single file
- * node ftp.js --path 'dist/path/to/file.js'
- * node ftp.js -p 'dist/path/to/file.js'
- *
- * or, the "dist" path can be omitted
- * node ftp.js -p 'path/to/file.js'
- *
- * Deploy a glob of files.
- * Any valid glob path is allowed
- * node ftp.js -p 'path/to/*.js'
- *
- * Download all files
- * node ftp.js --download
- * node ftp.js -d
- *
- * Download theme files
- * node ftp.js --downloadTheme
- *
- * Download a single file
- * node ftp.js --download 'path/to/file/on/remote/server/file.css'
- * node ftp.js --d 'path/to/file/on/remote/server/file.css'
- *
- * Download a directory of files
- * node ftp.js --download 'path/to/directory'
- * node ftp.js -d 'path/to/directory'
- *
- * Delete a file
- * node ftp.js --delete 'path/to/file.css'
- *
- * Delete a directory
- * node ftp.js --delete 'path/to/directory'
  */
 import * as basicFtp from 'basic-ftp';
 import chalk from 'chalk';
-import { Command } from 'commander';
-import 'dotenv/config';
 import fancyLog from 'fancy-log'
 import fs from 'fs-extra';
 import { globSync } from 'glob';
@@ -54,44 +10,30 @@ import logSymbols from 'log-symbols';
 import * as path from 'path';
 
 // Build scripts
-import config from './config.js';
 import { getGlob, prefixPath } from './helpers.js';
 
-// Some configuration values for deploying
-const distFolder = config.build.base;
-const distThemeFolder = config.build.theme;
-
 /**
- * Get the source path and make sure it starts with the distFolder path
+ * Get the source path and make sure it starts with the correct root path
  *
  * @param {string} sourcePath The source path
  * @returns {string}
  */
-const getSourcePath = (sourcePath) => {
-    return prefixPath(sourcePath, distFolder);
+const getSourcePath = (config, sourcePath) => {
+    const distFolder = prefixPath(config.build.base, config.root);
+    return prefixPath(sourcePath, distFolder, config.build.base);
 }
 
 /**
- * Get the processed source glob path
- *
- * @param {string} glob The glob path
- * @returns {string}
- */
-const getSourceGlob = (glob) => {
-    return getGlob(getSourcePath(glob));
-}
-
-/**
- * Parse the path to make sure that it does not start with the distFolder value
+ * Parse the path to make sure that it does not start with the correct build folder value
  *
  * @param {string} remotePath The file/folder path
  * @returns {string}
  */
-const getRemotePath = (remotePath) => {
+const getRemotePath = (config, remotePath) => {
     let returnValue = remotePath;
-    if (returnValue.startsWith(`${distFolder}/`)) {
-        returnValue = returnValue.slice(distFolder.length);
-    } else if (returnValue === distFolder) {
+    if (returnValue.startsWith(`${config.build.base}/`)) {
+        returnValue = returnValue.slice(config.build.base.length);
+    } else if (returnValue === config.build.base) {
         returnValue = '/';
     }
     if (returnValue.length === 0) {
@@ -104,10 +46,14 @@ const getRemotePath = (remotePath) => {
  * Delete the file from the FTP server
  *
  * @param {string} filePath The path to the file to delete
+ * @param {object} config The configuration object
  */
-export async function deleteFile(filePath) {
+export async function deleteFile(config, filePath) {
+    // Remove the file from the dist folder
+    const srcPath = getSourcePath(config, filePath);
+    fs.removeSync(srcPath);
     // Get the remote path for the file to remove.
-    let removePath = getRemotePath(filePath);
+    let removePath = getRemotePath(config, filePath);
 
     // Get the FTP connection
     const client = new basicFtp.Client();
@@ -133,19 +79,18 @@ export async function deleteFile(filePath) {
  * Deploy the file to the server
  *
  * @param {string} filePath The file path to upload
+ * @param {object} config The configuration object
  */
-export async function deployFile(filePath) {
-    let srcPath = getSourcePath(filePath)
-    let remotePath = getRemotePath(filePath);
+export async function deployFile(config, filePath) {
+    let srcPath = getSourcePath(config, filePath)
+    let remotePath = getRemotePath(config, filePath);
 
     fancyLog(`Uploading file: ${filePath}`);
 
     // Get the FTP connection
     const client = new basicFtp.Client();
     client.trackProgress(info => {
-        if (info.bytes > 0) {
-            fancyLog(chalk.magenta(`FTP ${info.type}`) + ' ' + chalk.cyan(srcPath) + ' to ' + chalk.cyan(info.name) + ` ${info.bytes} bytes`);
-        }
+        fancyLog(chalk.magenta(`FTP ${info.type}`) + ' ' + chalk.cyan(info.name) + ` ${info.bytes} bytes`);
     })
 
     try {
@@ -172,24 +117,23 @@ export async function deployFile(filePath) {
  * Download a file from the server
  *
  * @param {string} filePath The file path to downlpad
+ * @param {object} config The configuration object
  */
-async function downloadFile(filePath) {
-    let srcPath = getSourcePath(filePath)
-    let remotePath = getRemotePath(filePath);
-
+async function downloadFile(config, filePath) {
+    let srcPath = getSourcePath(config, filePath)
+    let remotePath = getRemotePath(config, filePath);
 
     // Get the FTP connection
     const client = new basicFtp.Client();
     client.trackProgress(info => {
         if (info.bytes > 0) {
-            fancyLog(chalk.magenta(`FTP ${info.type}`) + ' ' + chalk.cyan(srcPath) + ' to ' + chalk.cyan(info.name) + ` ${info.bytes} bytes`);
+            fancyLog(chalk.magenta(`FTP ${info.type}`) + ' ' + chalk.cyan(filePath) + ' to ' + chalk.cyan(prefixPath(info.name, config.build.base)) + ` ${info.bytes} bytes`);
         }
     })
 
     try {
         // Make sure that the destination directory exists
-        const dir = path.dirname(srcPath);
-        fs.ensureDirSync(dir);
+        fs.ensureDirSync(path.dirname(srcPath));
 
         await client.access({
             host: process.env.FTP_ENVIRONMENT === 'live' ? process.env.FTP_SERVER : process.env.FTP_DEV_SERVER,
@@ -208,9 +152,12 @@ async function downloadFile(filePath) {
  * Delete all files in a directory
  *
  * @param {string} dir The directory path to delete
+ * @param {object} config The configuration object
  */
-export async function deleteDir(dir) {
-    let removePath = getRemotePath(dir);
+export async function deleteDir(config, dir) {
+    let srcPath = getSourcePath(config, dir);
+    fs.removeSync(srcPath);
+    let removePath = getRemotePath(config, dir);
     // Get the FTP connection
     const client = new basicFtp.Client();
 
@@ -232,9 +179,13 @@ export async function deleteDir(dir) {
  * Deploy all files in a directory
  *
  * @param {string} dir The directory path to upload from
+ * @param {object} config The configuration object
  */
-async function deployDir(dir) {
-    const srcPath = getSourcePath(dir);
+async function deployDir(config, dir) {
+    const srcPath = getSourcePath(config, dir);
+    const remotePath = getRemotePath(config, dir);
+
+    fs.ensureDirSync(srcPath);
     // Get the FTP connection
     const client = new basicFtp.Client();
     client.trackProgress(info => {
@@ -247,7 +198,7 @@ async function deployDir(dir) {
             user: process.env.FTP_ENVIRONMENT === 'live' ? process.env.FTP_USERNAME : process.env.FTP_DEV_USERNAME,
             password: process.env.FTP_ENVIRONMENT === 'live' ? process.env.FTP_PASSWORD : process.env.FTP_DEV_PASSWORD,
         });
-        await client.uploadFromDir(srcPath);
+        await client.uploadFromDir(srcPath, remotePath);
         fancyLog(logSymbols.success, chalk.green(`Directory upload complete: ${dir}`));
     } catch (err) {
         fancyLog(chalk.red(err));
@@ -259,10 +210,11 @@ async function deployDir(dir) {
  * Download a folder of files via FTP to the dist folder
  *
  * @param {string} dir The directory path to upload from
+ * @param {object} config The configuration object
  */
-async function downloadDir(dir) {
-    const localPath = getSourcePath(dir);
-    const remotePath = getRemotePath(dir);
+async function downloadDir(config, dir) {
+    const localPath = getSourcePath(config, dir);
+    const remotePath = getRemotePath(config, dir);
 
     // Get the FTP connection
     const client = new basicFtp.Client();
@@ -286,81 +238,95 @@ async function downloadDir(dir) {
     client.close();
 }
 
+
 /**
- * Parse the command lines arguments and call the correct deploy function
+ * Show a message that no valid command line options were set
  */
-const program = new Command();
-program
-    .option('-a, --all', 'Upload all files')
-    .option('-d, --download [filePath]', 'Download a single file, or all files if no path is set')
-    .option('--delete <path>', 'Delete a file or a folder')
-    .option('--downloadTheme', 'Download all theme files')
-    .option('-p, --path <filePath>', 'Upload a file, a folder, or a glob') // Upload path, file, or glob
-    .option('-t --theme', 'Upload all theme files'); // Upload all theme files
+const showNoActionSpecified = () => {
+    fancyLog(logSymbols.error, chalk.red('No valid command line options were set for uploading files. Use --help for more information.'));
+}
 
-program.parse();
-const options = program.opts();
-
-if (Object.keys(options).length > 0) {
-    // At least one command line option was set
-    if (typeof options.path === 'string') {
-        // Upload a single file, a directory, or a glob of files
-        const glob = getSourceGlob(options.path);
-        const parsedGlobPath = path.parse(glob);
-        if (parsedGlobPath.ext === '' && parsedGlobPath.name != '*') {
-            // A directory path was set
-            fancyLog(chalk.green(`Uploading directory: ${options.path}`));
-            deployDir(glob);
-        } else {
-            fancyLog(chalk.green(`Uploading: ${options.path}`));
-            const paths = globSync(glob);
-            if (paths.length > 0) {
-                paths.forEach((path) => {
-                    deployFile(path);
-                });
+/**
+ * Process the FTP request
+ * 
+ * @param {object} config The configuration object
+ * @param {string} action The action to tak
+ * @param {object} args Any command line arguments
+ */
+const ftpHander = (config, action, args) => {
+    if (action === 'upload') {
+        if (Object.keys(args).length > 0) {
+            if (typeof args.path === 'string') {
+                // Upload a single file, a directory, or a glob of files
+                const glob = getGlob(args.path);
+                const parsedGlobPath = path.parse(glob);
+                if (parsedGlobPath.ext === '' && parsedGlobPath.name != '*') {
+                    // A directory path was set
+                    fancyLog(chalk.green(`Uploading directory: ${args.path}`));
+                    deployDir(config, glob);
+                } else {
+                    fancyLog(chalk.green(`Uploading: ${args.path}`));
+                    const paths = globSync(glob);
+                    if (paths.length > 0) {
+                        paths.forEach((path) => {
+                            deployFile(config, path);
+                        });
+                    } else {
+                        fancyLog(chalk.red('Your path did not match any files to upload. ') + args.path);
+                    }
+                }
+            } else if (args.theme) {
+                // Deploy the theme files
+                fancyLog(chalk.green(`Deploying theme files: ${config.build.theme}`));
+                deployDir(config, config.build.theme);
             } else {
-                fancyLog(chalk.red('Your path did not match any files to upload. ') + options.path);
+                // No valid command line options were set
+                showNoActionSpecified();
             }
-        }
-    } else if (typeof options.download === 'string') {
-        // Download a single file or a directory
-        const parsedPath = path.parse(options.download);
-        if (parsedPath.ext.length > 0) {
-            // A single file will be downloaded
-            fancyLog(chalk.green(`Downloading file: ${options.download}`));
-            downloadFile(options.download);
         } else {
-            // A directory is set to be downloaded
-            fancyLog(chalk.green(`Downloading directory: ${options.download}`));
-            downloadDir(options.download);
+            // Upload all files
+            fancyLog(chalk.green(`Deploying all files: ${config.build.base}`));
+            deployDir(config, config.build.base);
         }
-    } else if (options.downloadTheme) {
-        // Download the theme files
-        fancyLog(chalk.green(`Downloading theme files: ${distThemeFolder}`));
-        downloadDir(distThemeFolder);
-    } else if (options.download) {
-        // Download all files
-        fancyLog(chalk.green(`Downloading all files: ${distFolder}`));
-        downloadDir(distFolder);
-    } else if (options.theme) {
-        // Deploy the theme files
-        fancyLog(chalk.green(`Deploying theme files: ${distThemeFolder}`));
-        deployDir(distThemeFolder);
-    } else if (options.all) {
-        // Deploy all files
-        fancyLog(chalk.green(`Deploying all files: ${distFolder}`));
-        deployDir(distFolder);
-    } else if (typeof options.delete === 'string') {
-        // Delete a single file or a directory
-        const parsedPath = path.parse(options.delete);
-        if (parsedPath.ext.length > 0) {
-            // A single file will be deleted
-            fancyLog(chalk.green(`Deleting file: ${options.delete}`));
-            deleteFile(options.delete);
+    } else if (action === 'download') {
+        if (typeof args.path === 'string') {
+            // Download a single file or a directory
+            const parsedPath = path.parse(args.path);
+            if (parsedPath.ext.length > 0) {
+                // A single file will be downloaded
+                fancyLog(chalk.green(`Downloading file: ${args.path}`));
+                downloadFile(config, args.path);
+            } else {
+                // A directory is set to be downloaded
+                fancyLog(chalk.green(`Downloading directory: ${args.path}`));
+                downloadDir(config, args.path);
+            }
+        } else if (args.theme) {
+            // Download the theme files
+            fancyLog(chalk.green(`Downloading theme files: ${config.build.theme}`));
+            downloadDir(config, config.build.theme);
         } else {
-            // A directory is set to be deleted
-            fancyLog(chalk.green(`Deleting directory: ${options.delete}`));
-            deleteDir(options.delete);
+            // No valid command line options were set
+            showNoActionSpecified();
+        }
+    } else if (action === 'delete') {
+        if (typeof args.path === 'string') {
+            // Delete a single file or a directory
+            const parsedPath = path.parse(args.path);
+            if (parsedPath.ext.length > 0) {
+                // A single file will be deleted
+                fancyLog(chalk.green(`Deleting file: ${args.path}`));
+                deleteFile(config, args.path);
+            } else {
+                // A directory is set to be deleted
+                fancyLog(chalk.green(`Deleting directory: ${args.path}`));
+                deleteDir(config, args.path);
+            }
+        } else {
+            // No valid command line options were set
+            showNoActionSpecified();
         }
     }
 }
+
+export default ftpHander;
