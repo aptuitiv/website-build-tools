@@ -3,27 +3,26 @@
 =========================================================================== */
 
 import resolveFrom from 'resolve-from';
-import { isAbsolute, join, resolve } from 'path';
+import { dirname, isAbsolute, join, resolve } from 'path';
 import deepmerge from 'deepmerge';
 import { cosmiconfig } from 'cosmiconfig';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
 
 import { isObjectWithValues } from './helpers.js';
 
-// The root folder to build files too
-const buildFolder = 'dist';
-// The theme folder name
-const themeFolder = 'custom';
+// Get the directory name of the current module
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Set up the default configuration
 const defaultConfig = {
     build: {
         // The root build folder for the files to publish to the website. This is used when uploading files via FTP.
-        base: buildFolder,
+        base: 'dist',
         // The build folder for templates
-        templates: `${buildFolder}/theme/${themeFolder}/templates`,
+        templates: 'dist/theme/custom/templates',
         // The build folder path for all files for the theme. This is used when uploading files via FTP.
-        theme: `${buildFolder}/theme/${themeFolder}`
+        theme: 'dist/theme/custom'
     },
     css: {
         // The base CSS file(s) that import the other CSS files. This is used when building the files.
@@ -35,6 +34,21 @@ const defaultConfig = {
     // The root folder for the source files. If the user needs to change this they should put
     // it as the absolute path to the root of their project.
     root: process.cwd(),
+    // Stylelint configuration options
+    // https://stylelint.io/user-guide/options
+    // You can set any valid options here
+    stylelint: {
+        // Set the absolute path to the directory that relative paths defining "extends", "plugins", and "customSyntax" are relative to. 
+        // Only necessary if these values are relative paths.
+        // This is set to the root of the aptuitiv-build project folder.
+        // Override to your project's base directory if you want to use your own stylelint config file.
+        // If overridden, this must be the absolute path to the base directory of the project.
+        configBasedir: dirname(__dirname),
+        // The path to the configuration file.
+        // This is set to the file path in the root of the aptuitiv-build project folder.
+        // Override to the absolute path to the file in your project if you want to use your own stylelint config file.
+        configFile: `${dirname(__dirname)}/.stylelintrc.cjs`
+    },
     // The source files for the theme twig templates
     template: {
         src: 'src/theme'
