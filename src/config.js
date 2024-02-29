@@ -104,7 +104,13 @@ class Config {
                 build: 'templates',
                 // The source files for the theme twig templates within the root source folder. (config.src)
                 src: 'theme'
-            }
+            },
+            themeConfig: {
+                // The folder for the theme config files within the theme build folder. (config.build.theme)
+                build: 'config',
+                // The source files for the theme config files within the root source folder. (config.src)
+                src: 'config'
+            },
         };
 
         return defaultConfig;

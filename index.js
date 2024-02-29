@@ -10,9 +10,10 @@ import config from './src/config.js';
 import { copyHandler } from './src/copy.js';
 import { cssHandler } from './src/css.js';
 import exportHandler from './src/export.js';
-import fontHandler from './src/font.js';
+import { fontHandler } from './src/font.js';
 import ftpHander from './src/ftp.js';
 import { templateHandler } from './src/template.js';
+import { themeHandler } from './src/theme.js';
 import watchHandler from './src/watch.js';
 
 // Set up the command line options
@@ -142,6 +143,26 @@ program.command('push-templates')
     .action(async (args) => {
         await config.init(args);
         templateHandler({ push: true });
+    });
+
+/**
+ * Theme related commands
+ */
+program
+    .command('pull-theme-config')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        await config.init(args);
+        themeHandler('pull');
+    });
+program
+    .command('push-theme-config')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        await config.init(args);
+        themeHandler('push');
     });
 
 /**

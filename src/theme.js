@@ -4,23 +4,28 @@
 
 
 // Build files
-import config from './src/config.js';
-import { copyFile, copySrcToBuild, removeFileFromBuild } from './files.js';
-import { prefixRootPath, prefixSrcPath, prefixThemeBuildPath } from './helpers.js';
+import config from './config.js';
+import { copyBuildToSrc, copyFile, copySrcToBuild, removeFileFromBuild } from './files.js';
+import { prefixRootSrcPath, prefixSrcPath, prefixThemeBuildPath } from './helpers.js';
 
-export const copyFontSrcToBuild = (path) => {
-    const srcRoot = prefixRootPath(config.data.themes.src);
-    copyFile(path, '', srcRoot, prefixThemeBuildPath(config.data.themes.build));
+/**
+ * Copy the theme file to the build folder
+ * 
+ * @param {string} path The file path
+ */
+export const copyThemeSrcToBuild = (path) => {
+    const srcRoot = prefixRootSrcPath(config.data.themeConfig.src);
+    copyFile(path, '', srcRoot, prefixThemeBuildPath(config.data.themeConfig.build));
 }
 
 /**
- * Removes a deleted theme file from the build directory
+ * Removes a deleted theme config file from the build directory
  * 
  * @param {object} config The configuration object
- * @param {string} path The template file path
+ * @param {string} path The file path
  */
-export const removeFontFileFromBuild = (path) => {
-    const destRoot = prefixThemeBuildPath(config.data.themes.build);
+export const removeThemeFileFromBuild = (path) => {
+    const destRoot = prefixThemeBuildPath(config.data.themeConfig.build);
     removeFileFromBuild(path, destRoot, 'theme file');
 }
 
@@ -29,9 +34,11 @@ export const removeFontFileFromBuild = (path) => {
  * 
  * @param {object} config The configuration object
  */
-const themeHandler = async (action) => {
-    if (action === 'copyAll') {
-        copySrcToBuild(prefixSrcPath(config.data.themes.src), prefixThemeBuildPath(config.data.themes.build), 'themes');
+export const themeHandler = async (action) => {
+    if (action === 'pull') {
+        copyBuildToSrc(prefixThemeBuildPath(config.data.themeConfig.build), prefixSrcPath(config.data.themeConfig.src), 'themes');
+    } else if (action === 'push') {
+        copySrcToBuild(prefixSrcPath(config.data.themeConfig.src), prefixThemeBuildPath(config.data.themeConfig.build), 'themes');
     }
 }
 

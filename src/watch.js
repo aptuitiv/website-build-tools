@@ -9,8 +9,9 @@ import { copyWatchFile } from './copy.js';
 import { processCss } from './css.js';
 import { copyFontSrcToBuild, removeFontFileFromBuild } from './font.js';
 import { deleteFile, deployFile } from './ftp.js';
-import { prefixPath, prefixRootPath, prefixSrcPath, removePrefix } from './helpers.js';
+import { prefixRootPath, prefixRootSrcPath, prefixSrcPath, removePrefix } from './helpers.js';
 import { copyTemplateSrcToBuild, removeTemplateFileFromBuild } from './template.js';
+import { copyThemeSrcToBuild, removeThemeFileFromBuild } from './theme.js';
 
 /**
  * Process the watch request
@@ -32,7 +33,7 @@ const watchHandler = async () => {
         .on('unlink', (path) => { deleteFile(removePrefix(path, rootDistFolder)); });
 
     // Watch for any CSS changes
-    const cssFolder = prefixRootPath(prefixSrcPath(config.data.css.files));
+    const cssFolder = prefixRootSrcPath(config.data.css.files);
     fancyLog(chalk.magenta('Watching for changes in the CSS folder'), chalk.cyan(prefixSrcPath(config.data.css.base)));
     chokidar
         .watch(cssFolder, { ignoreInitial: true })
@@ -59,6 +60,17 @@ const watchHandler = async () => {
         .on('add', (path) => { copyTemplateSrcToBuild(removePrefix(path, rootTemplateFolder)); })
         .on('change', (path) => { copyTemplateSrcToBuild(removePrefix(path, rootTemplateFolder)); })
         .on('unlink', (path) => { removeTemplateFileFromBuild(removePrefix(path, rootTemplateFolder)); });
+
+    // Watch for any theme file changes
+    const themeSrcFolder = prefixSrcPath(config.data.themeConfig.src);
+    const rootThemeFolder = `${prefixRootPath(themeSrcFolder)}/`;
+    const themeFolder = `${rootThemeFolder}**/*`;
+    fancyLog(chalk.magenta('Watching for changes in the theme folder'), chalk.cyan(themeSrcFolder));
+    chokidar
+        .watch(themeFolder, { ignoreInitial: true })
+        .on('add', (path) => { copyThemeSrcToBuild(removePrefix(path, rootThemeFolder)); })
+        .on('change', (path) => { copyThemeSrcToBuild(removePrefix(path, rootThemeFolder)); })
+        .on('unlink', (path) => { removeThemeFileFromBuild(removePrefix(path, rootThemeFolder)); });
 
     // Watch an "copy" files
     const copyFilesToWatch = [];
