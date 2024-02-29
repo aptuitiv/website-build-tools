@@ -61,7 +61,7 @@ const watchHandler = async () => {
         .on('change', (path) => { copyTemplateSrcToBuild(removePrefix(path, rootTemplateFolder)); })
         .on('unlink', (path) => { removeTemplateFileFromBuild(removePrefix(path, rootTemplateFolder)); });
 
-    // Watch for any theme file changes
+    // Watch for any theme configuration file changes
     const themeSrcFolder = prefixSrcPath(config.data.themeConfig.src);
     const rootThemeFolder = `${prefixRootPath(themeSrcFolder)}/`;
     const themeFolder = `${rootThemeFolder}**/*`;
