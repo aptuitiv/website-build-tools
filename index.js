@@ -4,31 +4,73 @@
  * npx aptuitiv-build template --pulld
  */
 
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 
 import getConfig from './src/config.js';
+import ftpHander from './src/ftp.js';
 import templateHandler from './src/template.js';
 
+/**
+ * Get the configuration object
+ * 
+ * @param {object} args The arguments object
+ * @returns {object} The configuration object
+ */
+const getConfiguration = async (args) => {
+    return await getConfig(args.config ?? undefined, args.root ?? undefined);
+}
+
+// Set up the command line options
 const program = new Command();
+
+// Set up shared options
+const configFileOption = new Option('-c, --config <fileName>', 'The configuration file name for aptuitiv-build');
+const rootOption = new Option('--root <folderPath>', 'The root folder of the project');
+
+/**
+ * FTP commands
+ */
 program
     .command('upload')
-
-    .option('-a, --all', 'Upload all files')
     .option('-p, --path <filePath>', 'Upload a file, a folder, or a glob')
     .option('-t --theme', 'Upload all theme files')
-    .option('-c --config <fileName>', 'The configuration file name for aptuitiv-build')
+    .addOption(configFileOption)
+    .addOption(rootOption)
     .action(async (args) => {
-        const config = await getConfig(args.config);
-    })
+        ftpHander(await getConfiguration(args), 'upload', args);
+    });
 
-program.command('template')
-    .option('-c --config <fileName>', 'The configuration file name for aptuitiv-build')
-    .option('--pull', 'Copy theme files from the build folder to the src folder')
-    .option('--push', 'Copy theme files from the src folder to the build folder')
-    .option('--root <folderPath>', 'The root folder of the project')
+program
+    .command('download')
+    .option('-p, --path <filePath>', 'Download a file, a folder, or a glob')
+    .option('-t --theme', 'Download all theme files')
+    .addOption(configFileOption)
+    .addOption(rootOption)
     .action(async (args) => {
-        const config = await getConfig(args.config, args.root);
-        templateHandler(config, args);
+        ftpHander(await getConfiguration(args), 'download', args);
+    });
+
+program
+    .command('delete')
+    .option('-p, --path <filePath>', 'Delete a file, a folder, or a glob')
+    .action(async (args) => {
+        ftpHander(await getConfiguration(args), 'delete', args);
+    });
+/**
+ * Template related commands
+ */
+program.command('pull-template')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        templateHandler(await getConfiguration(args), { pull: true });
+    });
+
+program.command('push-template')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        templateHandler(await getConfiguration(args), { push: true });
     });
 
 program.parse();
