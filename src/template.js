@@ -4,14 +4,14 @@
     Functions to work with template files
 =========================================================================== */
 
-import fs from 'fs-extra';
+import fs, { copy } from 'fs-extra';
 import chalk from 'chalk';
 import fancyLog from 'fancy-log';
 import logSymbols from 'log-symbols';
 
 // Build scripts
-// import getConfig from './config.js';
 import { prefixPath } from './helpers.js';
+import { copyFile } from './copy.js';
 
 /**
  * Copy all of the theme files from the src folder to the build folder
@@ -36,17 +36,8 @@ const copyAllSrcToBuild = (config) => {
  * @param {string} path The template file path
  */
 export const copyTemplateSrcToBuild = (config, path) => {
-    fancyLog(chalk.magenta('Copying template file'), chalk.cyan(path), chalk.magenta('to build folder'));
     const srcRoot = prefixPath(config.template.src, config.root);
-    const srcPath = prefixPath(path, srcRoot);
-    const destRoot = prefixPath(config.build.templates, config.root);
-    const destPath = prefixPath(path, destRoot);
-    if (fs.existsSync(srcPath)) {
-        fs.copySync(srcPath, destPath)
-        fancyLog(logSymbols.success, chalk.green('Done copying template file to the build folder'), chalk.cyan(path));
-    } else {
-        fancyLog(logSymbols.warning, chalk.yellow('Nothing to copy because the source folder does not exist'), chalk.cyan(srcPath));
-    }
+    copyFile(config, path, '', srcRoot, config.build.templates);
 }
 
 /**
