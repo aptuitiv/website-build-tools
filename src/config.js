@@ -76,8 +76,14 @@ class Config {
             fonts: {
                 // The folder for the fonts within the theme build folder. (config.build.theme)
                 build: 'fonts',
-                // The source files for the fonts within the root source folder. (config.src)
+                // The source folder for the fonts within the root source folder. (config.src)
                 src: 'fonts'
+            },
+            icons: {
+                // The path within the src templates folder that the icon sprite will be created in
+                build: 'snippets/svg-icons.twig',
+                // The source folder for the svg icon files within the root source folder. (config.src)
+                src: 'icons',
             },
             // The root folder for all the project files. If the user needs to change this they should put
             // it as the absolute path to the root of their project.
@@ -102,13 +108,13 @@ class Config {
             templates: {
                 // The folder for the theme twig templates within the theme build folder. (config.build.theme)
                 build: 'templates',
-                // The source files for the theme twig templates within the root source folder. (config.src)
+                // The source folder for the theme twig templates within the root source folder. (config.src)
                 src: 'theme'
             },
             themeConfig: {
                 // The folder for the theme config files within the theme build folder. (config.build.theme)
                 build: 'config',
-                // The source files for the theme config files within the root source folder. (config.src)
+                // The source folder for the theme config files within the root source folder. (config.src)
                 src: 'config'
             },
         };

@@ -10,6 +10,7 @@ import { processCss } from './css.js';
 import { copyFontSrcToBuild, removeFontFileFromBuild } from './font.js';
 import { deleteFile, deployFile } from './ftp.js';
 import { prefixRootPath, prefixRootSrcPath, prefixSrcPath, removePrefix } from './helpers.js';
+import { createIconSprite } from './icons.js';
 import { copyTemplateSrcToBuild, removeTemplateFileFromBuild } from './template.js';
 import { copyThemeSrcToBuild, removeThemeFileFromBuild } from './theme.js';
 
@@ -49,6 +50,13 @@ const watchHandler = async () => {
         .on('add', (path) => { copyFontSrcToBuild(removePrefix(path, rootFontFolder)); })
         .on('change', (path) => { copyFontSrcToBuild(removePrefix(path, rootFontFolder)); })
         .on('unlink', (path) => { removeFontFileFromBuild(removePrefix(path, rootFontFolder)); });
+
+    // Watch for any con changes
+    const iconFolder = prefixRootSrcPath(config.data.icons.src);
+    fancyLog(chalk.magenta('Watching for changes in the icons folder'), chalk.cyan(prefixSrcPath(config.data.icons.src)));
+    chokidar
+        .watch(iconFolder, { ignoreInitial: true })
+        .on('all', () => { createIconSprite() });
 
     // Watch for any template changes
     const templateSrcFolder = prefixSrcPath(config.data.templates.src);
