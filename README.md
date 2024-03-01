@@ -26,6 +26,7 @@ Build tools to help with building and deploying websites at Aptuitiv.
   - [FTP delete actions](#ftp-delete-actions)
     - [Delete a file](#delete-a-file)
     - [Delete a folder](#delete-a-folder)
+  - [Icon action](#icon-action)
   - [Template actions](#template-actions)
     - [Pull template files](#pull-template-files)
     - [Push template files](#push-template-files)
@@ -357,6 +358,14 @@ Or the build folder can be left off.
 ```bash
 aptuitiv-build delete -p 'theme/custom/js'
 aptuitiv-build delete --path 'theme/custom/js'
+```
+
+## Icon action
+
+The icon action will combine all SVG icons into a sprite file. The file will be a Twig template in the snippets folder. By default it's called `svg-icons.twig`.
+
+```bash
+aptuitiv-build icons
 ```
 
 ## Template actions
