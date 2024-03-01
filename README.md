@@ -27,6 +27,7 @@ Build tools to help with building and deploying websites at Aptuitiv.
     - [Delete a file](#delete-a-file)
     - [Delete a folder](#delete-a-folder)
   - [Icon action](#icon-action)
+  - [Images action](#images-action)
   - [Template actions](#template-actions)
     - [Pull template files](#pull-template-files)
     - [Push template files](#push-template-files)
@@ -84,22 +85,63 @@ Below is the default configuration.
     build: {
         // The root build folder for the files to publish to the website. This is used when uploading files via FTP.
         base: 'dist',
-        // The build folder for templates
-        templates: 'dist/theme/custom/templates',
         // The build folder path for all files for the theme. This is used when uploading files via FTP.
         theme: 'dist/theme/custom'
     },
     css: {
-        // The base CSS file(s) that import the other CSS files. This is used when building the files.
-        base: 'src/css/*.css',
+        // The base path for the CSS files within the root source folder. (config.src)
+        base: 'css',
+        // The glob for CSS file(s) that import the other CSS files.  This is used when building the files.
+        // This is within the root source folder. (config.src)
+        buildFiles: 'css/*.css',
         // The glob for all CSS files. This is used when linting CSS files.
-        src: 'src/css/**/*.css'
+        // This is within the root source folder. (config.src)
+        files: 'css/**/*.css'
     },
     // An array of file globs and their destination folder
     copy: [],
-    // The root folder for the source files. If the user needs to change this they should put
+    fonts: {
+        // The folder for the fonts within the theme build folder. (config.build.theme)
+        build: 'fonts',
+        // The source folder for the fonts within the root source folder. (config.src)
+        src: 'fonts'
+    },
+    icons: {
+        // The path within the src templates folder that the icon sprite will be created in
+        build: 'snippets/svg-icons.twig',
+        // The source folder for the svg icon files within the root source folder. (config.src)
+        src: 'icons',
+    },
+    images: {
+        // The folder for the images within the theme build folder. (config.build.theme)
+        build: 'images',
+        // Image optimizations
+        optimizations: {
+            jpg: {
+                mozjpeg: true,
+                quality: 80,
+                progressive: true
+            },
+            png: {
+                quality: 80,
+                progressive: true,
+                compressionLevel: 6,
+                adaptiveFiltering: true
+            },
+            webp: {
+                quality: 80,
+                lossless: false,
+                smartSubsample: true
+            }
+        },
+        // The source folder for the image files within the root source folder. (config.src)
+        src: 'images'
+    },
+    // The root folder for all the project files. If the user needs to change this they should put
     // it as the absolute path to the root of their project.
     root: process.cwd(),
+    // The root folder to the source files.
+    src: 'src',
     // Stylelint configuration options
     // https://stylelint.io/user-guide/options
     // You can set any valid options here
@@ -115,10 +157,18 @@ Below is the default configuration.
         // Override to the absolute path to the file in your project if you want to use your own stylelint config file.
         configFile: `${dirname(__dirname)}/.stylelintrc.cjs`
     },
-    // The source files for the theme twig templates
-    template: {
-        src: 'src/theme'
-    }
+    templates: {
+        // The folder for the theme twig templates within the theme build folder. (config.build.theme)
+        build: 'templates',
+        // The source folder for the theme twig templates within the root source folder. (config.src)
+        src: 'theme'
+    },
+    themeConfig: {
+        // The folder for the theme config files within the theme build folder. (config.build.theme)
+        build: 'config',
+        // The source folder for the theme config files within the root source folder. (config.src)
+        src: 'config'
+    },
 }
 ```
 
@@ -365,7 +415,16 @@ aptuitiv-build delete --path 'theme/custom/js'
 The icon action will combine all SVG icons into a sprite file. The file will be a Twig template in the snippets folder. By default it's called `svg-icons.twig`.
 
 ```bash
+aptuitiv-build icon-sprite
 aptuitiv-build icons
+```
+
+## Images action
+
+Copy the images to the build folder and optimize the images.
+
+```bash
+aptuitiv-build images
 ```
 
 ## Template actions

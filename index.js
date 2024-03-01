@@ -13,6 +13,7 @@ import exportHandler from './src/export.js';
 import { fontHandler } from './src/font.js';
 import ftpHander from './src/ftp.js';
 import { iconHandler } from './src/icons.js';
+import { imageHandler } from './src/image.js';
 import { templateHandler } from './src/template.js';
 import { themeHandler } from './src/theme.js';
 import watchHandler from './src/watch.js';
@@ -138,6 +139,18 @@ program
     .action(async (args) => {
         await config.init(args);
         iconHandler();
+    });
+
+/**
+ * Image commands
+ */
+program
+    .command('images')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        await config.init(args);
+        imageHandler();
     });
 
 /**

@@ -85,6 +85,31 @@ class Config {
                 // The source folder for the svg icon files within the root source folder. (config.src)
                 src: 'icons',
             },
+            images: {
+                // The folder for the images within the theme build folder. (config.build.theme)
+                build: 'images',
+                // Image optimizations
+                optimizations: {
+                    jpg: {
+                        mozjpeg: true,
+                        quality: 80,
+                        progressive: true
+                    },
+                    png: {
+                        quality: 80,
+                        progressive: true,
+                        compressionLevel: 6,
+                        adaptiveFiltering: true
+                    },
+                    webp: {
+                        quality: 80,
+                        lossless: false,
+                        smartSubsample: true
+                    }
+                },
+                // The source folder for the image files within the root source folder. (config.src)
+                src: 'images'
+            },
             // The root folder for all the project files. If the user needs to change this they should put
             // it as the absolute path to the root of their project.
             root: process.cwd(),
