@@ -51,11 +51,14 @@ export const createIconSprite = async () => {
 
     // Add each file to the sprite generator
     files.forEach((file) => {
-        // Get the base path to the file within the icons folder.
-        // This handles situations where the file may be in a nested subfolder.
-        // In that case, the id will include the folder path.
-        const filePath = removePrefix(file, `${iconPath}/`);
-        spriteObj.add(file, filePath, fs.readFileSync(file, 'utf-8'));
+        const stat = fs.statSync(file);
+        if (stat.isFile()) {
+            // Get the base path to the file within the icons folder.
+            // This handles situations where the file may be in a nested subfolder.
+            // In that case, the id will include the folder path.
+            const filePath = removePrefix(file, `${iconPath}/`);
+            spriteObj.add(file, filePath, fs.readFileSync(file, 'utf-8'));
+        }
     });
     try {
         // Generate the sprite
