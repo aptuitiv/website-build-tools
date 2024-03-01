@@ -36,6 +36,9 @@ export const getGlob = (glob) => {
  */
 export const prefixPath = (path, basePath, baseFolder) => {
     let returnValue = path;
+    if (returnValue.startsWith('/')) {
+        returnValue = returnValue.slice(1);
+    }
     let base = basePath;
     if (base.endsWith('/')) {
         base = base.slice(0, base.length - 1);
