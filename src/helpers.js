@@ -127,6 +127,21 @@ export const removePrefix = (path, prefix) => {
 }
 
 /**
+ * Remove one or more prefixes from a path
+ * @param {string} path The original path
+ * @param {array} prefixes An array of prefixes to remove from the path.
+ *   They should be in nested order. The first is removed, and then the second, etc.
+ * @returns {string}
+ */
+export const removePrefixes = (path, prefixes) => {
+    let returnValue = path;
+    prefixes.forEach((prefix) => {
+        returnValue = removePrefix(returnValue, prefix);
+    });
+    return returnValue;
+}
+
+/**
  * Returns if the value is an object
  *
  * @link https://attacomsian.com/blog/javascript-check-variable-is-object
