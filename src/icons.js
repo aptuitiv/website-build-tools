@@ -7,6 +7,7 @@ import { globSync } from 'glob';
 import { dirname } from 'path';
 import chalk from 'chalk';
 import fancyLog from 'fancy-log';
+import isSvg from 'is-svg';
 import logSymbols from 'log-symbols';
 import sprite from 'svg-sprite';
 
@@ -57,7 +58,10 @@ export const createIconSprite = async () => {
             // This handles situations where the file may be in a nested subfolder.
             // In that case, the id will include the folder path.
             const filePath = removePrefix(file, `${iconPath}/`);
-            spriteObj.add(file, filePath, fs.readFileSync(file, 'utf-8'));
+            const contents = fs.readFileSync(file, 'utf-8');
+            if (isSvg(contents)) {
+                spriteObj.add(file, filePath, contents);
+            }
         }
     });
     try {
