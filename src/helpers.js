@@ -120,6 +120,8 @@ export const prefixThemeBuildPath = (path) => {
 export const removePrefix = (path, prefix) => {
     if (path.startsWith(prefix)) {
         return path.slice(prefix.length);
+    } else if (path.startsWith(`/${prefix}`)) {
+        return path.slice(prefix.length + 1);
     }
     return path;
 }
