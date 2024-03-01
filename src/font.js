@@ -4,17 +4,16 @@
 
 // Build files
 import config from './config.js';
-import { copyBuildToSrc, copyFile, copySrcToBuild, removeFileFromBuild } from './files.js';
-import { prefixRootSrcPath, prefixSrcPath, prefixThemeBuildPath } from './helpers.js';
+import { copyBuildFolderToSrc, copySrcFileToThemeBuild, copySrcFolderToBuild, removeFileFromThemeBuild } from './files.js';
+import { prefixSrcPath, prefixThemeBuildPath } from './helpers.js';
 
 /**
  * Copy the font file to the build folder
  * 
- * @param {string} path The font file path
+ * @param {string} path The path to the file
  */
 export const copyFontSrcToBuild = (path) => {
-    const srcRoot = prefixRootSrcPath(config.data.fonts.src);
-    copyFile(path, '', srcRoot, prefixThemeBuildPath(config.data.fonts.build));
+    copySrcFileToThemeBuild(path, config.data.fonts.src, config.data.fonts.build);
 }
 
 /**
@@ -23,8 +22,7 @@ export const copyFontSrcToBuild = (path) => {
  * @param {string} path The font file path
  */
 export const removeFontFileFromBuild = (path) => {
-    const destRoot = prefixThemeBuildPath(config.data.fonts.build);
-    removeFileFromBuild(path, destRoot, 'font file');
+    removeFileFromThemeBuild(path, config.data.fonts.build, 'font file');
 }
 
 /**
@@ -32,9 +30,9 @@ export const removeFontFileFromBuild = (path) => {
  */
 export const fontHandler = async (action) => {
     if (action === 'pull') {
-        copyBuildToSrc(prefixThemeBuildPath(config.data.fonts.build), prefixSrcPath(config.data.fonts.src), 'fonts');
+        copyBuildFolderToSrc(prefixThemeBuildPath(config.data.fonts.build), prefixSrcPath(config.data.fonts.src), 'fonts');
     } else if (action === 'push') {
-        copySrcToBuild(prefixSrcPath(config.data.fonts.src), prefixThemeBuildPath(config.data.fonts.build), 'fonts');
+        copySrcFolderToBuild(prefixSrcPath(config.data.fonts.src), prefixThemeBuildPath(config.data.fonts.build), 'fonts');
     }
 }
 

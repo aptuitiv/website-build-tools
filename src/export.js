@@ -6,7 +6,8 @@ import { globSync } from 'glob';
 
 // Build files
 import config from './config.js';
-import { copyFile } from './files.js';
+import { copyFileToDest } from './files.js';
+import { prefixPath } from './helpers.js';
 
 /**
  * Copy the files to an export folder
@@ -28,12 +29,12 @@ const exportFiles = async () => {
         if (filesToCopy.length > 0) {
             filesToCopy.forEach((file) => {
                 let dest = file;
-                if (file.startsWith('.')) {
-                    // This is a config file in the root directory.
+                if (file.indexOf('/') === -1) {
+                    // This is a file in the root directory.
                     // Set the destination to the root directory
                     dest = '';
                 }
-                copyFile(file, dest, config.data.root, '_export');
+                copyFileToDest(file, prefixPath(dest, '_export'));
             });
         }
     });

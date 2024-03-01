@@ -61,6 +61,16 @@ export const prefixPath = (path, basePath, baseFolder) => {
 }
 
 /**
+ * Prefix the root path
+ * 
+ * @param {string} path The file/glob path
+ * @returns {string}
+ */
+export const prefixRootPath = (path) => {
+    return prefixPath(path, config.data.root);
+}
+
+/**
  * Prefix the build path
  * 
  * @param {string} path The file/glob path
@@ -71,14 +81,15 @@ export const prefixBuildPath = (path) => {
 }
 
 /**
- * Prefix the root path
+ * Prefix the root and build paths to the path
  * 
  * @param {string} path The file/glob path
  * @returns {string}
  */
-export const prefixRootPath = (path) => {
-    return prefixPath(path, config.data.root);
+export const prefixRootBuildPath = (path) => {
+    return prefixRootPath(prefixBuildPath(path));
 }
+
 
 /**
  * Prefix the src path
@@ -111,6 +122,16 @@ export const prefixThemeBuildPath = (path) => {
 }
 
 /**
+ * Prefix the theme build and root paths to the path
+ * 
+ * @param {string} path The file/glob path
+ * @returns {string}
+ */
+export const prefixRootThemeBuildPath = (path) => {
+    return prefixRootPath(prefixThemeBuildPath(path));
+}
+
+/**
  * Removes the prefix from the path
  * 
  * @param {string} path The file path
@@ -124,6 +145,17 @@ export const removePrefix = (path, prefix) => {
         return path.slice(prefix.length + 1);
     }
     return path;
+}
+
+/**
+ * Removes the root prefix from the path
+ * 
+ * @param {string} path The path
+ * @returns {string}
+ */
+export const removeRootPrefix = (path) => {
+    return removePrefix(removePrefix(path, config.data.root), '/');
+
 }
 
 /**

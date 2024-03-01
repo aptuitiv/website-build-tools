@@ -4,14 +4,10 @@
     Functions to work with template files
 =========================================================================== */
 
-import chalk from 'chalk';
-import fancyLog from 'fancy-log';
-import logSymbols from 'log-symbols';
-
 // Build scripts
 import config from './config.js';
-import { copyBuildToSrc, copyFile, copySrcToBuild, removeFileFromBuild } from './files.js';
-import { prefixRootSrcPath, prefixSrcPath, prefixThemeBuildPath } from './helpers.js';
+import { copyBuildFolderToSrc, copySrcFileToThemeBuild, copySrcFolderToBuild, removeFileFromThemeBuild } from './files.js';
+import { prefixSrcPath, prefixThemeBuildPath } from './helpers.js';
 
 /**
  * Copy a template file to the build folder
@@ -19,8 +15,7 @@ import { prefixRootSrcPath, prefixSrcPath, prefixThemeBuildPath } from './helper
  * @param {string} path The template file path
  */
 export const copyTemplateSrcToBuild = (path) => {
-    const srcRoot = prefixRootSrcPath(config.data.templates.src);
-    copyFile(path, '', srcRoot, prefixThemeBuildPath(config.data.templates.build));
+    copySrcFileToThemeBuild(path, config.data.templates.src, config.data.templates.build);
 }
 
 /**
@@ -29,8 +24,7 @@ export const copyTemplateSrcToBuild = (path) => {
  * @param {string} path The template file path
  */
 export const removeTemplateFileFromBuild = (path) => {
-    const destRoot = prefixThemeBuildPath(config.data.templates.build);
-    removeFileFromBuild(path, destRoot, 'template file');
+    removeFileFromThemeBuild(path, config.data.templates.build, 'template file');
 }
 
 /**
@@ -40,8 +34,8 @@ export const removeTemplateFileFromBuild = (path) => {
  */
 export const templateHandler = (action) => {
     if (action === 'pull') {
-        copyBuildToSrc(prefixThemeBuildPath(config.data.templates.build), prefixSrcPath(config.data.templates.src), 'templates');
+        copyBuildFolderToSrc(prefixThemeBuildPath(config.data.templates.build), prefixSrcPath(config.data.templates.src), 'templates');
     } else if (action === 'push') {
-        copySrcToBuild(prefixSrcPath(config.data.templates.src), prefixThemeBuildPath(config.data.templates.build), 'templates');
+        copySrcFolderToBuild(prefixSrcPath(config.data.templates.src), prefixThemeBuildPath(config.data.templates.build), 'templates');
     }
 }

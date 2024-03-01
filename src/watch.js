@@ -9,8 +9,9 @@ import { copyWatchFile } from './copy.js';
 import { processCss } from './css.js';
 import { copyFontSrcToBuild, removeFontFileFromBuild } from './font.js';
 import { deleteFile, deployFile } from './ftp.js';
-import { prefixRootPath, prefixRootSrcPath, prefixSrcPath, removePrefix } from './helpers.js';
+import { prefixRootPath, prefixRootSrcPath, prefixSrcPath, removePrefix, removeRootPrefix } from './helpers.js';
 import { createIconSprite } from './icons.js';
+import { processImage, removeImageFileFromBuild } from './image.js';
 import { copyTemplateSrcToBuild, removeTemplateFileFromBuild } from './template.js';
 import { copyThemeSrcToBuild, removeThemeFileFromBuild } from './theme.js';
 
@@ -42,43 +43,50 @@ const watchHandler = async () => {
 
     // Watch for any font changes
     const fontSrcFolder = prefixSrcPath(config.data.fonts.src);
-    const rootFontFolder = `${prefixRootPath(fontSrcFolder)}/`;
-    const fontFolder = `${rootFontFolder}**/*`;
+    const fontFolder = `${prefixRootPath(fontSrcFolder)}/**/*`;
     fancyLog(chalk.magenta('Watching for changes in the font folder'), chalk.cyan(fontSrcFolder));
     chokidar
         .watch(fontFolder, { ignoreInitial: true })
-        .on('add', (path) => { copyFontSrcToBuild(removePrefix(path, rootFontFolder)); })
-        .on('change', (path) => { copyFontSrcToBuild(removePrefix(path, rootFontFolder)); })
-        .on('unlink', (path) => { removeFontFileFromBuild(removePrefix(path, rootFontFolder)); });
+        .on('add', (path) => { copyFontSrcToBuild(path); })
+        .on('change', (path) => { copyFontSrcToBuild(path); })
+        .on('unlink', (path) => { removeFontFileFromBuild(path); });
 
-    // Watch for any con changes
+    // Watch for any icon changes
     const iconFolder = prefixRootSrcPath(config.data.icons.src);
     fancyLog(chalk.magenta('Watching for changes in the icons folder'), chalk.cyan(prefixSrcPath(config.data.icons.src)));
     chokidar
         .watch(iconFolder, { ignoreInitial: true })
         .on('all', () => { createIconSprite() });
 
-    // Watch for any template changes
+    // Watch for any image file changes
+    const imageSrcFolder = prefixSrcPath(config.data.images.src);
+    const imageFolder = `${prefixRootPath(imageSrcFolder)}/**/*`;
+    fancyLog(chalk.magenta('Watching for changes in the images folder'), chalk.cyan(imageSrcFolder));
+    chokidar
+        .watch(imageFolder, { ignoreInitial: true })
+        .on('add', (path) => { processImage(path); })
+        .on('change', (path) => { processImage(path); })
+        .on('unlink', (path) => { removeImageFileFromBuild(path); });
+
+    // Watch for any template file changes
     const templateSrcFolder = prefixSrcPath(config.data.templates.src);
-    const rootTemplateFolder = `${prefixRootPath(templateSrcFolder)}/`;
-    const templateFolder = `${rootTemplateFolder}**/*`;
+    const templateFolder = `${prefixRootPath(templateSrcFolder)}/**/*`;
     fancyLog(chalk.magenta('Watching for changes in the template folder'), chalk.cyan(templateSrcFolder));
     chokidar
         .watch(templateFolder, { ignoreInitial: true })
-        .on('add', (path) => { copyTemplateSrcToBuild(removePrefix(path, rootTemplateFolder)); })
-        .on('change', (path) => { copyTemplateSrcToBuild(removePrefix(path, rootTemplateFolder)); })
-        .on('unlink', (path) => { removeTemplateFileFromBuild(removePrefix(path, rootTemplateFolder)); });
+        .on('add', (path) => { copyTemplateSrcToBuild(path); })
+        .on('change', (path) => { copyTemplateSrcToBuild(path); })
+        .on('unlink', (path) => { removeTemplateFileFromBuild(path); });
 
     // Watch for any theme configuration file changes
     const themeSrcFolder = prefixSrcPath(config.data.themeConfig.src);
-    const rootThemeFolder = `${prefixRootPath(themeSrcFolder)}/`;
-    const themeFolder = `${rootThemeFolder}**/*`;
+    const themeFolder = `${prefixRootPath(themeSrcFolder)}/**/*`;
     fancyLog(chalk.magenta('Watching for changes in the theme folder'), chalk.cyan(themeSrcFolder));
     chokidar
         .watch(themeFolder, { ignoreInitial: true })
-        .on('add', (path) => { copyThemeSrcToBuild(removePrefix(path, rootThemeFolder)); })
-        .on('change', (path) => { copyThemeSrcToBuild(removePrefix(path, rootThemeFolder)); })
-        .on('unlink', (path) => { removeThemeFileFromBuild(removePrefix(path, rootThemeFolder)); });
+        .on('add', (path) => { copyThemeSrcToBuild(path); })
+        .on('change', (path) => { copyThemeSrcToBuild(path); })
+        .on('unlink', (path) => { removeThemeFileFromBuild(path); });
 
     // Watch an "copy" files
     const copyFilesToWatch = [];

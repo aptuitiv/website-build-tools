@@ -9,8 +9,8 @@ import { globSync } from 'glob';
 
 // Build scripts
 import config from './config.js';
-import { copyFile } from './files.js';
-import { removePrefix } from './helpers.js';
+import { copyFileToThemeBuild } from './files.js';
+import { removeRootPrefix } from './helpers.js';
 
 
 /**
@@ -20,7 +20,7 @@ import { removePrefix } from './helpers.js';
  * @param {string} dest The file destination
  */
 export const copyWatchFile = (src, dest) => {
-    copyFile(removePrefix(src, config.data.root), dest, config.data.root, config.data.build.theme);
+    copyFileToThemeBuild(removeRootPrefix(src), dest);
 }
 
 /**
@@ -36,7 +36,7 @@ const copyFiles = async () => {
                 }
                 if (filesToCopy.length > 0) {
                     filesToCopy.forEach((file) => {
-                        copyFile(file, copy.dest, config.data.root, config.data.build.theme);
+                        copyFileToThemeBuild(file, copy.dest);
                     });
                 }
             }
