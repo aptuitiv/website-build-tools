@@ -25,7 +25,6 @@ import postcssReporter from 'postcss-reporter';
 import config from './config.js';
 import {
     getGlob,
-    isObjectWithValues,
     prefixPath,
     prefixRootPath,
     prefixRootSrcPath,
@@ -33,8 +32,12 @@ import {
     prefixSrcPath,
     removeRootPrefix,
 } from './helpers.js';
+import { isObjectWithValues } from './lib/types.js';
+
+/* global process */
 
 // Get the directory name of the current module
+// eslint-disable-next-line no-underscore-dangle -- The dangle is used to match the __dirname variable in Node.js
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /**
@@ -70,12 +73,11 @@ function areFilesDifferent(sourceFile, targetPath) {
  * @param {string} [fileGlob] The file glob to lint
  */
 const runStylelint = async (fileGlob) => {
-    const filesToLint =
-        fileGlob || prefixRootSrcPath(`${config.data.css.src}/**/*.css`);
+    const filesToLint = fileGlob || prefixRootSrcPath(`${config.data.css.src}/**/*.css`);
 
     // Set up the configuration.
     // https://stylelint.io/user-guide/node-api
-    let options = {
+    const options = {
         config: {
             cache: true,
             defaultSeverity: 'warning', // So that stylelint won't stop on errors and the CSS will still build
@@ -105,11 +107,6 @@ const runStylelint = async (fileGlob) => {
         // Only necessary if these values are relative paths.
         // This is set to the root of the aptuitiv-build project folder.
         configBasedir: dirname(__dirname),
-
-        // The path to the configuration file.
-        // This is set to the file path in the root of the aptuitiv-build project folder.
-        // Override to the absolute path to the file in your project if you want to use your own stylelint config file.
-        // configFile: `${dirname(__dirname)}/.stylelintrc.cjs`
         files: filesToLint,
         formatter: 'string',
     };
@@ -123,6 +120,7 @@ const runStylelint = async (fileGlob) => {
     );
     const results = await stylelint.lint(options);
     if (results.report.length > 0) {
+        // eslint-disable-next-line no-console -- Need to output the results
         console.log(results.report);
     }
     if (results.errored) {
@@ -146,6 +144,7 @@ const runPostCss = (filePath) => {
     }
     fs.readFile(filePath, (err, css) => {
         if (err) {
+            // eslint-disable-next-line no-console -- Need to output the error
             console.error('Reading CSS file error: ', err);
         }
         fancyLog(chalk.magenta('Building CSS'), chalk.cyan(filePath));
@@ -194,7 +193,7 @@ const runPostCss = (filePath) => {
  * @param {boolean} lint Whether to lint the CSS files
  */
 export const processCss = (lint = true) => {
-    const buildFiles = config.data.css.buildFiles;
+    const { buildFiles } = config.data.css;
     let paths = [];
     if (typeof buildFiles === 'string') {
         paths = globSync(

@@ -36,6 +36,8 @@ export const removeFontFileFromBuild = (path) => {
 
 /**
  * Process the font request
+ *
+ * @param {string} action The action to take
  */
 export const fontHandler = async (action) => {
     if (action === 'pull') {

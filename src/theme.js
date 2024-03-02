@@ -11,7 +11,6 @@ import {
     removeFileFromThemeBuild,
 } from './files.js';
 import {
-    prefixRootSrcPath,
     prefixSrcPath,
     prefixThemeBuildPath,
 } from './helpers.js';

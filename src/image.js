@@ -81,8 +81,8 @@ const getJpgOptimizations = () => {
         progressive: true,
     };
     if (
-        config.data.images.optimizations &&
-        config.data.images.optimizations.jpg
+        config.data.images.optimizations
+        && config.data.images.optimizations.jpg
     ) {
         opts = { ...opts, ...config.data.images.optimizations.jpg };
     }
@@ -102,8 +102,8 @@ const getPngOptimizations = () => {
         adaptiveFiltering: true,
     };
     if (
-        config.data.images.optimizations &&
-        config.data.images.optimizations.png
+        config.data.images.optimizations
+        && config.data.images.optimizations.png
     ) {
         opts = { ...opts, ...config.data.images.optimizations.png };
     }
@@ -122,8 +122,8 @@ const getWebPOptimizations = () => {
         smartSubsample: true,
     };
     if (
-        config.data.images.optimizations &&
-        config.data.images.optimizations.webp
+        config.data.images.optimizations
+        && config.data.images.optimizations.webp
     ) {
         opts = { ...opts, ...config.data.images.optimizations.webp };
     }
@@ -158,8 +158,8 @@ export const processImage = async (imageSrc) => {
 
         // Process the image
         if (
-            fileType &&
-            ['gif', 'jpg', 'jpeg', 'png', 'webp'].includes(fileType.ext)
+            fileType
+            && ['gif', 'jpg', 'jpeg', 'png', 'webp'].includes(fileType.ext)
         ) {
             const { ext } = fileType;
             fancyLog(
@@ -187,7 +187,6 @@ export const processImage = async (imageSrc) => {
         } else {
             // const ext = parse(imageSrc).ext.replace('.', '').toLowerCase();
             const ext = parse(imageSrc).ext.toLowerCase();
-            console.log('EXT: ', ext);
             // Check to see if the file extension is svg. If so process it.
             if (ext === 'svg') {
                 fancyLog(
@@ -234,7 +233,7 @@ const processImages = async () => {
         files.forEach((file) => {
             processImage(file);
         });
-        fancyLog(logSymbols.success, chalk.green(`Done processing images`));
+        fancyLog(logSymbols.success, chalk.green('Done processing images'));
     } else {
         fancyLog(
             logSymbols.warning,
@@ -248,6 +247,6 @@ const processImages = async () => {
 /**
  * Process the image request
  */
-export const imageHandler = async (action) => {
+export const imageHandler = async () => {
     processImages();
 };

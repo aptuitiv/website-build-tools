@@ -14,7 +14,6 @@ import {
     prefixRootSrcPath,
     prefixSrcPath,
     removePrefix,
-    removeRootPrefix,
 } from './helpers.js';
 import { createIconSprite } from './icons.js';
 import { processImage, removeImageFileFromBuild } from './image.js';
@@ -155,8 +154,8 @@ const watchHandler = async () => {
         if (typeof copy.dest === 'string' && copy.dest.length > 0) {
             let filesToCopy = [];
             if (
-                (typeof copy.src === 'string' && copy.src.length > 0) ||
-                (Array.isArray(copy.src) && copy.src.length > 0)
+                (typeof copy.src === 'string' && copy.src.length > 0)
+                || (Array.isArray(copy.src) && copy.src.length > 0)
             ) {
                 filesToCopy = globSync(copy.src);
             }

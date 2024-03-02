@@ -14,7 +14,7 @@ import { prefixPath } from './helpers.js';
  */
 const exportFiles = async () => {
     const files = [
-        config.data.src + '/**/*',
+        `${config.data.src}/**/*`,
         '.editorconfig',
         '.eslintignore',
         '.eslintrc.cjs',

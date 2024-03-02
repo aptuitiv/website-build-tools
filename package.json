@@ -4,7 +4,9 @@
     "description": "Build tools to help with building and deploying websites at Aptuitiv",
     "main": "index.js",
     "scripts": {
-        "prettier": "prettier --write ."
+        "eslint": "eslint --fix .",
+        "prettier": "prettier --write .",
+        "watch": "esw -w --color --fix ."
     },
     "repository": {
         "type": "git",
@@ -19,8 +21,11 @@
     "bin": {
         "aptuitiv-build": "./index.js"
     },
+    "devDependencies": {
+        "eslint-watch": "^8.0.0"
+    },
     "dependencies": {
-        "@aptuitiv/eslint-config-aptuitiv": "^0.5.0",
+        "@aptuitiv/eslint-config-aptuitiv": "^0.6.0",
         "autoprefixer": "^10.4.17",
         "basic-ftp": "^5.0.5",
         "chalk": "^5.3.0",

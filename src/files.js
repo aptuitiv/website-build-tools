@@ -6,19 +6,16 @@ import fs from 'fs-extra';
 import chalk from 'chalk';
 import fancyLog from 'fancy-log';
 import logSymbols from 'log-symbols';
-import path, { parse } from 'path';
+import { parse } from 'path';
 
 // Buld files
 import {
     prefixPath,
     prefixRootPath,
-    prefixRootBuildPath,
     prefixRootThemeBuildPath,
     prefixRootSrcPath,
-    removeRootPrefix,
     prefixThemeBuildPath,
     prefixSrcPath,
-    prefixBuildPath,
 } from './helpers.js';
 
 /**
@@ -39,9 +36,7 @@ export const getFileName = (path) => {
  * @param {string} filename The file name
  * @returns {string}
  */
-const getRootPath = (path, filename) => {
-    return prefixPath(filename, prefixRootPath(path));
-};
+const getRootPath = (path, filename) => prefixPath(filename, prefixRootPath(path));
 
 /**
  * Get the root src path for the file
@@ -50,9 +45,7 @@ const getRootPath = (path, filename) => {
  * @param {string} filename The file name
  * @returns {string}
  */
-const getRootSrcPath = (path, filename) => {
-    return prefixPath(filename, prefixRootSrcPath(path));
-};
+const getRootSrcPath = (path, filename) => prefixPath(filename, prefixRootSrcPath(path));
 
 /**
  * Get the src path for the file
@@ -61,9 +54,7 @@ const getRootSrcPath = (path, filename) => {
  * @param {string} filename The file name
  * @returns {string}
  */
-const getSrcPath = (path, filename) => {
-    return prefixPath(filename, prefixSrcPath(path));
-};
+const getSrcPath = (path, filename) => prefixPath(filename, prefixSrcPath(path));
 
 /**
  * Get the root theme build path for the file
@@ -72,9 +63,7 @@ const getSrcPath = (path, filename) => {
  * @param {string} filename The file name
  * @returns {string}
  */
-const getRootThemeBuildPath = (path, filename) => {
-    return prefixPath(filename, prefixRootThemeBuildPath(path));
-};
+const getRootThemeBuildPath = (path, filename) => prefixPath(filename, prefixRootThemeBuildPath(path));
 
 /**
  * Get the theme build path for the file
@@ -83,9 +72,7 @@ const getRootThemeBuildPath = (path, filename) => {
  * @param {string} filename The file name
  * @returns {string}
  */
-const getThemeBuildPath = (path, filename) => {
-    return prefixPath(filename, prefixThemeBuildPath(path));
-};
+const getThemeBuildPath = (path, filename) => prefixPath(filename, prefixThemeBuildPath(path));
 
 /**
  * Copy a file from the source path to the destination path

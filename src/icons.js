@@ -9,7 +9,7 @@ import chalk from 'chalk';
 import fancyLog from 'fancy-log';
 import isSvg from 'is-svg';
 import logSymbols from 'log-symbols';
-import sprite from 'svg-sprite';
+import Sprite from 'svg-sprite';
 
 // Build files
 import config from './config.js';
@@ -27,7 +27,7 @@ export const createIconSprite = async () => {
     const files = globSync(`${iconPath}/**/*.svg`);
 
     // Set up the sprite generator
-    const spriteObj = new sprite({
+    const spriteObj = new Sprite({
         mode: {
             symbol: {
                 inline: true,
@@ -76,7 +76,7 @@ export const createIconSprite = async () => {
 
         // The result sprite contains some code that we don't want so we use
         // the data object to get the svg code for each icon and build the sprite.
-        var stream = fs.createWriteStream(buildPath, { flags: 'w' });
+        const stream = fs.createWriteStream(buildPath, { flags: 'w' });
         stream.write(
             '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',
         );
@@ -86,6 +86,7 @@ export const createIconSprite = async () => {
         stream.end();
         fancyLog(logSymbols.success, chalk.green('Done creating icon sprite'));
     } catch (error) {
+        // eslint-disable-next-line no-console -- Need to output the error
         console.error(error);
     }
 };

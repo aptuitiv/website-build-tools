@@ -55,9 +55,9 @@ export const prefixPath = (path, basePath, baseFolder) => {
     }
     // Prepend the base path if the path doesn't already start with it or equal to it
     if (
-        !returnValue.startsWith(`${base}/`) &&
-        returnValue !== base &&
-        returnValue !== baseFolder
+        !returnValue.startsWith(`${base}/`)
+        && returnValue !== base
+        && returnValue !== baseFolder
     ) {
         returnValue = `${base}/${returnValue}`;
     }
@@ -70,9 +70,7 @@ export const prefixPath = (path, basePath, baseFolder) => {
  * @param {string} path The file/glob path
  * @returns {string}
  */
-export const prefixRootPath = (path) => {
-    return prefixPath(path, config.data.root);
-};
+export const prefixRootPath = (path) => prefixPath(path, config.data.root);
 
 /**
  * Prefix the build path
@@ -80,9 +78,7 @@ export const prefixRootPath = (path) => {
  * @param {string} path The file/glob path
  * @returns {string}
  */
-export const prefixBuildPath = (path) => {
-    return prefixPath(path, config.data.build.base);
-};
+export const prefixBuildPath = (path) => prefixPath(path, config.data.build.base);
 
 /**
  * Prefix the root and build paths to the path
@@ -90,9 +86,7 @@ export const prefixBuildPath = (path) => {
  * @param {string} path The file/glob path
  * @returns {string}
  */
-export const prefixRootBuildPath = (path) => {
-    return prefixRootPath(prefixBuildPath(path));
-};
+export const prefixRootBuildPath = (path) => prefixRootPath(prefixBuildPath(path));
 
 /**
  * Prefix the src path
@@ -100,9 +94,7 @@ export const prefixRootBuildPath = (path) => {
  * @param {string} path The file/glob path
  * @returns {string}
  */
-export const prefixSrcPath = (path) => {
-    return prefixPath(path, config.data.src);
-};
+export const prefixSrcPath = (path) => prefixPath(path, config.data.src);
 
 /**
  * Prefix the src and root paths
@@ -110,9 +102,7 @@ export const prefixSrcPath = (path) => {
  * @param {string} path The file/glob path
  * @returns {string}
  */
-export const prefixRootSrcPath = (path) => {
-    return prefixRootPath(prefixSrcPath(path));
-};
+export const prefixRootSrcPath = (path) => prefixRootPath(prefixSrcPath(path));
 
 /**
  * Prefix the theme build path
@@ -120,9 +110,7 @@ export const prefixRootSrcPath = (path) => {
  * @param {string} path The file/glob path
  * @returns {string}
  */
-export const prefixThemeBuildPath = (path) => {
-    return prefixPath(path, config.data.build.theme);
-};
+export const prefixThemeBuildPath = (path) => prefixPath(path, config.data.build.theme);
 
 /**
  * Prefix the theme build and root paths to the path
@@ -130,9 +118,7 @@ export const prefixThemeBuildPath = (path) => {
  * @param {string} path The file/glob path
  * @returns {string}
  */
-export const prefixRootThemeBuildPath = (path) => {
-    return prefixRootPath(prefixThemeBuildPath(path));
-};
+export const prefixRootThemeBuildPath = (path) => prefixRootPath(prefixThemeBuildPath(path));
 
 /**
  * Removes the prefix from the path
@@ -144,7 +130,7 @@ export const prefixRootThemeBuildPath = (path) => {
 export const removePrefix = (path, prefix) => {
     if (path.startsWith(prefix)) {
         return path.slice(prefix.length);
-    } else if (path.startsWith(`/${prefix}`)) {
+    } if (path.startsWith(`/${prefix}`)) {
         return path.slice(prefix.length + 1);
     }
     return path;
@@ -156,14 +142,13 @@ export const removePrefix = (path, prefix) => {
  * @param {string} path The path
  * @returns {string}
  */
-export const removeRootPrefix = (path) => {
-    return removePrefix(removePrefix(path, config.data.root), '/');
-};
+export const removeRootPrefix = (path) => removePrefix(removePrefix(path, config.data.root), '/');
 
 /**
  * Remove one or more prefixes from a path
+ *
  * @param {string} path The original path
- * @param {array} prefixes An array of prefixes to remove from the path.
+ * @param {Array} prefixes An array of prefixes to remove from the path.
  *   They should be in nested order. The first is removed, and then the second, etc.
  * @returns {string}
  */
@@ -174,15 +159,3 @@ export const removePrefixes = (path, prefixes) => {
     });
     return returnValue;
 };
-
-/**
- * Returns if the value is an object
- *
- * @link https://attacomsian.com/blog/javascript-check-variable-is-object
- *
- * @param {mixed} thing The value to test
- * @returns {boolean}
- */
-export const isObjectWithValues = (thing) =>
-    Object.prototype.toString.call(thing) === '[object Object]' &&
-    Object.keys(thing).length > 0;

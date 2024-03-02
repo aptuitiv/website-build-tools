@@ -18,6 +18,8 @@ import {
     prefixRootPath,
 } from './helpers.js';
 
+/* global process */
+
 /**
  * Get the source path and make sure it starts with the correct root path
  *
@@ -58,7 +60,7 @@ export async function deleteFile(filePath) {
     const srcPath = getSourcePath(filePath);
     fs.removeSync(srcPath);
     // Get the remote path for the file to remove.
-    let removePath = getRemotePath(filePath);
+    const removePath = getRemotePath(filePath);
 
     fancyLog(chalk.magenta('Deleting file'), chalk.cyan(filePath));
 
@@ -66,11 +68,9 @@ export async function deleteFile(filePath) {
     const client = new basicFtp.Client();
     client.trackProgress((info) => {
         fancyLog(
-            chalk.magenta(`FTP ${info.type}`) +
-                ' ' +
-                chalk.cyan(removePath) +
-                ' to ' +
-                chalk.cyan(info.name),
+            `${chalk.magenta(`FTP ${info.type}`)
+            } ${chalk.cyan(removePath)
+            } to ${chalk.cyan(info.name)}`,
         );
     });
 
@@ -106,8 +106,8 @@ export async function deleteFile(filePath) {
  * @param {string} filePath The file path to upload
  */
 export async function deployFile(filePath) {
-    let srcPath = getSourcePath(filePath);
-    let remotePath = getRemotePath(filePath);
+    const srcPath = getSourcePath(filePath);
+    const remotePath = getRemotePath(filePath);
 
     fancyLog(chalk.magenta('Uploading file'), chalk.cyan(filePath));
 
@@ -115,10 +115,9 @@ export async function deployFile(filePath) {
     const client = new basicFtp.Client();
     client.trackProgress((info) => {
         fancyLog(
-            chalk.magenta(`FTP ${info.type}`) +
-                ' ' +
-                chalk.cyan(info.name) +
-                ` ${info.bytes} bytes`,
+            `${chalk.magenta(`FTP ${info.type}`)
+            } ${chalk.cyan(info.name)
+            } ${info.bytes} bytes`,
         );
     });
 
@@ -159,8 +158,8 @@ export async function deployFile(filePath) {
  * @param {string} filePath The file path to downlpad
  */
 async function downloadFile(filePath) {
-    let srcPath = getSourcePath(filePath);
-    let remotePath = getRemotePath(filePath);
+    const srcPath = getSourcePath(filePath);
+    const remotePath = getRemotePath(filePath);
 
     fancyLog(chalk.magenta('Downloading file'), chalk.cyan(filePath));
 
@@ -169,12 +168,10 @@ async function downloadFile(filePath) {
     client.trackProgress((info) => {
         if (info.bytes > 0) {
             fancyLog(
-                chalk.magenta(`FTP ${info.type}`) +
-                    ' ' +
-                    chalk.cyan(filePath) +
-                    ' to ' +
-                    chalk.cyan(prefixBuildPath(info.name)) +
-                    ` ${info.bytes} bytes`,
+                `${chalk.magenta(`FTP ${info.type}`)
+                } ${chalk.cyan(filePath)
+                } to ${chalk.cyan(prefixBuildPath(info.name))
+                } ${info.bytes} bytes`,
             );
         }
     });
@@ -214,9 +211,9 @@ async function downloadFile(filePath) {
  * @param {string} dir The directory path to delete
  */
 export async function deleteDir(dir) {
-    let srcPath = getSourcePath(dir);
+    const srcPath = getSourcePath(dir);
     fs.removeSync(srcPath);
-    let removePath = getRemotePath(dir);
+    const removePath = getRemotePath(dir);
     // Get the FTP connection
     const client = new basicFtp.Client();
 
@@ -264,10 +261,9 @@ async function deployDir(dir) {
     const client = new basicFtp.Client();
     client.trackProgress((info) => {
         fancyLog(
-            chalk.magenta(`FTP ${info.type}`) +
-                ' ' +
-                chalk.cyan(info.name) +
-                ` ${info.bytes} bytes`,
+            `${chalk.magenta(`FTP ${info.type}`)
+            } ${chalk.cyan(info.name)
+            } ${info.bytes} bytes`,
         );
     });
 
@@ -313,10 +309,9 @@ async function downloadDir(dir) {
     client.trackProgress((info) => {
         if (info.type === 'download') {
             fancyLog(
-                chalk.magenta(`FTP ${info.type}`) +
-                    ' ' +
-                    chalk.cyan(info.name) +
-                    ` ${info.bytes} bytes`,
+                `${chalk.magenta(`FTP ${info.type}`)
+                } ${chalk.cyan(info.name)
+                } ${info.bytes} bytes`,
             );
         }
     });
@@ -372,15 +367,15 @@ const ftpHander = (action, args) => {
                 // Upload a single file, a directory, or a glob of files
                 const glob = getGlob(args.path);
                 const parsedGlobPath = path.parse(glob);
-                if (parsedGlobPath.ext === '' && parsedGlobPath.name != '*') {
+                if (parsedGlobPath.ext === '' && parsedGlobPath.name !== '*') {
                     // A directory path was set
                     deployDir(glob);
                 } else {
                     fancyLog(chalk.green(`Uploading: ${args.path}`));
                     const paths = globSync(glob);
                     if (paths.length > 0) {
-                        paths.forEach((path) => {
-                            deployFile(path);
+                        paths.forEach((filePath) => {
+                            deployFile(filePath);
                         });
                     } else {
                         fancyLog(

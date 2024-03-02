@@ -2,29 +2,22 @@
     Javascript file processing
 =========================================================================== */
 
-import fs from 'fs-extra';
 import chalk from 'chalk';
 import { ESLint } from 'eslint';
-import { globSync } from 'glob';
 import fancyLog from 'fancy-log';
 import logSymbols from 'log-symbols';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-// Get the directory name of the current module
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Build scripts
 import config from './config.js';
 import {
     getGlob,
-    isObjectWithValues,
     prefixPath,
     prefixRootPath,
     prefixRootSrcPath,
     prefixSrcPath,
     removeRootPrefix,
 } from './helpers.js';
+import { isObjectWithValues } from './lib/types.js';
 
 /**
  * Get the correct source path within the Javascript base directory
@@ -43,10 +36,9 @@ const getSrcPath = (filePath) => {
  *
  * @param {string} [fileGlob] The file glob to lint
  */
-const lint = async (fileGlob) => {
+const lintJs = async (fileGlob) => {
     // Get the glob of files to lint
-    const filesToLint =
-        fileGlob || prefixRootSrcPath(`${config.data.javascript.src}/**/*.js`);
+    const filesToLint = fileGlob || prefixRootSrcPath(`${config.data.javascript.src}/**/*.js`);
 
     fancyLog(
         chalk.magenta('Linting Javascript'),
@@ -56,7 +48,7 @@ const lint = async (fileGlob) => {
     // Set up the eslint options. This is different from the linting configuration in "baseConfig".
     // This is the configuration for the eslint API.
     // See options at https://eslint.org/docs/latest/integrate/nodejs-api#-new-eslintoptions
-    let options = {
+    const options = {
         cwd: config.data.root,
         // Default configuratoin for eslint.
         // https://eslint.org/docs/latest/use/configure/
@@ -81,12 +73,14 @@ const lint = async (fileGlob) => {
 
     // Format the results to remove the root directory from the file paths.
     results = results.map((result) => {
-        result.filePath = removeRootPrefix(result.filePath);
-        return result;
+        const returnValue = result;
+        returnValue.filePath = removeRootPrefix(result.filePath);
+        return returnValue;
     });
 
     // Format and output the results
     eslint.loadFormatter('stylish').then((formatter) => {
+        // eslint-disable-next-line no-console -- Need to output the results
         console.log(formatter.format(results));
     });
 
@@ -107,7 +101,7 @@ const processJsFile = (filePath) => {
  *
  * @param {boolean} lint Whether to lint the Javascript files
  */
-const processAllJs = (lint = true) => {
+export const processAllJs = (lint = true) => {
     console.log('PROCEWS ALL JS');
 };
 
@@ -121,7 +115,7 @@ export const jsHandler = (action, args) => {
     if (action === 'process') {
         if (typeof args.file === 'string') {
             if (args.lint) {
-                lint();
+                lintJs();
             }
             const filePath = getSrcPath(args.file);
             processJsFile(filePath);
@@ -131,9 +125,9 @@ export const jsHandler = (action, args) => {
     } else if (action === 'lint') {
         if (typeof args.path === 'string') {
             const lintPath = getGlob(getSrcPath(args.path));
-            lint(lintPath);
+            lintJs(lintPath);
         } else {
-            lint();
+            lintJs();
         }
     }
 };
