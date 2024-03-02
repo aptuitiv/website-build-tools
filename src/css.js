@@ -23,7 +23,16 @@ import postcssReporter from 'postcss-reporter';
 
 // Build scripts
 import config from './config.js';
-import { getGlob, isObjectWithValues, prefixPath, prefixRootPath, prefixRootSrcPath, prefixRootThemeBuildPath, prefixSrcPath, removeRootPrefix } from './helpers.js';
+import {
+    getGlob,
+    isObjectWithValues,
+    prefixPath,
+    prefixRootPath,
+    prefixRootSrcPath,
+    prefixRootThemeBuildPath,
+    prefixSrcPath,
+    removeRootPrefix,
+} from './helpers.js';
 
 // Get the directory name of the current module
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -38,7 +47,7 @@ const getSrcPath = (filePath) => {
     const sourcePath = prefixSrcPath(config.data.css.src);
     const basePath = prefixRootPath(sourcePath);
     return prefixPath(filePath, basePath, sourcePath);
-}
+};
 
 /**
  * Really basic function to test and see if the file contents are different
@@ -61,7 +70,8 @@ function areFilesDifferent(sourceFile, targetPath) {
  * @param {string} [fileGlob] The file glob to lint
  */
 const runStylelint = async (fileGlob) => {
-    const filesToLint = fileGlob || prefixRootSrcPath(`${config.data.css.src}/**/*.css`);
+    const filesToLint =
+        fileGlob || prefixRootSrcPath(`${config.data.css.src}/**/*.css`);
 
     // Set up the configuration.
     // https://stylelint.io/user-guide/node-api
@@ -83,13 +93,13 @@ const runStylelint = async (fileGlob) => {
                 'order/properties-alphabetical-order': true,
                 // Set the BEM pattern rule
                 'plugin/selector-bem-pattern': {
-                    'ignoreCustomProperties': ['.*'],
-                    'preset': 'suit',
-                    'utilitySelectors': '^\\.(?:[a-z][a-z-0-9]*)+$'
+                    ignoreCustomProperties: ['.*'],
+                    preset: 'suit',
+                    utilitySelectors: '^\\.(?:[a-z][a-z-0-9]*)+$',
                 },
                 'selector-class-pattern': null,
-                'selector-id-pattern': null
-            }
+                'selector-id-pattern': null,
+            },
         },
         // Set the absolute path to the directory that relative paths defining "extends", "plugins", and "customSyntax" are relative to.
         // Only necessary if these values are relative paths.
@@ -101,13 +111,16 @@ const runStylelint = async (fileGlob) => {
         // Override to the absolute path to the file in your project if you want to use your own stylelint config file.
         // configFile: `${dirname(__dirname)}/.stylelintrc.cjs`
         files: filesToLint,
-        formatter: "string"
-    }
+        formatter: 'string',
+    };
     if (isObjectWithValues(config.data.stylelint)) {
         options.config = deepmerge(options.config, config.data.stylelint);
     }
 
-    fancyLog(chalk.magenta('Stylelint'), chalk.cyan(removeRootPrefix(filesToLint)));
+    fancyLog(
+        chalk.magenta('Stylelint'),
+        chalk.cyan(removeRootPrefix(filesToLint)),
+    );
     const results = await stylelint.lint(options);
     if (results.report.length > 0) {
         console.log(results.report);
@@ -116,7 +129,7 @@ const runStylelint = async (fileGlob) => {
         process.exit(2);
     }
     fancyLog(logSymbols.success, chalk.green('Stylelint finished'));
-}
+};
 
 /**
  * Run PostCSS on the file
@@ -145,23 +158,35 @@ const runPostCss = (filePath) => {
             // cssnano needs to be run last
             cssnano({
                 preset: 'default',
-            })
+            }),
         ])
             .process(css, { from: filePath, to: dest })
-            .then(result => {
+            .then((result) => {
                 if (areFilesDifferent(result.css, dest)) {
                     fs.writeFile(dest, result.css, () => {
-                        fancyLog(logSymbols.success, chalk.green('Process CSS complete'), chalk.cyan(filePath));
-                    })
+                        fancyLog(
+                            logSymbols.success,
+                            chalk.green('Process CSS complete'),
+                            chalk.cyan(filePath),
+                        );
+                    });
                     if (result.map) {
-                        fs.writeFile(`${dest}.map`, result.map.toString(), () => true)
+                        fs.writeFile(
+                            `${dest}.map`,
+                            result.map.toString(),
+                            () => true,
+                        );
                     }
                 } else {
-                    fancyLog(chalk.yellow(`Skipping ${filePath} because the built content is the same as ${dest}`));
+                    fancyLog(
+                        chalk.yellow(
+                            `Skipping ${filePath} because the built content is the same as ${dest}`,
+                        ),
+                    );
                 }
             });
-    })
-}
+    });
+};
 
 /**
  * Process all the CSS files
@@ -172,25 +197,30 @@ export const processCss = (lint = true) => {
     const buildFiles = config.data.css.buildFiles;
     let paths = [];
     if (typeof buildFiles === 'string') {
-        paths = globSync(prefixRootSrcPath(prefixPath(buildFiles, config.data.css.src)));
+        paths = globSync(
+            prefixRootSrcPath(prefixPath(buildFiles, config.data.css.src)),
+        );
     } else if (Array.isArray(buildFiles)) {
         buildFiles.forEach((file) => {
-            paths = paths.concat(globSync(prefixRootSrcPath(prefixPath(file, config.data.css.src))));
+            paths = paths.concat(
+                globSync(
+                    prefixRootSrcPath(prefixPath(file, config.data.css.src)),
+                ),
+            );
         });
     }
     if (lint) {
-        runStylelint()
-            .then(() => {
-                paths.forEach((filePath) => {
-                    runPostCss(filePath);
-                })
+        runStylelint().then(() => {
+            paths.forEach((filePath) => {
+                runPostCss(filePath);
             });
+        });
     } else {
         paths.forEach((filePath) => {
             runPostCss(filePath);
-        })
+        });
     }
-}
+};
 
 /**
  * Process the css request
@@ -217,4 +247,4 @@ export const cssHandler = (action, args) => {
             runStylelint();
         }
     }
-}
+};

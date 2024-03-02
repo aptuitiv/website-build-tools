@@ -30,24 +30,24 @@ export const createIconSprite = async () => {
     const spriteObj = new sprite({
         mode: {
             symbol: {
-                inline: true
-            }
+                inline: true,
+            },
         },
         shape: {
-            id: { // SVG shape ID related options
+            id: {
+                // SVG shape ID related options
                 separator: '-', // Separator for directory name traversal
-                generator: 'icon-%s'
+                generator: 'icon-%s',
             },
-            transform: [{
-                'svgo': {
-                    // https://svgo.dev/docs/plugins/
-                    plugins: [
-                        'preset-default',
-                        'removeXMLNS'
-                    ]
-                }
-            }],
-        }
+            transform: [
+                {
+                    svgo: {
+                        // https://svgo.dev/docs/plugins/
+                        plugins: ['preset-default', 'removeXMLNS'],
+                    },
+                },
+            ],
+        },
     });
 
     // Add each file to the sprite generator
@@ -69,13 +69,17 @@ export const createIconSprite = async () => {
         const { data } = await spriteObj.compileAsync();
 
         // Set up the build path and make sure that the folder exists
-        const buildPath = prefixRootSrcPath(prefixPath(config.data.icons.build, config.data.templates.src));
+        const buildPath = prefixRootSrcPath(
+            prefixPath(config.data.icons.build, config.data.templates.src),
+        );
         fs.ensureDirSync(dirname(buildPath));
 
         // The result sprite contains some code that we don't want so we use
         // the data object to get the svg code for each icon and build the sprite.
         var stream = fs.createWriteStream(buildPath, { flags: 'w' });
-        stream.write('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">');
+        stream.write(
+            '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',
+        );
         data.symbol.shapes.forEach((shape) => {
             stream.write(shape.svg);
         });
@@ -84,11 +88,11 @@ export const createIconSprite = async () => {
     } catch (error) {
         console.error(error);
     }
-}
+};
 
 /**
  * Process the icon request
  */
 export const iconHandler = async () => {
     createIconSprite();
-}
+};

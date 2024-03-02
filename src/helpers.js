@@ -23,7 +23,7 @@ export const getGlob = (glob) => {
         returnValue = `${returnValue.slice(0, returnValue.length - 2)}*`;
     }
     return returnValue;
-}
+};
 
 /**
  * Prefix a base path to a file/glob path if it doesn't already start with the base path.
@@ -54,86 +54,89 @@ export const prefixPath = (path, basePath, baseFolder) => {
         }
     }
     // Prepend the base path if the path doesn't already start with it or equal to it
-    if (!returnValue.startsWith(`${base}/`) && returnValue !== base && returnValue !== baseFolder) {
+    if (
+        !returnValue.startsWith(`${base}/`) &&
+        returnValue !== base &&
+        returnValue !== baseFolder
+    ) {
         returnValue = `${base}/${returnValue}`;
     }
     return returnValue;
-}
+};
 
 /**
  * Prefix the root path
- * 
+ *
  * @param {string} path The file/glob path
  * @returns {string}
  */
 export const prefixRootPath = (path) => {
     return prefixPath(path, config.data.root);
-}
+};
 
 /**
  * Prefix the build path
- * 
+ *
  * @param {string} path The file/glob path
  * @returns {string}
  */
 export const prefixBuildPath = (path) => {
     return prefixPath(path, config.data.build.base);
-}
+};
 
 /**
  * Prefix the root and build paths to the path
- * 
+ *
  * @param {string} path The file/glob path
  * @returns {string}
  */
 export const prefixRootBuildPath = (path) => {
     return prefixRootPath(prefixBuildPath(path));
-}
-
+};
 
 /**
  * Prefix the src path
- * 
+ *
  * @param {string} path The file/glob path
  * @returns {string}
  */
 export const prefixSrcPath = (path) => {
     return prefixPath(path, config.data.src);
-}
+};
 
 /**
  * Prefix the src and root paths
- * 
+ *
  * @param {string} path The file/glob path
  * @returns {string}
  */
 export const prefixRootSrcPath = (path) => {
     return prefixRootPath(prefixSrcPath(path));
-}
+};
 
 /**
  * Prefix the theme build path
- * 
+ *
  * @param {string} path The file/glob path
  * @returns {string}
  */
 export const prefixThemeBuildPath = (path) => {
     return prefixPath(path, config.data.build.theme);
-}
+};
 
 /**
  * Prefix the theme build and root paths to the path
- * 
+ *
  * @param {string} path The file/glob path
  * @returns {string}
  */
 export const prefixRootThemeBuildPath = (path) => {
     return prefixRootPath(prefixThemeBuildPath(path));
-}
+};
 
 /**
  * Removes the prefix from the path
- * 
+ *
  * @param {string} path The file path
  * @param {string} prefix The file path prefix to remove
  * @returns {string}
@@ -145,18 +148,17 @@ export const removePrefix = (path, prefix) => {
         return path.slice(prefix.length + 1);
     }
     return path;
-}
+};
 
 /**
  * Removes the root prefix from the path
- * 
+ *
  * @param {string} path The path
  * @returns {string}
  */
 export const removeRootPrefix = (path) => {
     return removePrefix(removePrefix(path, config.data.root), '/');
-
-}
+};
 
 /**
  * Remove one or more prefixes from a path
@@ -171,7 +173,7 @@ export const removePrefixes = (path, prefixes) => {
         returnValue = removePrefix(returnValue, prefix);
     });
     return returnValue;
-}
+};
 
 /**
  * Returns if the value is an object
@@ -182,4 +184,5 @@ export const removePrefixes = (path, prefixes) => {
  * @returns {boolean}
  */
 export const isObjectWithValues = (thing) =>
-    Object.prototype.toString.call(thing) === '[object Object]' && Object.keys(thing).length > 0;
+    Object.prototype.toString.call(thing) === '[object Object]' &&
+    Object.keys(thing).length > 0;

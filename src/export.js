@@ -38,13 +38,13 @@ const exportFiles = async () => {
             });
         }
     });
-}
+};
 
 /**
  * Process the export request
  */
 const exportHandler = async () => {
     exportFiles();
-}
+};
 
 export default exportHandler;

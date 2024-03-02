@@ -23,8 +23,14 @@ import watchHandler from './src/watch.js';
 const program = new Command();
 
 // Set up shared options
-const configFileOption = new Option('-c, --config <fileName>', 'The configuration file name for aptuitiv-build');
-const rootOption = new Option('--root <folderPath>', 'The root folder of the project');
+const configFileOption = new Option(
+    '-c, --config <fileName>',
+    'The configuration file name for aptuitiv-build',
+);
+const rootOption = new Option(
+    '--root <folderPath>',
+    'The root folder of the project',
+);
 
 /**
  * Copy commands
@@ -55,7 +61,10 @@ program
     .command('stylelint')
     .alias('css-lint')
     .alias('csslint')
-    .option('-p, --path [fileGlob]', 'The glob of files to lint. By default it lints all files. If you pass a file glob then only those files will be linted.')
+    .option(
+        '-p, --path [fileGlob]',
+        'The glob of files to lint. By default it lints all files. If you pass a file glob then only those files will be linted.',
+    )
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
@@ -130,7 +139,6 @@ program
         ftpHander('delete', args);
     });
 
-
 /**
  * Icon commands
  */
@@ -176,7 +184,10 @@ program
     .alias('js-lint')
     .alias('javascript-lint')
     .alias('scripts-lint')
-    .option('-p, --path [fileGlob]', 'The glob of files to lint. By default it lints all files. If you pass a file glob then only those files will be linted.')
+    .option(
+        '-p, --path [fileGlob]',
+        'The glob of files to lint. By default it lints all files. If you pass a file glob then only those files will be linted.',
+    )
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
@@ -187,7 +198,8 @@ program
 /**
  * Template related commands
  */
-program.command('pull-templates')
+program
+    .command('pull-templates')
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
@@ -195,7 +207,8 @@ program.command('pull-templates')
         templateHandler('pull');
     });
 
-program.command('push-templates')
+program
+    .command('push-templates')
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {

@@ -9,10 +9,19 @@ import { copyWatchFile } from './copy.js';
 import { processCss } from './css.js';
 import { copyFontSrcToBuild, removeFontFileFromBuild } from './font.js';
 import { deleteFile, deployFile } from './ftp.js';
-import { prefixRootPath, prefixRootSrcPath, prefixSrcPath, removePrefix, removeRootPrefix } from './helpers.js';
+import {
+    prefixRootPath,
+    prefixRootSrcPath,
+    prefixSrcPath,
+    removePrefix,
+    removeRootPrefix,
+} from './helpers.js';
 import { createIconSprite } from './icons.js';
 import { processImage, removeImageFileFromBuild } from './image.js';
-import { copyTemplateSrcToBuild, removeTemplateFileFromBuild } from './template.js';
+import {
+    copyTemplateSrcToBuild,
+    removeTemplateFileFromBuild,
+} from './template.js';
 import { copyThemeSrcToBuild, removeThemeFileFromBuild } from './theme.js';
 
 /**
@@ -27,66 +36,117 @@ const watchHandler = async () => {
     // aptuitiv-build delete -p path/to/folder
     const rootDistFolder = prefixRootPath(config.data.build.base);
     const distFolder = `${rootDistFolder}/**/*`;
-    fancyLog(chalk.magenta('Watching for changes in the dist folder'), chalk.cyan(config.data.build.base));
+    fancyLog(
+        chalk.magenta('Watching for changes in the dist folder'),
+        chalk.cyan(config.data.build.base),
+    );
     chokidar
         .watch(distFolder, { ignoreInitial: true })
-        .on('add', (path) => { deployFile(removePrefix(path, rootDistFolder)); })
-        .on('change', (path) => { deployFile(removePrefix(path, rootDistFolder)); })
-        .on('unlink', (path) => { deleteFile(removePrefix(path, rootDistFolder)); });
+        .on('add', (path) => {
+            deployFile(removePrefix(path, rootDistFolder));
+        })
+        .on('change', (path) => {
+            deployFile(removePrefix(path, rootDistFolder));
+        })
+        .on('unlink', (path) => {
+            deleteFile(removePrefix(path, rootDistFolder));
+        });
 
     // Watch for any CSS changes
     const cssFolder = prefixRootSrcPath(`${config.data.css.src}/**/*.css`);
-    fancyLog(chalk.magenta('Watching for changes in the CSS folder'), chalk.cyan(prefixSrcPath(config.data.css.src)));
-    chokidar
-        .watch(cssFolder, { ignoreInitial: true })
-        .on('all', () => { processCss() });
+    fancyLog(
+        chalk.magenta('Watching for changes in the CSS folder'),
+        chalk.cyan(prefixSrcPath(config.data.css.src)),
+    );
+    chokidar.watch(cssFolder, { ignoreInitial: true }).on('all', () => {
+        processCss();
+    });
 
     // Watch for any font changes
     const fontSrcFolder = prefixSrcPath(config.data.fonts.src);
     const fontFolder = `${prefixRootPath(fontSrcFolder)}/**/*`;
-    fancyLog(chalk.magenta('Watching for changes in the font folder'), chalk.cyan(fontSrcFolder));
+    fancyLog(
+        chalk.magenta('Watching for changes in the font folder'),
+        chalk.cyan(fontSrcFolder),
+    );
     chokidar
         .watch(fontFolder, { ignoreInitial: true })
-        .on('add', (path) => { copyFontSrcToBuild(path); })
-        .on('change', (path) => { copyFontSrcToBuild(path); })
-        .on('unlink', (path) => { removeFontFileFromBuild(path); });
+        .on('add', (path) => {
+            copyFontSrcToBuild(path);
+        })
+        .on('change', (path) => {
+            copyFontSrcToBuild(path);
+        })
+        .on('unlink', (path) => {
+            removeFontFileFromBuild(path);
+        });
 
     // Watch for any icon changes
     const iconFolder = prefixRootSrcPath(config.data.icons.src);
-    fancyLog(chalk.magenta('Watching for changes in the icons folder'), chalk.cyan(prefixSrcPath(config.data.icons.src)));
-    chokidar
-        .watch(iconFolder, { ignoreInitial: true })
-        .on('all', () => { createIconSprite() });
+    fancyLog(
+        chalk.magenta('Watching for changes in the icons folder'),
+        chalk.cyan(prefixSrcPath(config.data.icons.src)),
+    );
+    chokidar.watch(iconFolder, { ignoreInitial: true }).on('all', () => {
+        createIconSprite();
+    });
 
     // Watch for any image file changes
     const imageSrcFolder = prefixSrcPath(config.data.images.src);
     const imageFolder = `${prefixRootPath(imageSrcFolder)}/**/*`;
-    fancyLog(chalk.magenta('Watching for changes in the images folder'), chalk.cyan(imageSrcFolder));
+    fancyLog(
+        chalk.magenta('Watching for changes in the images folder'),
+        chalk.cyan(imageSrcFolder),
+    );
     chokidar
         .watch(imageFolder, { ignoreInitial: true })
-        .on('add', (path) => { processImage(path); })
-        .on('change', (path) => { processImage(path); })
-        .on('unlink', (path) => { removeImageFileFromBuild(path); });
+        .on('add', (path) => {
+            processImage(path);
+        })
+        .on('change', (path) => {
+            processImage(path);
+        })
+        .on('unlink', (path) => {
+            removeImageFileFromBuild(path);
+        });
 
     // Watch for any template file changes
     const templateSrcFolder = prefixSrcPath(config.data.templates.src);
     const templateFolder = `${prefixRootPath(templateSrcFolder)}/**/*`;
-    fancyLog(chalk.magenta('Watching for changes in the template folder'), chalk.cyan(templateSrcFolder));
+    fancyLog(
+        chalk.magenta('Watching for changes in the template folder'),
+        chalk.cyan(templateSrcFolder),
+    );
     chokidar
         .watch(templateFolder, { ignoreInitial: true })
-        .on('add', (path) => { copyTemplateSrcToBuild(path); })
-        .on('change', (path) => { copyTemplateSrcToBuild(path); })
-        .on('unlink', (path) => { removeTemplateFileFromBuild(path); });
+        .on('add', (path) => {
+            copyTemplateSrcToBuild(path);
+        })
+        .on('change', (path) => {
+            copyTemplateSrcToBuild(path);
+        })
+        .on('unlink', (path) => {
+            removeTemplateFileFromBuild(path);
+        });
 
     // Watch for any theme configuration file changes
     const themeSrcFolder = prefixSrcPath(config.data.themeConfig.src);
     const themeFolder = `${prefixRootPath(themeSrcFolder)}/**/*`;
-    fancyLog(chalk.magenta('Watching for changes in the theme folder'), chalk.cyan(themeSrcFolder));
+    fancyLog(
+        chalk.magenta('Watching for changes in the theme folder'),
+        chalk.cyan(themeSrcFolder),
+    );
     chokidar
         .watch(themeFolder, { ignoreInitial: true })
-        .on('add', (path) => { copyThemeSrcToBuild(path); })
-        .on('change', (path) => { copyThemeSrcToBuild(path); })
-        .on('unlink', (path) => { removeThemeFileFromBuild(path); });
+        .on('add', (path) => {
+            copyThemeSrcToBuild(path);
+        })
+        .on('change', (path) => {
+            copyThemeSrcToBuild(path);
+        })
+        .on('unlink', (path) => {
+            removeThemeFileFromBuild(path);
+        });
 
     // Watch an "copy" files
     const copyFilesToWatch = [];
@@ -94,7 +154,10 @@ const watchHandler = async () => {
     config.data.copy.forEach((copy) => {
         if (typeof copy.dest === 'string' && copy.dest.length > 0) {
             let filesToCopy = [];
-            if ((typeof copy.src === 'string' && copy.src.length > 0) || (Array.isArray(copy.src) && copy.src.length > 0)) {
+            if (
+                (typeof copy.src === 'string' && copy.src.length > 0) ||
+                (Array.isArray(copy.src) && copy.src.length > 0)
+            ) {
                 filesToCopy = globSync(copy.src);
             }
             if (filesToCopy.length > 0) {
@@ -107,7 +170,11 @@ const watchHandler = async () => {
         }
     });
     if (copyFilesToWatch.length > 0) {
-        fancyLog(chalk.magenta('Watching for changes in the copy configuration source files'));
+        fancyLog(
+            chalk.magenta(
+                'Watching for changes in the copy configuration source files',
+            ),
+        );
         // This is watching individual files so we're only going to process the "change" event.
         chokidar
             .watch(copyFilesToWatch, { ignoreInitial: true })
@@ -115,6 +182,6 @@ const watchHandler = async () => {
                 copyWatchFile(path, copyFilesMap[path]);
             });
     }
-}
+};
 
 export default watchHandler;

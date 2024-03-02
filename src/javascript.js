@@ -11,13 +11,20 @@ import logSymbols from 'log-symbols';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-
 // Get the directory name of the current module
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Build scripts
 import config from './config.js';
-import { getGlob, isObjectWithValues, prefixPath, prefixRootPath, prefixRootSrcPath, prefixSrcPath, removeRootPrefix } from './helpers.js';
+import {
+    getGlob,
+    isObjectWithValues,
+    prefixPath,
+    prefixRootPath,
+    prefixRootSrcPath,
+    prefixSrcPath,
+    removeRootPrefix,
+} from './helpers.js';
 
 /**
  * Get the correct source path within the Javascript base directory
@@ -29,7 +36,7 @@ const getSrcPath = (filePath) => {
     const sourcePath = prefixSrcPath(config.data.javascript.src);
     const basePath = prefixRootPath(sourcePath);
     return prefixPath(filePath, basePath, sourcePath);
-}
+};
 
 /**
  * Run eslint on the javascript files
@@ -38,9 +45,13 @@ const getSrcPath = (filePath) => {
  */
 const lint = async (fileGlob) => {
     // Get the glob of files to lint
-    const filesToLint = fileGlob || prefixRootSrcPath(`${config.data.javascript.src}/**/*.js`);
+    const filesToLint =
+        fileGlob || prefixRootSrcPath(`${config.data.javascript.src}/**/*.js`);
 
-    fancyLog(chalk.magenta('Linting Javascript'), chalk.cyan(removeRootPrefix(filesToLint)));
+    fancyLog(
+        chalk.magenta('Linting Javascript'),
+        chalk.cyan(removeRootPrefix(filesToLint)),
+    );
 
     // Set up the eslint options. This is different from the linting configuration in "baseConfig".
     // This is the configuration for the eslint API.
@@ -50,11 +61,11 @@ const lint = async (fileGlob) => {
         // Default configuratoin for eslint.
         // https://eslint.org/docs/latest/use/configure/
         baseConfig: {
-            extends: ['@aptuitiv/eslint-config-aptuitiv']
+            extends: ['@aptuitiv/eslint-config-aptuitiv'],
         },
         fix: true,
         overrideConfig: null,
-    }
+    };
     // Get the override configuration from the configuration file in the website project.
     if (isObjectWithValues(config.data.eslint)) {
         options.overrideConfig = config.data.eslint;
@@ -80,8 +91,7 @@ const lint = async (fileGlob) => {
     });
 
     fancyLog(logSymbols.success, chalk.green('Javascript linting finished'));
-}
-
+};
 
 /**
  * Process a single Javascript file
@@ -90,7 +100,7 @@ const lint = async (fileGlob) => {
  */
 const processJsFile = (filePath) => {
     console.log('PROCESS JS FILE ', filePath);
-}
+};
 
 /**
  * Process all the Javascript files
@@ -99,7 +109,7 @@ const processJsFile = (filePath) => {
  */
 const processAllJs = (lint = true) => {
     console.log('PROCEWS ALL JS');
-}
+};
 
 /**
  * Process the Javascript request
@@ -126,4 +136,4 @@ export const jsHandler = (action, args) => {
             lint();
         }
     }
-}
+};

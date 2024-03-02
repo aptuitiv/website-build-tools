@@ -33,7 +33,7 @@ class Config {
         if (Object.keys(this.data).length === 0) {
             await this.getConfigFromProject(args.config, args.root);
         }
-    }
+    };
 
     /**
      * Get the configuration object
@@ -42,7 +42,7 @@ class Config {
      */
     getConfig = () => {
         return this.data;
-    }
+    };
 
     /**
      * Get the default configuration object
@@ -59,7 +59,7 @@ class Config {
                 // The root build folder for the files to publish to the website. This is used when uploading files via FTP.
                 base: 'dist',
                 // The build folder path for all files for the theme. This is used when uploading files via FTP.
-                theme: 'dist/theme/custom'
+                theme: 'dist/theme/custom',
             },
             css: {
                 // The folder for the CSS files within the theme build folder. (config.build.theme)
@@ -79,7 +79,7 @@ class Config {
                 // The folder for the fonts within the theme build folder. (config.build.theme)
                 build: 'fonts',
                 // The source folder for the fonts within the root source folder. (config.src)
-                src: 'fonts'
+                src: 'fonts',
             },
             icons: {
                 // The path within the src templates folder that the icon sprite will be created in
@@ -95,22 +95,22 @@ class Config {
                     jpg: {
                         mozjpeg: true,
                         quality: 80,
-                        progressive: true
+                        progressive: true,
                     },
                     png: {
                         quality: 80,
                         progressive: true,
                         compressionLevel: 6,
-                        adaptiveFiltering: true
+                        adaptiveFiltering: true,
                     },
                     webp: {
                         quality: 80,
                         lossless: false,
-                        smartSubsample: true
-                    }
+                        smartSubsample: true,
+                    },
                 },
                 // The source folder for the image files within the root source folder. (config.src)
-                src: 'images'
+                src: 'images',
             },
             javascript: {
                 // The folder for the javascript files within the theme build folder. (config.build.theme)
@@ -120,7 +120,7 @@ class Config {
                 // An array of file globs to process.
                 files: [],
                 // The source folder for the javascript files within the root source folder. (config.src)
-                src: 'js'
+                src: 'js',
             },
             // The root folder for all the project files. If the user needs to change this they should put
             // it as the absolute path to the root of their project.
@@ -134,18 +134,18 @@ class Config {
                 // The folder for the theme twig templates within the theme build folder. (config.build.theme)
                 build: 'templates',
                 // The source folder for the theme twig templates within the root source folder. (config.src)
-                src: 'theme'
+                src: 'theme',
             },
             themeConfig: {
                 // The folder for the theme config files within the theme build folder. (config.build.theme)
                 build: 'config',
                 // The source folder for the theme config files within the root source folder. (config.src)
-                src: 'config'
+                src: 'config',
             },
         };
 
         return defaultConfig;
-    }
+    };
     /**
      * Loads the configuration file and merges it with the default configuration.
      *
@@ -171,11 +171,14 @@ class Config {
         const configExplorer = cosmiconfig('aptuitiv-build', {
             transform: (cosmiconfigResult) => {
                 let foundConfig = {};
-                if (isObjectWithValues(cosmiconfigResult) && isObjectWithValues(cosmiconfigResult.config)) {
+                if (
+                    isObjectWithValues(cosmiconfigResult) &&
+                    isObjectWithValues(cosmiconfigResult.config)
+                ) {
                     foundConfig = cosmiconfigResult.config;
                 }
                 // Merge the default configuration with the configuration file contents
-                return deepmerge(this.getDefaultConfig(), foundConfig)
+                return deepmerge(this.getDefaultConfig(), foundConfig);
             },
             searchStrategy: 'project',
         });
@@ -196,15 +199,18 @@ class Config {
         }
         // Load the configuration file if it exists
         if (typeof configFile === 'string') {
-            const configPath = resolveFrom.silent(cwd, configFile) || join(cwd, configFile);
-            await configExplorer.load(configPath)
+            const configPath =
+                resolveFrom.silent(cwd, configFile) || join(cwd, configFile);
+            await configExplorer
+                .load(configPath)
                 .then((result) => {
                     // The specified configuration file exists
                     config = result;
                 })
                 .catch(async (err) => {
                     // The specified configuration file doesn't exist so search for for the configuration file based 'aptuitiv-build' in the root folder
-                    await configExplorer.search()
+                    await configExplorer
+                        .search()
                         .then((result) => {
                             config = result;
                         })
@@ -212,10 +218,9 @@ class Config {
                 });
         } else {
             // NO configuration file was specified so search for for the configuration file based 'aptuitiv-build' in the root folder
-            await configExplorer.search()
-                .then((result) => {
-                    config = result;
-                });
+            await configExplorer.search().then((result) => {
+                config = result;
+            });
         }
 
         // Override the root folder if it was passed in as an argument
@@ -229,7 +234,7 @@ class Config {
         dotenv.config({ path: resolve(cwd, '.env') });
 
         this.data = config;
-    }
+    };
 }
 
 const configClass = new Config();

@@ -1,55 +1,56 @@
 {
-  "name": "@aptuitiv/website-build-tools",
-  "version": "1.0.0",
-  "description": "Build tools to help with building and deploying websites at Aptuitiv",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/aptuitiv/website-build-tools.git"
-  },
-  "author": "Eric Tompkins",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/aptuitiv/website-build-tools/issues"
-  },
-  "homepage": "https://github.com/aptuitiv/website-build-tools#readme",
-  "bin": {
-    "aptuitiv-build": "./index.js"
-  },
-  "dependencies": {
-    "@aptuitiv/eslint-config-aptuitiv": "^0.5.0",
-    "autoprefixer": "^10.4.17",
-    "basic-ftp": "^5.0.5",
-    "chalk": "^5.3.0",
-    "chokidar": "^3.6.0",
-    "commander": "^12.0.0",
-    "cosmiconfig": "^9.0.0",
-    "cssnano": "^6.0.5",
-    "deepmerge": "^4.3.1",
-    "dotenv": "^16.4.5",
-    "eslint": "^8.57.0",
-    "fancy-log": "^2.0.0",
-    "fs-extra": "^11.2.0",
-    "glob": "^10.3.10",
-    "image-type": "^5.2.0",
-    "is-svg": "^5.0.0",
-    "log-symbols": "^6.0.0",
-    "postcss": "^8.4.35",
-    "postcss-custom-media": "^10.0.3",
-    "postcss-import": "^16.0.1",
-    "postcss-reporter": "^7.1.0",
-    "read-chunk": "^4.0.3",
-    "resolve-from": "^5.0.0",
-    "sharp": "^0.33.2",
-    "stylelint": "^16.2.1",
-    "stylelint-config-standard": "^36.0.0",
-    "stylelint-order": "^6.0.4",
-    "stylelint-selector-bem-pattern": "^4.0.0",
-    "svg-sprite": "^2.0.2",
-    "svgo": "^3.2.0"
-  },
-  "type": "module"
+    "name": "@aptuitiv/website-build-tools",
+    "version": "1.0.0",
+    "description": "Build tools to help with building and deploying websites at Aptuitiv",
+    "main": "index.js",
+    "scripts": {
+        "prettier": "prettier --write ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/aptuitiv/website-build-tools.git"
+    },
+    "author": "Eric Tompkins",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/aptuitiv/website-build-tools/issues"
+    },
+    "homepage": "https://github.com/aptuitiv/website-build-tools#readme",
+    "bin": {
+        "aptuitiv-build": "./index.js"
+    },
+    "dependencies": {
+        "@aptuitiv/eslint-config-aptuitiv": "^0.5.0",
+        "autoprefixer": "^10.4.17",
+        "basic-ftp": "^5.0.5",
+        "chalk": "^5.3.0",
+        "chokidar": "^3.6.0",
+        "commander": "^12.0.0",
+        "cosmiconfig": "^9.0.0",
+        "cssnano": "^6.0.5",
+        "deepmerge": "^4.3.1",
+        "dotenv": "^16.4.5",
+        "eslint": "^8.57.0",
+        "fancy-log": "^2.0.0",
+        "fs-extra": "^11.2.0",
+        "glob": "^10.3.10",
+        "image-type": "^5.2.0",
+        "is-svg": "^5.0.0",
+        "log-symbols": "^6.0.0",
+        "postcss": "^8.4.35",
+        "postcss-custom-media": "^10.0.3",
+        "postcss-import": "^16.0.1",
+        "postcss-reporter": "^7.1.0",
+        "prettier": "^3.2.5",
+        "read-chunk": "^4.0.3",
+        "resolve-from": "^5.0.0",
+        "sharp": "^0.33.2",
+        "stylelint": "^16.2.1",
+        "stylelint-config-standard": "^36.0.0",
+        "stylelint-order": "^6.0.4",
+        "stylelint-selector-bem-pattern": "^4.0.0",
+        "svg-sprite": "^2.0.2",
+        "svgo": "^3.2.0"
+    },
+    "type": "module"
 }
