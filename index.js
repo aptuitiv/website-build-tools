@@ -64,7 +64,19 @@ program
     });
 
 /**
- * Font commands 
+ * Export command
+ */
+program
+    .command('export')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        await config.init(args);
+        exportHandler();
+    });
+
+/**
+ * Font commands
  */
 program
     .command('push-fonts')
@@ -118,17 +130,6 @@ program
         ftpHander('delete', args);
     });
 
-/**
- * Export command
- */
-program
-    .command('export')
-    .addOption(configFileOption)
-    .addOption(rootOption)
-    .action(async (args) => {
-        await config.init(args);
-        exportHandler();
-    });
 
 /**
  * Icon commands
