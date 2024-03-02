@@ -128,20 +128,8 @@ class Config {
             // The root folder to the source files.
             src: 'src',
             // Stylelint configuration options
-            // https://stylelint.io/user-guide/options
-            // You can set any valid options here
-            stylelint: {
-                // Set the absolute path to the directory that relative paths defining "extends", "plugins", and "customSyntax" are relative to.
-                // Only necessary if these values are relative paths.
-                // This is set to the root of the aptuitiv-build project folder.
-                // Override to your project's base directory if you want to use your own stylelint config file.
-                // If overridden, this must be the absolute path to the base directory of the project.
-                configBasedir: dirname(__dirname),
-                // The path to the configuration file.
-                // This is set to the file path in the root of the aptuitiv-build project folder.
-                // Override to the absolute path to the file in your project if you want to use your own stylelint config file.
-                configFile: `${dirname(__dirname)}/.stylelintrc.cjs`
-            },
+            // https://stylelint.io/user-guide/configure
+            stylelint: {},
             templates: {
                 // The folder for the theme twig templates within the theme build folder. (config.build.theme)
                 build: 'templates',
