@@ -1,0 +1,7 @@
+# Export action
+
+You can export the site source files to make it easier to copy them to another site. They are exported to the `_export` folder in the project root folder.
+
+```bash
+aptuitiv-build export
+```

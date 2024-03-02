@@ -1,0 +1,39 @@
+# Copy file actions
+
+Often you'll need to copy files from the `node_modules` folder to your build folder to deploy to your website. The easiest way to do this is to set up your own configuration file and set the `copy` value.
+
+Here is an example of a JSON configuration file with the `copy` configuration.
+
+```json
+{
+  "copy": [
+    {
+      "src": [
+        "node_modules/@splidejs/splide/dist/css/splide.min.css",
+        "node_modules/@splidejs/splide/dist/js/splide.min.js",
+        "node_modules/@splidejs/splide-extension-video/dist/js/splide-extension-video.min.js",
+        "node_modules/@splidejs/splide-extension-video/dist/css/splide-extension-video.min.css"
+      ],
+      "dest": "splide"
+    },
+    {
+      "src": "node_modules/just-validate/dist/just-validate.production.min.js",
+      "dest": "just-validate"
+    }
+  ]
+}
+```
+
+Each object in the `copy` array should have a `src` value and a `dest` value.
+
+The `src` value can be a string matching a single file, a string glob, and array of of files, or an array of globs.
+
+The `dest` value is the folder within the theme build folder to copy the files to.
+
+The command line call to copy files is:
+
+```bash
+aptuitiv-build copy
+```
+
+The copy `src` paths will be watched and re-copied if they change while the [watch](Watch.md) process is running.

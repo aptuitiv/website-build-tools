@@ -1,0 +1,144 @@
+# FTP actions
+
+You can upload files or directories, download files or directories, and delete files or directories via FTP.
+
+- [FTP actions](#ftp-actions)
+  - [Upload files and directories](#upload-files-and-directories)
+    - [Upload all files in the build directory](#upload-all-files-in-the-build-directory)
+    - [Upload the theme files in the build theme directory](#upload-the-theme-files-in-the-build-theme-directory)
+    - [Upload a single file](#upload-a-single-file)
+    - [Upload a folder](#upload-a-folder)
+    - [Upload a glob of files](#upload-a-glob-of-files)
+  - [Download files or directories](#download-files-or-directories)
+    - [Download a folder](#download-a-folder)
+    - [Download a file](#download-a-file)
+    - [Download all the theme files](#download-all-the-theme-files)
+  - [Delete files or directories](#delete-files-or-directories)
+    - [Delete a file](#delete-a-file)
+    - [Delete a folder](#delete-a-folder)
+
+## Upload files and directories
+
+### Upload all files in the build directory
+
+```bash
+aptuitiv-build upload
+```
+
+### Upload the theme files in the build theme directory
+
+```bash
+aptuitiv-build upload -t
+aptuitiv-build upload --theme
+```
+
+### Upload a single file
+
+```bash
+aptuitiv-build upload -p 'dist/theme/custom/css/main.css'
+aptuitiv-build upload --path 'dist/theme/custom/css/main.css'
+```
+
+Or the build folder can be left off.
+
+```bash
+aptuitiv-build upload -p 'theme/custom/css/main.css'
+aptuitiv-build upload --path 'theme/custom/css/main.css'
+```
+
+### Upload a folder
+
+```bash
+aptuitiv-build upload -p 'dist/theme/custom/css'
+aptuitiv-build upload --path 'dist/theme/custom/css'
+```
+
+Or the build folder can be left off.
+
+```bash
+aptuitiv-build upload -p 'theme/custom/css'
+aptuitiv-build upload --path 'theme/custom/css'
+```
+
+### Upload a glob of files
+
+```bash
+aptuitiv-build upload -p 'dist/theme/custom/js/*'
+aptuitiv-build upload --path 'dist/theme/custom/js/*'
+```
+
+Or the build folder can be left off.
+
+```bash
+aptuitiv-build upload -p 'theme/custom/js/**/*.js'
+aptuitiv-build upload --path 'theme/custom/js/**/*.js'
+```
+
+## Download files or directories
+
+### Download a folder
+
+```bash
+aptuitiv-build download -p 'dist/theme/custom/js'
+aptuitiv-build download --path 'dist/theme/custom/js'
+```
+
+Or the build folder can be left off.
+
+```bash
+aptuitiv-build download -p 'theme/custom/js'
+aptuitiv-build download --path 'theme/custom/js'
+```
+
+### Download a file
+
+```bash
+aptuitiv-build download -p 'dist/theme/custom/js/main.js'
+aptuitiv-build download --path 'dist/theme/custom/js/main.js'
+```
+
+Or the build folder can be left off.
+
+```bash
+aptuitiv-build download -p 'theme/custom/js/main.js'
+aptuitiv-build download --path 'theme/custom/js/main.js'
+```
+
+### Download all the theme files
+
+```bash
+aptuitiv-build download -t
+aptuitiv-build download --theme
+```
+
+## Delete files or directories
+
+Delete a file or folder.
+
+### Delete a file
+
+```bash
+aptuitiv-build delete -p 'dist/theme/custom/js/main.js'
+aptuitiv-build delete --path 'dist/theme/custom/js/main.js'
+```
+
+Or the build folder can be left off.
+
+```bash
+aptuitiv-build delete -p 'theme/custom/js/main.js'
+aptuitiv-build delete --path 'theme/custom/js/main.js'
+```
+
+### Delete a folder
+
+```bash
+aptuitiv-build delete -p 'dist/theme/custom/js'
+aptuitiv-build delete --path 'dist/theme/custom/js'
+```
+
+Or the build folder can be left off.
+
+```bash
+aptuitiv-build delete -p 'theme/custom/js'
+aptuitiv-build delete --path 'theme/custom/js'
+```
