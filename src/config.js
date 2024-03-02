@@ -17,16 +17,16 @@ import { isObjectWithValues } from './helpers.js';
 class Config {
     /**
      * Holds the configuration object
-     * 
+     *
      * @type {object}
      */
     data = {};
 
     /**
      * Initializes the configuration object.
-     * 
+     *
      * If it doesn't exist yet then it's set up.
-     * 
+     *
      * @param {object} args An object containing the command line arguments
      */
     init = async (args) => {
@@ -37,7 +37,7 @@ class Config {
 
     /**
      * Get the configuration object
-     * 
+     *
      * @returns {object} The configuration object
      */
     getConfig = () => {
@@ -46,7 +46,7 @@ class Config {
 
     /**
      * Get the default configuration object
-     * 
+     *
      * @returns {object} The default configuration object
      */
     getDefaultConfig = () => {
@@ -72,6 +72,9 @@ class Config {
             },
             // An array of file globs to copy and their destination folders
             copy: [],
+            // Eslint linting configuration
+            // https://eslint.org/docs/latest/use/configure/
+            eslint: {},
             fonts: {
                 // The folder for the fonts within the theme build folder. (config.build.theme)
                 build: 'fonts',
@@ -109,6 +112,16 @@ class Config {
                 // The source folder for the image files within the root source folder. (config.src)
                 src: 'images'
             },
+            javascript: {
+                // The folder for the javascript files within the theme build folder. (config.build.theme)
+                build: 'js',
+                // An array of file globs to bundle and their destination folder
+                bundles: [],
+                // An array of file globs to process.
+                files: [],
+                // The source folder for the javascript files within the root source folder. (config.src)
+                src: 'js'
+            },
             // The root folder for all the project files. If the user needs to change this they should put
             // it as the absolute path to the root of their project.
             root: process.cwd(),
@@ -118,7 +131,7 @@ class Config {
             // https://stylelint.io/user-guide/options
             // You can set any valid options here
             stylelint: {
-                // Set the absolute path to the directory that relative paths defining "extends", "plugins", and "customSyntax" are relative to. 
+                // Set the absolute path to the directory that relative paths defining "extends", "plugins", and "customSyntax" are relative to.
                 // Only necessary if these values are relative paths.
                 // This is set to the root of the aptuitiv-build project folder.
                 // Override to your project's base directory if you want to use your own stylelint config file.
@@ -147,21 +160,21 @@ class Config {
     }
     /**
      * Loads the configuration file and merges it with the default configuration.
-     * 
-     * The configuration file can follow the cosmiconfig specification. 
+     *
+     * The configuration file can follow the cosmiconfig specification.
      * This means it can be a JSON or YAML file, or a JavaScript file that exports the configuration object.
      * https://github.com/cosmiconfig/cosmiconfig
-     * 
+     *
      * Or, it can be a file that is specified in the "-c" or "--config" command line argument.
-     * 
+     *
      * The path searched will either be:
      * - A specificed configuration file path
      * - The root folder of the project
      * - The working directory
-     * 
+     *
      * This is inspired by the way that stylelint loads its configuration file.
      * https://github.com/stylelint/stylelint/blob/main/lib/cli.mjs
-     * 
+     *
      * @param {string} [configFile] The name of the configuration file to load
      * @param {string} [rootFolder] The root folder of the project
      */

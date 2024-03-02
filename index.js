@@ -14,6 +14,7 @@ import { fontHandler } from './src/font.js';
 import ftpHander from './src/ftp.js';
 import { iconHandler } from './src/icons.js';
 import { imageHandler } from './src/image.js';
+import { jsHandler } from './src/javascript.js';
 import { templateHandler } from './src/template.js';
 import { themeHandler } from './src/theme.js';
 import watchHandler from './src/watch.js';
@@ -152,6 +153,34 @@ program
     .action(async (args) => {
         await config.init(args);
         imageHandler();
+    });
+
+/**
+ * Javascripot commands
+ */
+program
+    .command('js')
+    .alias('javascript')
+    .alias('scripts')
+    .option('-f, --file <filePath>', 'Process a specific file')
+    .option('--no-lint', 'Whether to lint the Javascript files')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        await config.init(args);
+        jsHandler('process', args);
+    });
+program
+    .command('jslint')
+    .alias('js-lint')
+    .alias('javascript-lint')
+    .alias('scripts-lint')
+    .option('-p, --path [fileGlob]', 'The glob of files to lint. By default it lints all files. If you pass a file glob then only those files will be linted.')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        await config.init(args);
+        jsHandler('lint', args);
     });
 
 /**

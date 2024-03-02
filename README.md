@@ -8,6 +8,10 @@ Build tools to help with building and deploying websites at Aptuitiv.
     - [Default configuration](#default-configuration)
   - [Copy file actions](#copy-file-actions)
   - [Processing CSS files](#processing-css-files)
+  - [Processing Javscript files](#processing-javscript-files)
+    - [Javascript bundles](#javascript-bundles)
+    - [Single Javascript files](#single-javascript-files)
+  - [Linting Javascript](#linting-javascript)
   - [CSS actions](#css-actions)
     - [Process all CSS files](#process-all-css-files)
     - [Process a specific file](#process-a-specific-file)
@@ -29,6 +33,10 @@ Build tools to help with building and deploying websites at Aptuitiv.
     - [Delete a folder](#delete-a-folder)
   - [Icon action](#icon-action)
   - [Images action](#images-action)
+  - [Javascript actions](#javascript-actions)
+    - [Process all Javascript files](#process-all-javascript-files)
+    - [Process a specific Javascript file](#process-a-specific-javascript-file)
+    - [Lint Javsacript files with eslint](#lint-javsacript-files-with-eslint)
   - [Template actions](#template-actions)
     - [Pull template files](#pull-template-files)
     - [Push template files](#push-template-files)
@@ -90,14 +98,13 @@ Below is the default configuration.
         theme: 'dist/theme/custom'
     },
     css: {
-        // The base path for the CSS files within the root source folder. (config.src)
-        base: 'css',
+        // The folder for the CSS files within the theme build folder. (config.build.theme)
+        build: 'css',
         // The glob for CSS file(s) that import the other CSS files.  This is used when building the files.
         // This is within the root source folder. (config.src)
-        buildFiles: 'css/*.css',
-        // The glob for all CSS files. This is used when linting CSS files.
-        // This is within the root source folder. (config.src)
-        files: 'css/**/*.css'
+        buildFiles: '*.css',
+        // The source folder for the CSS files within the root source folder. (config.src)
+        src: 'css',
     },
     // An array of file globs and their destination folder
     copy: [],
@@ -250,6 +257,138 @@ If the value is an array then it should be an array of file paths or globs.
   ]
 }
 ```
+
+## Processing Javscript files
+
+There are two ways that Javascript files can be processed.
+
+1. As a bundle with the `javascript.bundles` configuration array. This will join files together and output them in a single file in the build folder.
+2. As a single file that is minified and then output in the build folder.
+
+### Javascript bundles
+
+Javascript files are often bundled together and minified before saving to the build folder. The `javascript.bundles` configuration array holds that inforamation.
+
+The `javascript.budles` array holds an array of objects that specify each bundle.
+
+Each bundle object can have the following values.
+
+- _name_ (Required) (string) The name of the bundled file that will be output in the Javascript build directory (`javascript.build`).
+- _node_modules_ (string|array) A string containing the path to a single file or glob to include in the bundle from the `node_modules` folder. Or, an array of files or globs to include in the bundle from the `node_modules` folder. The path should start with the package name and not with the `node_modules` folder.
+- _src_ (string|array) A string containing the path to a single file or glob in the Javascript src folder (`javascript.src`) to include in the bundle. Or, an array of files or globs in the Javascript source folder to include in the bundle. The path should start within the Javascript source folder and not include the source folder name.
+
+In addition to `name`, you must at least set `node_modules` or `src`. You can set both.
+Here are some examples:
+
+```js
+{
+  "javascript": {
+    "bundles": [
+      {
+        "name": "name-of-file.js",
+        "src": "folder/**/*.js",
+      }
+    ]
+  }
+}
+```
+
+```js
+{
+  "javascript": {
+    "bundles": [
+      {
+        "name": "name-of-file.js",
+        "src": [
+          "file1.js",
+          "folder/file2.js",
+          "another-file.js",
+          "glob-folder/*.js"
+        ]
+      }
+    ]
+  }
+}
+```
+
+```js
+{
+  "javascript": {
+    "bundles": [
+      {
+        "name": "name-of-file.js",
+        "node_modules": [
+          "packageName/path/to/file.js",
+          "anotherPackage/path/**/*.js"
+        ],
+        "src": [
+          "some-file.js",
+          "folder/*.js"
+        ]
+      }
+    ]
+  }
+}
+```
+
+```js
+{
+  "javascript": {
+    "bundles": [
+      {
+        "name": "name-of-file.js",
+        "node_modules": "anotherPackage/path/**/*.js",
+        "src": "some-file.js",
+      }
+    ]
+  }
+}
+```
+
+### Single Javascript files
+
+If you don't need to bundle a file with another set of files then you can use the `javascript.files` configuration array to specify files to minify and copy to the build directory.
+
+The `javascript.files` arary is an array of file paths where the file path starts in the Javascript source directory (`javascript.src`).
+
+```js
+{
+  "javascript": {
+    "files": [
+      "filename.js",
+      "subFolder/my-file.js"
+    ]
+  }
+}
+```
+
+The files are minified and output in the build directory in the Javascript build directory (`javascript.build`) with the same file name and path.
+
+## Linting Javascript
+
+Javascript files are linted with [eslint](https://eslint.org/). Only files within the `javascript.src` directory are linted. This means that you don't have to worry about setting up ignore rules for the build folder or other folders.
+
+You can override the existing [eslint configuration](https://eslint.org/docs/latest/use/configure/) with your own configuration in the `eslint` section of the configuration file.
+
+The base configuration is simple and only extends [@aptuitiv/eslint-config-aptuitiv](https://github.com/aptuitiv/eslint-config-aptuitiv).
+
+```js
+{
+    extends: ['@aptuitiv/eslint-config-aptuitiv']
+}
+```
+
+This means that you are save to set any valid eslint configuration and it won't completely overwrite an existing configuration (unless you set `extends`).
+
+Typically, the only configuration that you may need to do is to add some ignore patterns. For example, to ignore the Javascript for [fslightbox](https://fslightbox.com/) you might do something like this:
+
+```json
+"eslint": {
+    "ignorePatterns": ["fslightbox.js"]
+}
+```
+
+If you're just ignoring files, you could also add a `.eslintignore` file in your project root. But, for consistency with keeping all build functionality in one place, we recommend that you put any eslint ignores in the configuration file as described above.
 
 ## CSS actions
 
@@ -464,6 +603,64 @@ Copy the images to the build folder and optimize the images.
 
 ```bash
 aptuitiv-build images
+```
+
+## Javascript actions
+
+### Process all Javascript files
+
+The following are equivalent.
+
+```bash
+aptuitiv-build js
+aptuitiv-build javascript
+aptuitiv-build scripts
+```
+
+Don't lint while processing.
+
+```bash
+aptuitiv-build js --no-lint
+```
+
+### Process a specific Javascript file
+
+```bash
+aptuitiv-build js -f my-file.js
+aptuitiv-build js --file my-file.js
+```
+
+The `file` argument should be the path to the Javascript file within the base Javascript folder, which is typically `src/js`.
+
+Don't lint while processing.
+
+```bash
+aptuitiv-build js -f my-file.js --no-lint
+```
+
+### Lint Javsacript files with eslint
+
+Lint all files.
+
+The following are equivalent.
+
+```bash
+aptuitiv-build jslint
+aptuitiv-build js-lint
+aptuitiv-build javascript-lint
+aptuitiv-build scripts-lint
+```
+
+Lint a specific file.
+
+```bash
+aptuitiv-build jslint -p 'src/js/my-file.js'
+```
+
+Lint a glob of files.
+
+```bash
+aptuitiv-build jslint -p 'src/js/something/*'
 ```
 
 ## Template actions

@@ -20,6 +20,7 @@
     "aptuitiv-build": "./index.js"
   },
   "dependencies": {
+    "@aptuitiv/eslint-config-aptuitiv": "^0.5.0",
     "autoprefixer": "^10.4.17",
     "basic-ftp": "^5.0.5",
     "chalk": "^5.3.0",
@@ -29,6 +30,7 @@
     "cssnano": "^6.0.5",
     "deepmerge": "^4.3.1",
     "dotenv": "^16.4.5",
+    "eslint": "^8.57.0",
     "fancy-log": "^2.0.0",
     "fs-extra": "^11.2.0",
     "glob": "^10.3.10",
