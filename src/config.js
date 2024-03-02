@@ -62,16 +62,15 @@ class Config {
                 theme: 'dist/theme/custom'
             },
             css: {
-                // The base path for the CSS files within the root source folder. (config.src)
-                base: 'css',
+                // The folder for the CSS files within the theme build folder. (config.build.theme)
+                build: 'css',
                 // The glob for CSS file(s) that import the other CSS files.  This is used when building the files.
                 // This is within the root source folder. (config.src)
-                buildFiles: 'css/*.css',
-                // The glob for all CSS files. This is used when linting CSS files.
-                // This is within the root source folder. (config.src)
-                files: 'css/**/*.css'
+                buildFiles: '*.css',
+                // The source folder for the CSS files within the root source folder. (config.src)
+                src: 'css',
             },
-            // An array of file globs and their destination folder
+            // An array of file globs to copy and their destination folders
             copy: [],
             fonts: {
                 // The folder for the fonts within the theme build folder. (config.build.theme)

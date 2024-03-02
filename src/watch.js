@@ -35,8 +35,8 @@ const watchHandler = async () => {
         .on('unlink', (path) => { deleteFile(removePrefix(path, rootDistFolder)); });
 
     // Watch for any CSS changes
-    const cssFolder = prefixRootSrcPath(config.data.css.files);
-    fancyLog(chalk.magenta('Watching for changes in the CSS folder'), chalk.cyan(prefixSrcPath(config.data.css.base)));
+    const cssFolder = prefixRootSrcPath(`${config.data.css.src}/**/*.css`);
+    fancyLog(chalk.magenta('Watching for changes in the CSS folder'), chalk.cyan(prefixSrcPath(config.data.css.src)));
     chokidar
         .watch(cssFolder, { ignoreInitial: true })
         .on('all', () => { processCss() });

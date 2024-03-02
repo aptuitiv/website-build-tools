@@ -21,7 +21,7 @@ import postcssReporter from 'postcss-reporter';
 
 // Build scripts
 import config from './config.js';
-import { getGlob, prefixPath, prefixRootPath, prefixSrcPath } from './helpers.js';
+import { getGlob, prefixPath, prefixRootPath, prefixRootSrcPath, prefixRootThemeBuildPath, prefixSrcPath } from './helpers.js';
 
 /**
  * Get the correct CSS source path within the CSS base directory
@@ -30,7 +30,7 @@ import { getGlob, prefixPath, prefixRootPath, prefixSrcPath } from './helpers.js
  * @returns {string}
  */
 const getSrcPath = (filePath) => {
-    const sourcePath = prefixSrcPath(config.data.css.base);
+    const sourcePath = prefixSrcPath(config.data.css.src);
     const basePath = prefixRootPath(sourcePath);
     return prefixPath(filePath, basePath, sourcePath);
 }
@@ -56,7 +56,7 @@ function areFilesDifferent(sourceFile, targetPath) {
  * @param {string} [fileGlob] The file glob to lint
  */
 const runStylelint = async (fileGlob) => {
-    const filesToLint = fileGlob || prefixSrcPath(config.data.css.files);
+    const filesToLint = fileGlob || prefixRootSrcPath(`${config.data.css.src}/**/*.css`);
     let options = {
         files: filesToLint,
         formatter: "string"
@@ -81,8 +81,8 @@ const runStylelint = async (fileGlob) => {
  */
 const runPostCss = (filePath) => {
     const { base: fileName } = parse(filePath);
-    const destDir = `${config.data.build.theme}/css`;
-    const dest = `${destDir}/${fileName}`;
+    const destDir = prefixRootThemeBuildPath(config.data.css.build);
+    const dest = prefixPath(fileName, destDir);
     // Make sure that the destination directory exists
     if (!fs.existsSync(destDir)) {
         fs.mkdirSync(destDir, { recursive: true });
@@ -125,7 +125,15 @@ const runPostCss = (filePath) => {
  * @param {boolean} lint Whether to lint the CSS files
  */
 export const processCss = (lint = true) => {
-    const paths = globSync(prefixSrcPath(config.data.css.buildFiles));
+    const buildFiles = config.data.css.buildFiles;
+    let paths = [];
+    if (typeof buildFiles === 'string') {
+        paths = globSync(prefixRootSrcPath(prefixPath(buildFiles, config.data.css.src)));
+    } else if (Array.isArray(buildFiles)) {
+        buildFiles.forEach((file) => {
+            paths = paths.concat(globSync(prefixRootSrcPath(prefixPath(file, config.data.css.src))));
+        });
+    }
     if (lint) {
         runStylelint()
             .then(() => {

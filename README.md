@@ -7,6 +7,7 @@ Build tools to help with building and deploying websites at Aptuitiv.
   - [Configuration](#configuration)
     - [Default configuration](#default-configuration)
   - [Copy file actions](#copy-file-actions)
+  - [Processing CSS files](#processing-css-files)
   - [CSS actions](#css-actions)
     - [Process all CSS files](#process-all-css-files)
     - [Process a specific file](#process-a-specific-file)
@@ -211,6 +212,44 @@ aptuitiv-build copy
 ```
 
 The copy `src` paths will be watched and re-copied if they change while the [watch](#watch-action) process is running.
+
+## Processing CSS files
+
+The `css.buildFiles` configuration references the base CSS files in the source folder (`css.src`). The value can be a string or an array.
+
+If it's a string then it should be a path to a single CSS file or a glob referencing one or more files.
+
+```js
+{
+  "css": "main.css"
+}
+```
+
+```js
+{
+  "css": "*.css"
+}
+```
+
+If the value is an array then it should be an array of file paths or globs.
+
+```js
+{
+  "css": [
+    "*.css",
+    "folder/other-file.css"
+  ]
+}
+```
+
+```js
+{
+  "css": [
+    "main.css",
+    "other-file.css"
+  ]
+}
+```
 
 ## CSS actions
 
