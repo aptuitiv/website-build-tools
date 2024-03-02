@@ -21,7 +21,7 @@ import postcssReporter from 'postcss-reporter';
 
 // Build scripts
 import config from './config.js';
-import { getGlob, prefixPath, prefixRootPath, prefixRootSrcPath, prefixRootThemeBuildPath, prefixSrcPath } from './helpers.js';
+import { getGlob, prefixPath, prefixRootPath, prefixRootSrcPath, prefixRootThemeBuildPath, prefixSrcPath, removeRootPrefix } from './helpers.js';
 
 /**
  * Get the correct CSS source path within the CSS base directory
@@ -63,7 +63,7 @@ const runStylelint = async (fileGlob) => {
     }
     options = { ...options, ...config.data.stylelint };
 
-    fancyLog(chalk.magenta('Stylelint'), chalk.cyan(filesToLint));
+    fancyLog(chalk.magenta('Stylelint'), chalk.cyan(removeRootPrefix(filesToLint)));
     const results = await stylelint.lint(options);
     if (results.report.length > 0) {
         console.log(results.report);
