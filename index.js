@@ -53,6 +53,7 @@ program
 program
     .command('stylelint')
     .alias('css-lint')
+    .alias('csslint')
     .option('-p, --path [fileGlob]', 'The glob of files to lint. By default it lints all files. If you pass a file glob then only those files will be linted.')
     .addOption(configFileOption)
     .addOption(rootOption)
