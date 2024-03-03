@@ -199,6 +199,8 @@ const processFile = async (filePath) => {
     // Get the build directory and file path from the source file path
     let buildFile = removeRootPrefix(filePath);
     buildFile = removePrefixes(buildFile, [config.data.src, config.data.javascript.src, '/']);
+    const fileToProcess = buildFile;
+    fancyLog(chalk.magenta('Processing Javascript file: '), chalk.cyan(fileToProcess));
     const buildDirectory = prefixRootThemeBuildPath(config.data.javascript.build);
     buildFile = prefixPath(buildFile, buildDirectory);
     // Make sure the directory exists
@@ -215,6 +217,7 @@ const processFile = async (filePath) => {
         const results = await minify(contents, minifyOptions);
         fs.writeFileSync(buildFile, results.code);
     }
+    fancyLog(logSymbols.success, chalk.green('Javascript file processing finished', chalk.cyan(fileToProcess)));
 };
 
 /**
