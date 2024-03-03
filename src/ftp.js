@@ -12,7 +12,7 @@ import * as path from 'path';
 // Build scripts
 import config from './config.js';
 import {
-    getGlob,
+    processGlobPath,
     prefixBuildPath,
     prefixPath,
     prefixRootPath,
@@ -365,7 +365,7 @@ const ftpHander = (action, args) => {
         if (Object.keys(args).length > 0) {
             if (typeof args.path === 'string') {
                 // Upload a single file, a directory, or a glob of files
-                const glob = getGlob(args.path);
+                const glob = processGlobPath(args.path);
                 const parsedGlobPath = path.parse(glob);
                 if (parsedGlobPath.ext === '' && parsedGlobPath.name !== '*') {
                     // A directory path was set

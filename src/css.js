@@ -24,7 +24,7 @@ import postcssReporter from 'postcss-reporter';
 // Build scripts
 import config from './config.js';
 import {
-    getGlob,
+    processGlobPath,
     prefixPath,
     prefixRootPath,
     prefixRootSrcPath,
@@ -240,7 +240,7 @@ export const cssHandler = (action, args) => {
         }
     } else if (action === 'lint') {
         if (typeof args.path === 'string') {
-            const lintPath = getGlob(getSrcPath(args.path));
+            const lintPath = processGlobPath(getSrcPath(args.path));
             runStylelint(lintPath);
         } else {
             runStylelint();
