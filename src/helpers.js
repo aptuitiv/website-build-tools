@@ -2,6 +2,7 @@
     Helper functions for the build scripts
 =========================================================================== */
 
+import { globSync } from 'glob';
 import config from './config.js';
 
 /**
@@ -10,7 +11,7 @@ import config from './config.js';
  * @param {string} glob The glob path
  * @returns {string}
  */
-export const getGlob = (glob) => {
+export const processGlobPath = (glob) => {
     let returnValue = glob;
     // If the glob ends with "/" then assume that the developer intended to
     // reference all files in the folder
@@ -24,6 +25,14 @@ export const getGlob = (glob) => {
     }
     return returnValue;
 };
+
+/**
+ * Get the globs from the glob path
+ *
+ * @param {string} glob The glob path
+ * @returns {Array<string>}
+ */
+export const getGlob = (glob) => globSync(processGlobPath(glob));
 
 /**
  * Prefix a base path to a file/glob path if it doesn't already start with the base path.
@@ -65,6 +74,23 @@ export const prefixPath = (path, basePath, baseFolder) => {
 };
 
 /**
+ * Prefixes one or more paths to the path
+ *
+ * @param {string} path The path to prefix to
+ * @param {Array} prefixes The array of paths to prefix to the path
+ * @returns {string}
+ */
+const prefixPaths = (path, prefixes) => {
+    let processedPath = path;
+    if (Array.isArray(prefixes)) {
+        prefixes.forEach((prefix) => {
+            processedPath = prefixPath(processedPath, prefix);
+        });
+    }
+    return processedPath;
+};
+
+/**
  * Prefix the root path
  *
  * @param {string} path The file/glob path
@@ -100,25 +126,28 @@ export const prefixSrcPath = (path) => prefixPath(path, config.data.src);
  * Prefix the src and root paths
  *
  * @param {string} path The file/glob path
+ * @param {Array} [additionalPrefixes] An array of additional prefixes to add to the path
  * @returns {string}
  */
-export const prefixRootSrcPath = (path) => prefixRootPath(prefixSrcPath(path));
+export const prefixRootSrcPath = (path, additionalPrefixes) => prefixRootPath(prefixSrcPath(prefixPaths(path, additionalPrefixes)));
 
 /**
  * Prefix the theme build path
  *
  * @param {string} path The file/glob path
+ * @param {Array} [additionalPrefixes] An array of additional prefixes to add to the path
  * @returns {string}
  */
-export const prefixThemeBuildPath = (path) => prefixPath(path, config.data.build.theme);
+export const prefixThemeBuildPath = (path, additionalPrefixes) => prefixPath(prefixPaths(path, additionalPrefixes), config.data.build.theme);
 
 /**
  * Prefix the theme build and root paths to the path
  *
  * @param {string} path The file/glob path
+ * @param {Array} [additionalPrefixes] An array of additional prefixes to add to the path
  * @returns {string}
  */
-export const prefixRootThemeBuildPath = (path) => prefixRootPath(prefixThemeBuildPath(path));
+export const prefixRootThemeBuildPath = (path, additionalPrefixes) => prefixRootPath(prefixThemeBuildPath(prefixPaths(path, additionalPrefixes)));
 
 /**
  * Removes the prefix from the path
@@ -159,3 +188,11 @@ export const removePrefixes = (path, prefixes) => {
     });
     return returnValue;
 };
+
+/**
+ * Remove the root theme build prefix from a path
+ *
+ * @param {string} path The path to the remove the prefixes from
+ * @returns {string}
+ */
+export const removeRootThemeBuildPrefix = (path) => removePrefixes(path, [config.data.build.theme, config.data.root]);
