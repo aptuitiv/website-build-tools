@@ -165,7 +165,7 @@ program
     });
 
 /**
- * Javascripot commands
+ * Javascript commands
  */
 program
     .command('js')

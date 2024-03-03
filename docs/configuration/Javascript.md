@@ -7,6 +7,7 @@ In the [configuration file](/docs/Configuration.md) you will want to set up how 
     - [Javascript bundles](#javascript-bundles)
     - [Single Javascript files](#single-javascript-files)
   - [Linting Javascript](#linting-javascript)
+  - [Minify Javascript](#minify-javascript)
 
 ## Processing Javscript files
 
@@ -23,11 +24,11 @@ The `javascript.budles` array holds an array of objects that specify each bundle
 
 Each bundle object can have the following values.
 
-- _name_ (Required) (string) The name of the bundled file that will be output in the Javascript build directory (`javascript.build`).
-- _node_modules_ (string|array) A string containing the path to a single file or glob to include in the bundle from the `node_modules` folder. Or, an array of files or globs to include in the bundle from the `node_modules` folder. The path should start with the package name and not with the `node_modules` folder.
+- _build_ (Required) (string) The name of the bundled file that will be output in the Javascript build directory (`javascript.build`) and optionally a directory path. if you're ok with the file going in the `javascript.build` path then this can just be the file name.
+- _nodeModules_ (string|array) A string containing the path to a single file or glob to include in the bundle from the `node_modules` folder. Or, an array of files or globs to include in the bundle from the `node_modules` folder. The path should start with the package name and not with the `node_modules` folder.
 - _src_ (string|array) A string containing the path to a single file or glob in the Javascript src folder (`javascript.src`) to include in the bundle. Or, an array of files or globs in the Javascript source folder to include in the bundle. The path should start within the Javascript source folder and not include the source folder name.
 
-In addition to `name`, you must at least set `node_modules` or `src`. You can set both.
+In addition to `build`, you must at least set `nodeModules` or `src`. You can set both.
 Here are some examples:
 
 ```js
@@ -35,7 +36,7 @@ Here are some examples:
   "javascript": {
     "bundles": [
       {
-        "name": "name-of-file.js",
+        "build": "name-of-file.js",
         "src": "folder/**/*.js",
       }
     ]
@@ -46,9 +47,9 @@ Here are some examples:
 ```js
 {
   "javascript": {
-    "bundles": [
+    "bundles": [****
       {
-        "name": "name-of-file.js",
+        "build": "name-of-file.js",
         "src": [
           "file1.js",
           "folder/file2.js",
@@ -66,8 +67,8 @@ Here are some examples:
   "javascript": {
     "bundles": [
       {
-        "name": "name-of-file.js",
-        "node_modules": [
+        "build": "path/to/name-of-file.js",
+        "nodeModules": [
           "packageName/path/to/file.js",
           "anotherPackage/path/**/*.js"
         ],
@@ -86,8 +87,8 @@ Here are some examples:
   "javascript": {
     "bundles": [
       {
-        "name": "name-of-file.js",
-        "node_modules": "anotherPackage/path/**/*.js",
+        "build": "name-of-file.js",
+        "nodeModules": "anotherPackage/path/**/*.js",
         "src": "some-file.js",
       }
     ]
@@ -139,3 +140,60 @@ Typically, the only configuration that you may need to do is to add some ignore 
 ```
 
 If you're just ignoring files, you could also add a `.eslintignore` file in your project root. But, for consistency with keeping all build functionality in one place, we recommend that you put any eslint ignores in the configuration file as described above.
+
+## Minify Javascript
+
+By default Javascript files are minified when they are processed. We use [terser](https://terser.org/) to handle the minification.
+
+The default minify options are:
+
+```js
+{
+    compress: {
+        defaults: false,
+    },
+    mangle: false,
+}
+```
+
+You can alter the minify process with the `javascript.minify` configuration option.
+
+There are two things you can do with the `javascript.minify` option.
+
+First, you can pass different minify options to terser. Set `javascript.minify` to be an object containing any valid [terser options](https://terser.org/docs/api-reference/#minify-options) and they will be merged with the existing options.
+
+```js
+{
+    javascript: {
+        minify:  {
+            compress: {
+                collapse_vars: false,
+                defaults: false,
+            },
+            mangle: true,
+            keep_classnames: true
+        }
+    }
+}
+   
+```
+
+Secondly, you can cancel the minification by either setting `javascript.minify` to `false`, or by settings `javascript.minify.compress` to false.
+
+```js
+{
+    javascript: {
+        minify: false
+    }
+}
+```
+
+```js
+{
+    javascript: {
+        minify:  {
+            compress: false
+        }
+    }
+}
+```

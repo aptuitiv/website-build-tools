@@ -78,6 +78,9 @@ const defaultConfig = {
         bundles: [],
         // An array of file globs to process.
         files: [],
+        // Minification options for terser.
+        // https://terser.org/docs/options/
+        minify: {},
         // The source folder for the javascript files within the root source folder. (config.src)
         src: 'js',
     },
