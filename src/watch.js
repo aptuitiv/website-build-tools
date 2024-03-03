@@ -17,6 +17,7 @@ import {
 } from './helpers.js';
 import { createIconSprite } from './icons.js';
 import { processImage, removeImageFileFromBuild } from './image.js';
+import { processJsFile } from './javascript.js';
 import {
     copyTemplateSrcToBuild,
     removeTemplateFileFromBuild,
@@ -79,6 +80,16 @@ const watchHandler = async () => {
         .on('unlink', (path) => {
             removeFontFileFromBuild(path);
         });
+
+    // Watch for any CSS changes
+    const jsfolder = prefixRootSrcPath(`${config.data.javascript.src}/**/*.js`);
+    fancyLog(
+        chalk.magenta('Watching for changes in the Javascript folder'),
+        chalk.cyan(prefixSrcPath(config.data.javascript.src)),
+    );
+    chokidar.watch(jsfolder, { ignoreInitial: true }).on('all', (event, path) => {
+        processJsFile(path);
+    });
 
     // Watch for any icon changes
     const iconFolder = prefixRootSrcPath(config.data.icons.src);
