@@ -40,6 +40,9 @@ const defaultConfig = {
         // The source folder for the fonts within the root source folder. (config.src)
         src: 'fonts',
     },
+    ftp: {
+        notify: true
+    },
     icons: {
         // The path within the src templates folder that the icon sprite will be created in
         build: 'snippets/svg-icons.twig',

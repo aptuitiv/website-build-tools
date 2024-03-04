@@ -7,6 +7,7 @@ import fancyLog from 'fancy-log';
 import fs from 'fs-extra';
 import { globSync } from 'glob';
 import logSymbols from 'log-symbols';
+import notifier from 'node-notifier';
 import * as path from 'path';
 
 // Build scripts
@@ -94,6 +95,13 @@ export async function deleteFile(filePath) {
             logSymbols.success,
             chalk.green(`File deleted from server: ${filePath}`),
         );
+        if (config.data.ftp.notify) {
+            notifier.notify({
+                title: 'Deploy',
+                message: 'File deleted from FTP server!',
+                sound: true
+            });
+        }
     } catch (err) {
         fancyLog(chalk.red(err));
     }
@@ -144,6 +152,13 @@ export async function deployFile(filePath) {
                         logSymbols.success,
                         chalk.green(`Upload complete: ${filePath}`),
                     );
+                    if (config.data.ftp.notify) {
+                        notifier.notify({
+                            title: 'Deploy',
+                            message: 'File uploaded to FTP server!',
+                            sound: true
+                        });
+                    }
                 });
             });
     } catch (err) {
