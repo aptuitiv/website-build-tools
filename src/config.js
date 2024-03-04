@@ -3,12 +3,19 @@
 =========================================================================== */
 
 import resolveFrom from 'resolve-from';
-import { isAbsolute, join, resolve } from 'path';
+import {
+    isAbsolute, dirname, join, resolve,
+} from 'path';
 import deepmerge from 'deepmerge';
 import { cosmiconfig } from 'cosmiconfig';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
 
 import { isObjectWithValues } from './lib/types.js';
+
+// Get the directory name of the current module
+// eslint-disable-next-line no-underscore-dangle -- The dangle is used to match the __dirname variable in Node.js
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /* global process */
 
@@ -42,7 +49,7 @@ const defaultConfig = {
     },
     ftp: {
         // Whether to do a growl notification when a file is uploaded or deleted via FTP.
-        notify: true
+        notify: true,
     },
     icons: {
         // The path to the Twig file within the src templates folder that the icon sprite will be created in
@@ -229,6 +236,10 @@ class Config {
         // The .env file is used to set environment variables for the project
         // such as the FTP credentials.
         dotenv.config({ path: resolve(cwd, '.env') });
+
+        // Set the root folder for this package.
+        // This is used when the root path to this package is needed (like setting the CSS stylelint configuration path).
+        config.packageRoot = dirname(__dirname);
 
         this.data = config;
     }

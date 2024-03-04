@@ -9,10 +9,9 @@ import deepmerge from 'deepmerge';
 import { globSync } from 'glob';
 import fancyLog from 'fancy-log';
 import logSymbols from 'log-symbols';
-import { dirname, parse } from 'path';
+import { parse } from 'path';
 import postcss from 'postcss';
 import stylelint from 'stylelint';
-import { fileURLToPath } from 'url';
 
 // PostCSS plugins
 import autoprefixer from 'autoprefixer';
@@ -35,10 +34,6 @@ import {
 import { isObjectWithValues } from './lib/types.js';
 
 /* global process */
-
-// Get the directory name of the current module
-// eslint-disable-next-line no-underscore-dangle -- The dangle is used to match the __dirname variable in Node.js
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /**
  * Get the correct CSS source path within the CSS base directory
@@ -106,7 +101,7 @@ const runStylelint = async (fileGlob) => {
         // Set the absolute path to the directory that relative paths defining "extends", "plugins", and "customSyntax" are relative to.
         // Only necessary if these values are relative paths.
         // This is set to the root of the aptuitiv-build project folder.
-        configBasedir: dirname(__dirname),
+        configBasedir: config.data.packageRoot,
         files: filesToLint,
         formatter: 'string',
     };
