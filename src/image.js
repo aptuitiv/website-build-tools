@@ -219,8 +219,10 @@ export const processImage = async (imageSrc) => {
 
 /**
  * Process all images in the images folder
+ *
+ * @returns {Promise}
  */
-const processImages = async () => {
+const processImages = async () => new Promise((resolve) => {
     const imageSrc = prefixRootSrcPath(config.data.images.src);
     // Get all the files in the images folder
     const files = globSync(`${imageSrc}/**/*`);
@@ -230,10 +232,14 @@ const processImages = async () => {
                 `Processing ${files.length} files in the ${config.data.images.src} folder`,
             ),
         );
+        const filePromises = [];
         files.forEach((file) => {
-            processImage(file);
+            filePromises.push(processImage(file));
         });
-        fancyLog(logSymbols.success, chalk.green('Done processing images'));
+        Promise.all(filePromises).then(() => {
+            fancyLog(logSymbols.success, chalk.green('Done processing images'));
+            resolve();
+        });
     } else {
         fancyLog(
             logSymbols.warning,
@@ -241,12 +247,18 @@ const processImages = async () => {
                 `Nothing to process as there are no images found in the ${config.data.images.src} folder`,
             ),
         );
+        resolve();
     }
-};
+});
 
 /**
  * Process the image request
+ *
+ * @returns {Promise}
  */
-export const imageHandler = async () => {
-    processImages();
-};
+export const imageHandler = () => new Promise((resolve) => {
+    // Process the images
+    processImages().then(() => {
+        resolve();
+    });
+});

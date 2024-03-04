@@ -19,8 +19,6 @@ import {
     prefixRootPath,
 } from './helpers.js';
 
-/* global process */
-
 /**
  * Get the source path and make sure it starts with the correct root path
  *

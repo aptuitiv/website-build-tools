@@ -33,7 +33,21 @@ const rootOption = new Option(
 );
 
 /**
- * Build command
+ * Run the build process
+ */
+const runBuild = async () => {
+    await copyHandler();
+    await cssHandler('css', {});
+    fontHandler('push');
+    await iconHandler();
+    await imageHandler();
+    await jsHandler('process', {});
+    templateHandler('push');
+    themeHandler('push');
+};
+
+/**
+ * Build and start commands
  */
 program
     .command('build')
@@ -42,14 +56,19 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        copyHandler();
-        cssHandler('css', {});
-        fontHandler('push');
-        iconHandler();
-        jsHandler('process', {});
-        imageHandler();
-        templateHandler('push');
-        themeHandler('push');
+        runBuild();
+    });
+
+program
+    .command('start')
+    .description('Run the build and start the watch process')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        await config.init(args);
+        runBuild().then(() => {
+            watchHandler();
+        });
     });
 
 /**

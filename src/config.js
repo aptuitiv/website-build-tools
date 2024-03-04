@@ -17,8 +17,6 @@ import { isObjectWithValues } from './lib/types.js';
 // eslint-disable-next-line no-underscore-dangle -- The dangle is used to match the __dirname variable in Node.js
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-/* global process */
-
 // Set up the default configuration
 const defaultConfig = {
     build: {
