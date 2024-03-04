@@ -99,7 +99,7 @@ const defaultConfig = {
         // The folder for the theme twig templates within the theme build folder. (config.build.theme)
         build: 'templates',
         // The source folder for the theme twig templates within the root source folder. (config.src)
-        src: 'theme',
+        src: 'templates',
     },
     themeConfig: {
         // The folder for the theme config files within the theme build folder. (config.build.theme)

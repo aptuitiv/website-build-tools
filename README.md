@@ -40,7 +40,7 @@ These build tools expect the following project structure:
   - **fonts** Any self-hosted fonts needed for the project.
   - **icons** Any SVG icons to complile into a sprite.
   - **js** Any Javascript files for the project.
-  - **theme** The Twig template files.
+  - **templates** The Twig template files.
 - **.aptuitiv-buildrc.js** - The [configuration file](docs/Configuration.md) for the build tools.
 - **.env** - The environment file that holds the FTP credentials.
 
