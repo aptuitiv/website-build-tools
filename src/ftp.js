@@ -99,7 +99,7 @@ export async function deleteFile(filePath) {
             notifier.notify({
                 title: 'Deploy',
                 message: 'File deleted from FTP server!',
-                sound: true
+                sound: true,
             });
         }
     } catch (err) {
@@ -156,7 +156,7 @@ export async function deployFile(filePath) {
                         notifier.notify({
                             title: 'Deploy',
                             message: 'File uploaded to FTP server!',
-                            sound: true
+                            sound: true,
                         });
                     }
                 });
