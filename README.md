@@ -2,6 +2,12 @@
 
 Build tools to help with building and deploying websites at [Aptuitiv](https://www.aptuitiv.com/).
 
+## Install
+
+```bash
+npm i - D @aptuitiv/website-build-tools
+```
+
 ## Usage
 
 There are two ways to call the build tools.
