@@ -16,6 +16,7 @@ import {
     prefixRootSrcPath,
     prefixThemeBuildPath,
     prefixSrcPath,
+    removeRootSrcPrefix,
 } from './helpers.js';
 
 /**
@@ -117,16 +118,16 @@ const copyFile = (src, dest, msgSrc, msgDest) => {
  * @param {string} destPath The destination path to the file in the "build" folder
  */
 export const copySrcFileToThemeBuild = (path, srcPath, destPath) => {
-    // Get the file name
-    const filename = getFileName(path);
+    // Get the path to the file without the root path, root source path, and the srcPath value
+    const filePath = removeRootSrcPrefix(path, [srcPath]);
 
     // Get the paths to the source and destination files
-    const copySrc = getRootSrcPath(srcPath, filename);
-    const copyDest = getRootThemeBuildPath(destPath, filename);
+    const copySrc = getRootSrcPath(srcPath, filePath);
+    const copyDest = getRootThemeBuildPath(destPath, filePath);
 
     // Get the message paths for the source and destination file paths
-    const msgSrc = getSrcPath(srcPath, filename);
-    const msgDest = getThemeBuildPath(destPath, filename);
+    const msgSrc = getSrcPath(srcPath, filePath);
+    const msgDest = getThemeBuildPath(destPath, filePath);
 
     copyFile(copySrc, copyDest, msgSrc, msgDest);
 };

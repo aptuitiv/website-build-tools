@@ -166,14 +166,6 @@ export const removePrefix = (path, prefix) => {
 };
 
 /**
- * Removes the root prefix from the path
- *
- * @param {string} path The path
- * @returns {string}
- */
-export const removeRootPrefix = (path) => removePrefix(removePrefix(path, config.data.root), '/');
-
-/**
  * Remove one or more prefixes from a path
  *
  * @param {string} path The original path
@@ -187,6 +179,39 @@ export const removePrefixes = (path, prefixes) => {
         returnValue = removePrefix(returnValue, prefix);
     });
     return returnValue;
+};
+
+/**
+ * Removes the root prefix from the path
+ *
+ * @param {string} path The path
+ * @param {Array} [additionalPrefixes] An array of additional prefixes to remove from the path
+ * @returns {string}
+ */
+export const removeRootPrefix = (path, additionalPrefixes) => {
+    let returnValue = removePrefix(path, config.data.root);
+    if (Array.isArray(additionalPrefixes)) {
+        additionalPrefixes.forEach((prefix) => {
+            returnValue = removePrefix(returnValue, prefix);
+        });
+    }
+    return removePrefix(returnValue, '/');
+};
+
+/**
+ * Removes the root source prefix from the path
+ *
+ * @param {string} path The path
+ * @param {Array} [additionalPrefixes] An array of additional prefixes to remove from the path
+ * @returns {string}
+ */
+export const removeRootSrcPrefix = (path, additionalPrefixes) => {
+    let prefixes = [config.data.root, config.data.src];
+    if (Array.isArray(additionalPrefixes)) {
+        prefixes = prefixes.concat(additionalPrefixes);
+    }
+    prefixes.push('/');
+    return removePrefixes(path, prefixes);
 };
 
 /**
