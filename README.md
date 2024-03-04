@@ -23,6 +23,30 @@ The other way is using the [command line](docs/Command-line.md).
 aptuitiv-build pull-template
 ```
 
+## Expected project structure
+
+These build tools expect the following project structure:
+
+- **build** - The folder that the CSS, Javscript, templates and other assets are built to. The contents of this folder are uploaded to the website via FTP.
+- **src** - The source folder for the CSS, Javascript, template, and other assets.
+  - **config** The folder holding the theme configuration files
+  - **css** The CSS files for the project.
+  - **fonts** Any self-hosted fonts needed for the project.
+  - **icons** Any SVG icons to complile into a sprite.
+  - **js** Any Javascript files for the project.
+  - **theme** The Twig template files.
+- **.aptuitiv-buildrc.js** - The [configuration file](docs/Configuration.md) for the build tools.
+- **.env** - The environment file that holds the FTP credentials.
+
+You can configure different paths for your assets in the [configuration file](docs/Configuration.md), but we recommend keeping this structure for consistency between projects.
+  
+While not required for the build tools, is recommended that you also have the following configuration files in the root of your project.
+
+- **.editorconfig**
+- **.gitignore**
+- **.prettierignore**
+- **.prettierrc.cjs**
+
 ## More information
 
 - [Command line usage and actions](docs/Command-line.md)
