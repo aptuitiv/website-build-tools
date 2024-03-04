@@ -6,6 +6,7 @@
     "scripts": {
         "eslint": "eslint --fix .",
         "prettier": "prettier --write .",
+        "updateBrowsersList": "npx browserslist@latest --update-db",
         "watch": "esw -w --color --fix ."
     },
     "repository": {
