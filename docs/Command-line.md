@@ -8,6 +8,28 @@ The pattern for a command line call is:
 aptuitiv-build <action> [parameters]
 ```
 
+## Getting help
+
+You can get help by using `--help` or calling `help`.
+
+```bash
+aptuitiv-build --help
+```
+
+or
+
+```bash
+aptuitiv-build help
+```
+
+You can also use `--help` with any of the actions to get help with them.
+
+```bash
+aptuitiv-build css --help
+```
+
+## Changing the root directory
+
 If you're not calling the script from the base directory of your project then you must pass the `--root` argument so that the correct folders paths are used.
 
 ```bash

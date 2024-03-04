@@ -41,10 +41,11 @@ const defaultConfig = {
         src: 'fonts',
     },
     ftp: {
+        // Whether to do a growl notification when a file is uploaded or deleted via FTP.
         notify: true
     },
     icons: {
-        // The path within the src templates folder that the icon sprite will be created in
+        // The path to the Twig file within the src templates folder that the icon sprite will be created in
         build: 'snippets/svg-icons.twig',
         // The source folder for the svg icon files within the root source folder. (config.src)
         src: 'icons',
