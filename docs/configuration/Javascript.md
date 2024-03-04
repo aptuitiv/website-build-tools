@@ -129,7 +129,9 @@ The base configuration is simple and only extends [@aptuitiv/eslint-config-aptui
 }
 ```
 
-This means that you are safe to set any valid eslint configuration and it won't completely overwrite an existing configuration (unless you set `extends`).
+This means that you are safe to set any valid eslint configuration and it won't completely overwrite an existing configuration.
+
+> **The only thing you cannot overwrite is the `extends` configuration.** The packages referenced in the `extends` configuration are loaded from the `@aptuitiv/website-build-tools` package. If you try to set your own `extends` configuration then your packages won't load because they don't exist in the `@aptuitiv/website-build-tools` package. Instead, consider an update to the `@aptuitiv/website-build-tools` package or use the `rules` eslint configuration.
 
 Typically, the only configuration that you may need to do is to add some ignore patterns. For example, to ignore the Javascript for [fslightbox](https://fslightbox.com/) you might do something like this:
 

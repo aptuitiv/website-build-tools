@@ -49,11 +49,21 @@ export const themeHandler = async (action) => {
             prefixSrcPath(config.data.themeConfig.src),
             'theme config files',
         );
+        copySrcFileToThemeBuild(
+            'theme.json',
+            config.data.src,
+            config.data.build.theme,
+        );
     } else if (action === 'push') {
         copySrcFolderToBuild(
             prefixSrcPath(config.data.themeConfig.src),
             prefixThemeBuildPath(config.data.themeConfig.build),
             'theme config files',
+        );
+        copySrcFileToThemeBuild(
+            'theme.json',
+            config.data.src,
+            config.data.build.theme,
         );
     }
 };

@@ -3,14 +3,19 @@
 =========================================================================== */
 
 import resolveFrom from 'resolve-from';
-import { isAbsolute, join, resolve } from 'path';
+import {
+    isAbsolute, dirname, join, resolve,
+} from 'path';
 import deepmerge from 'deepmerge';
 import { cosmiconfig } from 'cosmiconfig';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
 
 import { isObjectWithValues } from './lib/types.js';
 
-/* global process */
+// Get the directory name of the current module
+// eslint-disable-next-line no-underscore-dangle -- The dangle is used to match the __dirname variable in Node.js
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Set up the default configuration
 const defaultConfig = {
@@ -40,8 +45,12 @@ const defaultConfig = {
         // The source folder for the fonts within the root source folder. (config.src)
         src: 'fonts',
     },
+    ftp: {
+        // Whether to do a growl notification when a file is uploaded or deleted via FTP.
+        notify: true,
+    },
     icons: {
-        // The path within the src templates folder that the icon sprite will be created in
+        // The path to the Twig file within the src templates folder that the icon sprite will be created in
         build: 'snippets/svg-icons.twig',
         // The source folder for the svg icon files within the root source folder. (config.src)
         src: 'icons',
@@ -96,7 +105,7 @@ const defaultConfig = {
         // The folder for the theme twig templates within the theme build folder. (config.build.theme)
         build: 'templates',
         // The source folder for the theme twig templates within the root source folder. (config.src)
-        src: 'theme',
+        src: 'templates',
     },
     themeConfig: {
         // The folder for the theme config files within the theme build folder. (config.build.theme)
@@ -225,6 +234,10 @@ class Config {
         // The .env file is used to set environment variables for the project
         // such as the FTP credentials.
         dotenv.config({ path: resolve(cwd, '.env') });
+
+        // Set the root folder for this package.
+        // This is used when the root path to this package is needed (like setting the CSS stylelint configuration path).
+        config.packageRoot = dirname(__dirname);
 
         this.data = config;
     }

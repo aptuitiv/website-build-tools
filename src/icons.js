@@ -17,6 +17,8 @@ import { prefixPath, prefixRootSrcPath, removePrefix } from './helpers.js';
 
 /**
  * Create the icon sprite
+ *
+ * @returns {Promise}
  */
 export const createIconSprite = async () => {
     fancyLog(chalk.magenta('Creating icon sprite'));
@@ -95,5 +97,5 @@ export const createIconSprite = async () => {
  * Process the icon request
  */
 export const iconHandler = async () => {
-    createIconSprite();
+    await createIconSprite();
 };

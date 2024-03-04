@@ -39,7 +39,7 @@ export const removeFontFileFromBuild = (path) => {
  *
  * @param {string} action The action to take
  */
-export const fontHandler = async (action) => {
+export const fontHandler = (action) => {
     if (action === 'pull') {
         copyBuildFolderToSrc(
             prefixThemeBuildPath(config.data.fonts.build),

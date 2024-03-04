@@ -134,8 +134,12 @@ const lintJs = async (fileGlob) => {
     // This is the configuration for the eslint API.
     // See options at https://eslint.org/docs/latest/integrate/nodejs-api#-new-eslintoptions
     const options = {
-        cwd: config.data.root,
-        // Default configuratoin for eslint.
+        // Need to set the current working directory to the package root so that the any
+        // "extend" configurations are found. They are looked for in the node_modules of this package,
+        // not the site's package. The "extends" configuration is the one thing that the developer
+        // can't overwrite because their packages won't be found.
+        cwd: config.data.packageRoot,
+        // Default configuration for eslint.
         // https://eslint.org/docs/latest/use/configure/
         baseConfig: {
             extends: ['@aptuitiv/eslint-config-aptuitiv'],
@@ -260,20 +264,22 @@ const processBundle = async (bundle) => {
 /**
  * Process all the Javascript files
  *
- * @param {boolean} lint Whether to lint the Javascript files
+ * @returns {Promise}
  */
-const processAllJs = async (lint = true) => {
+const processAllJs = async () => new Promise((resolve) => {
     prepareJsConfig();
-    if (lint) {
-        await lintJs();
-    }
+
+    const jsPromises = [];
     bundles.forEach((bundle) => {
-        processBundle(bundle);
+        jsPromises.push(processBundle(bundle));
     });
     files.forEach((file) => {
-        processFile(file);
+        jsPromises.push(processFile(file));
     });
-};
+    Promise.all(jsPromises).then(() => {
+        resolve();
+    });
+});
 
 /**
  * Process a single Javascript file
@@ -320,20 +326,24 @@ export const processJsFile = async (filePath, lint = true) => {
  *
  * @param {string} action The action to take
  * @param {object} args The command line arguments
+ * @returns {Promise}
  */
-export const jsHandler = (action, args) => {
+export const jsHandler = async (action, args) => {
     if (action === 'process') {
-        if (typeof args.file === 'string') {
-            processJsFile(args.file, args.lint);
+        if (isString(args.file)) {
+            await processJsFile(args.file, args.lint);
         } else {
-            processAllJs(args.lint);
+            if (args.lint) {
+                await lintJs();
+            }
+            await processAllJs();
         }
     } else if (action === 'lint') {
-        if (typeof args.path === 'string') {
+        if (isString(args.path)) {
             const lintPath = processGlobPath(getSrcPath(args.path));
-            lintJs(lintPath);
+            await lintJs(lintPath);
         } else {
-            lintJs();
+            await lintJs();
         }
     }
 };

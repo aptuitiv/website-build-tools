@@ -9,10 +9,9 @@ import deepmerge from 'deepmerge';
 import { globSync } from 'glob';
 import fancyLog from 'fancy-log';
 import logSymbols from 'log-symbols';
-import { dirname, parse } from 'path';
+import { parse } from 'path';
 import postcss from 'postcss';
 import stylelint from 'stylelint';
-import { fileURLToPath } from 'url';
 
 // PostCSS plugins
 import autoprefixer from 'autoprefixer';
@@ -33,12 +32,6 @@ import {
     removeRootPrefix,
 } from './helpers.js';
 import { isObjectWithValues } from './lib/types.js';
-
-/* global process */
-
-// Get the directory name of the current module
-// eslint-disable-next-line no-underscore-dangle -- The dangle is used to match the __dirname variable in Node.js
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /**
  * Get the correct CSS source path within the CSS base directory
@@ -71,6 +64,7 @@ function areFilesDifferent(sourceFile, targetPath) {
  * Run stylelint on the css files
  *
  * @param {string} [fileGlob] The file glob to lint
+ * @returns {Promise}
  */
 const runStylelint = async (fileGlob) => {
     const filesToLint = fileGlob || prefixRootSrcPath(`${config.data.css.src}/**/*.css`);
@@ -106,7 +100,7 @@ const runStylelint = async (fileGlob) => {
         // Set the absolute path to the directory that relative paths defining "extends", "plugins", and "customSyntax" are relative to.
         // Only necessary if these values are relative paths.
         // This is set to the root of the aptuitiv-build project folder.
-        configBasedir: dirname(__dirname),
+        configBasedir: config.data.packageRoot,
         files: filesToLint,
         formatter: 'string',
     };
@@ -133,8 +127,9 @@ const runStylelint = async (fileGlob) => {
  * Run PostCSS on the file
  *
  * @param {string} filePath The path of the CSS file to process
+ * @returns {Promise}
  */
-const runPostCss = (filePath) => {
+const runPostCss = (filePath) => new Promise((resolve) => {
     const { base: fileName } = parse(filePath);
     const destDir = prefixRootThemeBuildPath(config.data.css.build);
     const dest = prefixPath(fileName, destDir);
@@ -162,37 +157,38 @@ const runPostCss = (filePath) => {
             .process(css, { from: filePath, to: dest })
             .then((result) => {
                 if (areFilesDifferent(result.css, dest)) {
-                    fs.writeFile(dest, result.css, () => {
-                        fancyLog(
-                            logSymbols.success,
-                            chalk.green('Process CSS complete'),
-                            chalk.cyan(filePath),
-                        );
-                    });
+                    fs.writeFileSync(dest, result.css);
                     if (result.map) {
-                        fs.writeFile(
+                        fs.writeFileSync(
                             `${dest}.map`,
                             result.map.toString(),
-                            () => true,
                         );
                     }
+                    fancyLog(
+                        logSymbols.success,
+                        chalk.green('Process CSS complete'),
+                        chalk.cyan(filePath),
+                    );
+                    resolve();
                 } else {
                     fancyLog(
                         chalk.yellow(
                             `Skipping ${filePath} because the built content is the same as ${dest}`,
                         ),
                     );
+                    resolve();
                 }
             });
     });
-};
+});
 
 /**
  * Process all the CSS files
  *
  * @param {boolean} lint Whether to lint the CSS files
+ * @returns {Promise}
  */
-export const processCss = (lint = true) => {
+export const processCss = (lint = true) => new Promise((resolve) => {
     const { buildFiles } = config.data.css;
     let paths = [];
     if (typeof buildFiles === 'string') {
@@ -208,42 +204,50 @@ export const processCss = (lint = true) => {
             );
         });
     }
+    const cssPromises = [];
     if (lint) {
         runStylelint().then(() => {
             paths.forEach((filePath) => {
-                runPostCss(filePath);
+                cssPromises.push(runPostCss(filePath));
+            });
+            Promise.all(cssPromises).then(() => {
+                resolve();
             });
         });
     } else {
         paths.forEach((filePath) => {
-            runPostCss(filePath);
+            cssPromises.push(runPostCss(filePath));
+        });
+        Promise.all(cssPromises).then(() => {
+            resolve();
         });
     }
-};
+});
 
 /**
  * Process the css request
  *
  * @param {string} action The action to take
  * @param {object} args The command line arguments
+ * @returns {Promise}
  */
-export const cssHandler = (action, args) => {
+export const cssHandler = async (action, args) => {
     if (action === 'css') {
         if (typeof args.file === 'string') {
             if (args.lint) {
-                runStylelint();
+                await runStylelint();
             }
             const filePath = getSrcPath(args.file);
-            runPostCss(filePath);
+            await runPostCss(filePath);
         } else {
-            processCss(args.lint);
+            await processCss(args.lint);
         }
     } else if (action === 'lint') {
         if (typeof args.path === 'string') {
             const lintPath = processGlobPath(getSrcPath(args.path));
-            runStylelint(lintPath);
+            await runStylelint(lintPath);
         } else {
-            runStylelint();
+            await runStylelint();
         }
     }
 };

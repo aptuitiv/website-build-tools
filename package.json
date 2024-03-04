@@ -1,11 +1,12 @@
 {
     "name": "@aptuitiv/website-build-tools",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Build tools to help with building and deploying websites at Aptuitiv",
     "main": "index.js",
     "scripts": {
         "eslint": "eslint --fix .",
         "prettier": "prettier --write .",
+        "updateBrowsersList": "npx browserslist@latest --update-db",
         "watch": "esw -w --color --fix ."
     },
     "repository": {
@@ -42,6 +43,7 @@
         "image-type": "^5.2.0",
         "is-svg": "^5.0.0",
         "log-symbols": "^6.0.0",
+        "node-notifier": "^10.0.1",
         "postcss": "^8.4.35",
         "postcss-custom-media": "^10.0.3",
         "postcss-import": "^16.0.1",
