@@ -134,8 +134,12 @@ const lintJs = async (fileGlob) => {
     // This is the configuration for the eslint API.
     // See options at https://eslint.org/docs/latest/integrate/nodejs-api#-new-eslintoptions
     const options = {
-        cwd: config.data.root,
-        // Default configuratoin for eslint.
+        // Need to set the current working directory to the package root so that the any
+        // "extend" configurations are found. They are looked for in the node_modules of this package,
+        // not the site's package. The "extends" configuration is the one thing that the developer
+        // can't overwrite because their packages won't be found.
+        cwd: config.data.packageRoot,
+        // Default configuration for eslint.
         // https://eslint.org/docs/latest/use/configure/
         baseConfig: {
             extends: ['@aptuitiv/eslint-config-aptuitiv'],
