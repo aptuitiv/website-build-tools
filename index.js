@@ -33,6 +33,26 @@ const rootOption = new Option(
 );
 
 /**
+ * Build command
+ */
+program
+    .command('build')
+    .description('Build and process all of the source files')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        await config.init(args);
+        copyHandler();
+        cssHandler('css', {});
+        fontHandler('push');
+        iconHandler();
+        jsHandler('process', {});
+        imageHandler();
+        templateHandler('push');
+        themeHandler('push');
+    });
+
+/**
  * Copy commands
  */
 program

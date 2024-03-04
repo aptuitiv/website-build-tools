@@ -44,6 +44,7 @@ aptuitiv-build pull-template --root ../../
 
 ## Actions
 
+- [Build](actions/Build.md)
 - [Copy files](actions/Copy-files.md)
 - [CSS](actions/Css.md)
 - [Export](actions/Export.md)
