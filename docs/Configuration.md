@@ -9,11 +9,58 @@
 
 You can optionally set a configuration file to override any of the default configuration below. The following places are searched for the configurtation.
 
-- An aptuitiv-build property in the `package.json` file.
-- An `.aptuitiv-buildrc` file in JSON or YAML format.
-- An `.aptuitiv-buildrc.json`, `.aptuitiv-buildrc.yaml`, `.aptuitiv-buildrc.yml`, `.aptuitiv-buildrc.js`, `.aptuitiv-buildrc.ts`, `.aptuitiv-buildrc.mjs`, or .`aptuitiv-buildrc.cjs` file.
+- An `aptuitiv-build` property in the `package.json` file.
+- An `.aptuitiv-buildrc` file in JSON or YAML format. We recommend that you add the correct extension to the file (e.g. `.json`) to end up with one of the following file names:
+  - `.aptuitiv-buildrc.json`, `.aptuitiv-buildrc.yaml`, `.aptuitiv-buildrc.yml`
+- An `.aptuitiv-buildrc.js`, `.aptuitiv-buildrc.ts`, `.aptuitiv-buildrc.mjs`, or .`aptuitiv-buildrc.cjs` file.
+- `aptuitiv-build.config.mjs` or `.aptuitiv-buildrc.mjs` file using `export default` (ES module)
+- `aptuitiv-build.config.cjs` or `.aptuitiv-buildrc.cjs` file using `module.exports` (CommonJS)
 - An `aptuitiv-buildrc`, `aptuitiv-buildrc.json`, `aptuitiv-buildrc.yaml`, `aptuitiv-buildrc.yml`, `aptuitiv-buildrc.js`, `aptuitiv-buildrc.ts`, `aptuitiv-buildrc.mjs`, or `aptuitiv-buildrc.cjs` file inside a `.config` subdirectory.
-- An `aptuitiv-build.config.js`, `aptuitiv-build.config.ts`, `aptuitiv-build.config.mjs`, or `aptuitiv-build.config.cjs` file.
+- An `aptuitiv-build.config.js`, `aptuitiv-build.config.ts` file.
+
+Which module system to use depends on your [default module system configuration](https://nodejs.org/api/packages.html#determining-module-system) for Node.js (e.g., `"type": "module"` in `package.json`).
+
+ES module example:
+
+```js
+export default {
+    "javascript": {
+        "files": [
+            "filename.js",
+            "subFolder/my-file.js"
+        ]
+    }
+};
+```
+
+CommonJS example:
+
+```js
+module.exports = {
+    "javascript": {
+        "files": [
+            "filename.js",
+            "subFolder/my-file.js"
+        ]
+    }
+};
+```
+
+JSON example:
+
+```json
+{
+    "javascript": {
+        "files": ["file1.js", "test.js"]
+    }
+}
+```
+
+See these examples:
+
+- [CommonJS (cjs)](configuration/examples/cjs.md)
+- [ES Module (js)](configuration/examples/js.md)
+- [JSON](configuration/examples/json.md)
 
 ## Default configuration
 
@@ -94,8 +141,8 @@ Below is the default configuration.
     // The root folder to the source files.
     src: 'src',
     // Stylelint configuration options
-    // https://stylelint.io/user-guide/configure
-    stylelint: {},
+    // https://aptuitiv-build.io/user-guide/configure
+    aptuitiv-build: {},
     templates: {
         // The folder for the theme twig templates within the theme build folder. (config.build.theme)
         build: 'templates',
