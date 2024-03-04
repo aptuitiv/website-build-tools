@@ -27,7 +27,7 @@ aptuitiv-build pull-template --root ../../
 - [Export](actions/Export.md)
 - [Fonts](actions/Fonts.md)
 - [FTP](actions/FTP.md)
-- [Icons](actions/Icons)
+- [Icons](actions/Icons.md)
 - [Images](actions/Images.md)
 - [Javascript](actions/Javascript.md)
 - [Templates](actions/Templates.md)

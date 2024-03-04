@@ -31,7 +31,7 @@ aptuitiv-build pull-template
   - [Export](docs/actions/Export.md)
   - [Fonts](docs/actions/Fonts.md)
   - [FTP](docs/actions/FTP.md)
-  - [Icons](docs/actions/Icons)
+  - [Icons](docs/actions/Icons.md)
   - [Images](docs/actions/Images.md)
   - [Javascript](docs/actions/Javascript.md)
   - [Templates](docs/actions/Templates.md)
