@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.3.2 - March 6, 2024
+
+- Fixed the stylelint `fix` option.
+
 ## v1.3.1 - March 6, 2024
 
 - Fixed issue where the closing icon SVG tag was missing.
