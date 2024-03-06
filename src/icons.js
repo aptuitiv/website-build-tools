@@ -85,6 +85,7 @@ export const createIconSprite = async () => {
         data.symbol.shapes.forEach((shape) => {
             stream.write(shape.svg);
         });
+        stream.write('</svg>');
         stream.end();
         fancyLog(logSymbols.success, chalk.green('Done creating icon sprite'));
     } catch (error) {
