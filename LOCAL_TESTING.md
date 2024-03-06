@@ -24,7 +24,7 @@ You should unlink the local project for any of these situations:
 First, in the project that uses this library:
 
 ```bash
-npm unlink @aptuitiv/website-build-scripts --no-**save**
+npm unlink @aptuitiv/website-build-scripts --no-save
 ```
 
 The `--no-save` flag keeps the original live version of this package from NPM.
