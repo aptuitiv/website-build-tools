@@ -179,8 +179,11 @@ const lintJs = async (fileGlob) => {
 
     // Format and output the results
     await eslint.loadFormatter('stylish').then((formatter) => {
-        // eslint-disable-next-line no-console -- Need to output the results
-        console.log(formatter.format(results));
+        const formatResults = formatter.format(results);
+        if (formatResults.length > 0) {
+            // eslint-disable-next-line no-console -- Need to output the results
+            console.log(formatResults);
+        }
     });
 
     fancyLog(logSymbols.success, chalk.green('Javascript linting finished'));
