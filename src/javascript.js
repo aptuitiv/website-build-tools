@@ -42,6 +42,9 @@ const prepareJsConfig = () => {
                     const buildPath = prefixRootThemeBuildPath(bundle.build, [config.data.javascript.build]);
                     // Set up the bundle files
                     let bundleFiles = [];
+                    // Set up a separate array of files to lint.
+                    // This is done so that we can exclude the node_modules files from the linting.
+                    let lintFiles = [];
                     // Process any node_modules files if there are any
                     if (typeof bundle.nodeModules !== 'undefined') {
                         if (isStringWithValue(bundle.nodeModules)) {
@@ -60,14 +63,18 @@ const prepareJsConfig = () => {
                         if (isStringWithValue(bundle.src)) {
                             // Set up the bundle files from the string value and treat as a glob
                             const src = prefixRootSrcPath(bundle.src, [config.data.javascript.src]);
-                            bundleFiles = bundleFiles.concat(getGlob(src));
+                            const srcGlob = getGlob(src);
+                            bundleFiles = bundleFiles.concat(srcGlob);
+                            lintFiles = lintFiles.concat(srcGlob);
                         } else if (Array.isArray(bundle.src)) {
                             // Process the array of source files and treat them as a glob
                             bundle.src.forEach((srcPath) => {
                                 // Each source value should be a string
                                 if (isStringWithValue(srcPath)) {
                                     const processedSrc = prefixRootSrcPath(srcPath, [config.data.javascript.src]);
-                                    bundleFiles = bundleFiles.concat(getGlob(processedSrc));
+                                    const srcGlob = getGlob(processedSrc);
+                                    bundleFiles = bundleFiles.concat(srcGlob);
+                                    lintFiles = lintFiles.concat(srcGlob);
                                 }
                             });
                         }
@@ -75,8 +82,9 @@ const prepareJsConfig = () => {
 
                     if (bundleFiles.length > 0) {
                         bundles.push({
-                            src: bundleFiles,
                             dest: buildPath,
+                            lint: lintFiles,
+                            src: bundleFiles,
                         });
                     }
                 }
@@ -307,14 +315,14 @@ export const processJsFile = async (filePath, lint = true) => {
     const matchedBundle = bundles.find((bundle) => bundle.src.includes(file) || bundle.dest === file);
     if (matchedBundle) {
         if (lint) {
-            await lintJs(matchedBundle.src);
+            await lintJs(matchedBundle.lint);
         }
         processBundle(matchedBundle);
     } else {
         const matchedFile = files.find((f) => f === file);
         if (matchedFile) {
             if (lint) {
-                // await lintJs(file);
+                await lintJs(file);
             }
             processFile(file);
         } else {
