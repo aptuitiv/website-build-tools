@@ -94,9 +94,10 @@ const prefixPaths = (path, prefixes) => {
  * Prefix the root path
  *
  * @param {string} path The file/glob path
+ * @param {Array} [additionalPrefixes] An array of additional prefixes to add to the path
  * @returns {string}
  */
-export const prefixRootPath = (path) => prefixPath(path, config.data.root);
+export const prefixRootPath = (path, additionalPrefixes) => prefixPath(prefixPaths(path, additionalPrefixes), config.data.root);
 
 /**
  * Prefix the build path

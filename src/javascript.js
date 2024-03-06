@@ -42,6 +42,20 @@ const prepareJsConfig = () => {
                     const buildPath = prefixRootThemeBuildPath(bundle.build, [config.data.javascript.build]);
                     // Set up the bundle files
                     let bundleFiles = [];
+                    // Process any node_modules files if there are any
+                    if (typeof bundle.nodeModules !== 'undefined') {
+                        if (isStringWithValue(bundle.nodeModules)) {
+                            bundleFiles = bundleFiles.concat(getGlob(prefixRootPath(bundle.nodeModules, ['node_modules'])));
+                        } else if (Array.isArray(bundle.nodeModules)) {
+                            bundle.nodeModules.forEach((srcPath) => {
+                                // Each source value should be a string
+                                if (isStringWithValue(srcPath)) {
+                                    bundleFiles = bundleFiles.concat(getGlob(prefixRootPath(srcPath, ['node_modules'])));
+                                }
+                            });
+                        }
+                    }
+                    // Process the src files
                     if (typeof bundle.src !== 'undefined') {
                         if (isStringWithValue(bundle.src)) {
                             // Set up the bundle files from the string value and treat as a glob
@@ -58,19 +72,7 @@ const prepareJsConfig = () => {
                             });
                         }
                     }
-                    // Process any node_modules files if there are any
-                    if (typeof bundle.nodeModules !== 'undefined') {
-                        if (isStringWithValue(bundle.nodeModules)) {
-                            bundleFiles = bundleFiles.concat(getGlob(prefixRootPath(bundle.nodeModules)));
-                        } else if (Array.isArray(bundle.nodeModules)) {
-                            bundle.nodeModules.forEach((srcPath) => {
-                                // Each source value should be a string
-                                if (isStringWithValue(srcPath)) {
-                                    bundleFiles = bundleFiles.concat(getGlob(prefixRootPath(srcPath)));
-                                }
-                            });
-                        }
-                    }
+
                     if (bundleFiles.length > 0) {
                         bundles.push({
                             src: bundleFiles,
