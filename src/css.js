@@ -76,7 +76,6 @@ const runStylelint = async (fileGlob) => {
             cache: true,
             defaultSeverity: 'warning', // So that stylelint won't stop on errors and the CSS will still build
             extends: ['stylelint-config-standard'],
-            fix: true,
             plugins: ['stylelint-order', 'stylelint-selector-bem-pattern'],
             reportDescriptionlessDisables: true, // https://github.com/stylelint/stylelint/blob/main/docs/user-guide/options.md#reportdescriptionlessdisables
             reportInvalidScopeDisables: true, // https://github.com/stylelint/stylelint/blob/main/docs/user-guide/options.md#reportinvalidscopedisables
@@ -102,6 +101,7 @@ const runStylelint = async (fileGlob) => {
         // This is set to the root of the aptuitiv-build project folder.
         configBasedir: config.data.packageRoot,
         files: filesToLint,
+        fix: true,
         formatter: 'string',
     };
     if (isObjectWithValues(config.data.stylelint)) {
