@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.3.1 - March 6, 2024
+
+- Fixed issue where the closing icon SVG tag was missing.
+  
 ## v1.3 - March 6, 2024
 
 - Fixed issue where node_modules code wasn’t included in the script bundle.
