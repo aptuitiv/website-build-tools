@@ -7,6 +7,7 @@ import fancyLog from 'fancy-log';
 import fs from 'fs-extra';
 import logSymbols from 'log-symbols';
 import { isAbsolute, parse, resolve } from 'path';
+import * as readline from 'node:readline/promises';
 
 // // Build scripts
 import { isStringWithValue } from './lib/types.js';
@@ -128,6 +129,29 @@ const createConfigFile = (configFile) => {
 };
 
 /**
+ * Create the .env file
+ */
+const createEnvFile = async () => {
+    fancyLog(chalk.magenta('Creating the .env file'));
+    fancyLog(chalk.blue('Setting up the FTP credentials. You can get the username and password from the Settings -> Domain / FTP / DNS  section in the website administration.'));
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+    const name = await rl.question('What is the name of this website? ');
+    const username = await rl.question('What is the FTP username? ');
+    const password = await rl.question('What is the FTP password? ');
+    rl.close();
+    const contents = `# ${name} FTP
+FTP_ENVIRONMENT = live
+FTP_SERVER = ftp1.branchcms.com
+FTP_USERNAME = ${username}
+FTP_PASSWORD = ${password}`;
+    fs.writeFileSync('.env', contents);
+    fancyLog(logSymbols.success, chalk.green('Environment file created'), chalk.cyan('.env'));
+};
+
+/**
  * Process the initialize request
  *
  * @param {object} args The command line arguments
@@ -137,14 +161,15 @@ const initiaizeHandler = async (args) => {
     const configFile = args.config || '.aptuitiv-buildrc.js';
     const files = checkForFiles(configFile);
     if (files.env && files.config) {
-        fancyLog(logSymbols.success, chalk.green('The environment is already set up. Nothing to do here.'));
+        fancyLog(logSymbols.success, chalk.green('The environment is already set up. Go forth and build!'));
     } else {
         if (!files.env) {
-            fancyLog(logSymbols.info, chalk.magenta('Creating the .env file.'));
+            await createEnvFile();
         }
         if (!files.config) {
             createConfigFile(configFile);
         }
+        fancyLog(logSymbols.success, chalk.green('All set! Ready for you to build.'));
     }
 };
 
