@@ -74,3 +74,4 @@ While not required for the build tools, is recommended that you also have the fo
 - [Configuration](docs/Configuration.md)
   - [Configuring CSS](docs/configuration/Css.md).
   - [Configuring Javascript](docs/configuration/Javascript.md)
+  - [Recommended package.json scripts](docs/configuration/Package-json-scripts.md)
