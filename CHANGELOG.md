@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.4 - March 8, 2024
+
+- Added `init` action to help set up the config file and the `.env` file.
+
 ## v1.3.2 - March 6, 2024
 
 - Fixed the stylelint `fix` option.
