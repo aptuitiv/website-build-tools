@@ -138,7 +138,7 @@ const setupPackageJsonScripts = async () => {
  * This orders the package.json file contents, sets the correct license, updates the scripts, and
  * sets the correct dev dependencies.
  *
- * @param args
+ * @param {object} args The arguments from the command line
  */
 export const formatPackageJson = async (args) => {
     const license = args.license || defaultLicense;
