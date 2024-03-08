@@ -135,7 +135,6 @@ javascript:
  */
 const createConfigFile = (configFile) => {
     const { ext } = parse(configFile);
-    console.log('ext: ', ext);
     if (ext === '.json' || configFile === '.aptuitiv-buildrc') {
         createJsonConfigFile(configFile);
     } else if (ext === '.cjs') {
