@@ -108,7 +108,24 @@ const getScripts = (currentScripts) => {
         'upload-theme': 'aptuitiv-build upload -t',
         watch: 'aptuitiv-build watch',
     };
+    remove.forEach((item) => {
+        delete scripts[item];
+    });
     return { ...scripts, ...add };
+};
+
+/**
+ * Set up the scripts in the package.json file
+ */
+const setupPackageJsonScripts = async () => {
+    // Get the package.json file
+    const packageJson = await fs.readJson('package.json');
+
+    // Get the correct scripts
+    packageJson.scripts = getScripts(packageJson.scripts);
+
+    // Write the updated package.json back to the file
+    fs.writeJSONSync('package.json', packageJson, { spaces: 4 });
 };
 
 /**
@@ -204,5 +221,7 @@ export const packageJsonHandler = async (args, action) => {
     if (action === 'format') {
         await formatPackageJson(args);
         setupLicense(args);
+    } else if (action === 'scripts') {
+        await setupPackageJsonScripts();
     }
 };
