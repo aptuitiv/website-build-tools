@@ -113,16 +113,35 @@ export default {
 };
 
 /**
+ * Create the YAML config file
+ *
+ * @param {string} configFile The configuration file name
+ */
+const createYamlConfigFile = (configFile) => {
+    const contents = `# Configuration for the aptuitiv-build package.
+# See https://github.com/aptuitiv/website-build-tools/blob/main/docs/Configuration.md for more information.
+copy: null
+javascript:
+  bundles: null
+  files: null`;
+    fs.writeFileSync(configFile, contents);
+    fancyLog(logSymbols.success, chalk.green('Config file created'), chalk.cyan(configFile));
+};
+
+/**
  * Create the config file
  *
  * @param {string} configFile The config file name
  */
 const createConfigFile = (configFile) => {
     const { ext } = parse(configFile);
+    console.log('ext: ', ext);
     if (ext === '.json' || configFile === '.aptuitiv-buildrc') {
         createJsonConfigFile(configFile);
     } else if (ext === '.cjs') {
         createCommonJsConfigFile(configFile);
+    } else if (['.yaml', '.yml'].includes(ext)) {
+        createYamlConfigFile(configFile);
     } else {
         createEsModuleConfigFile(configFile);
     }
@@ -146,7 +165,7 @@ const createEnvFile = async () => {
 FTP_ENVIRONMENT = live
 FTP_SERVER = ftp1.branchcms.com
 FTP_USERNAME = ${username}
-FTP_PASSWORD = ${password}`;
+FTP_PASSWORD = ${password} `;
     fs.writeFileSync('.env', contents);
     fancyLog(logSymbols.success, chalk.green('Environment file created'), chalk.cyan('.env'));
 };
