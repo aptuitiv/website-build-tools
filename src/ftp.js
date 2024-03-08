@@ -19,6 +19,8 @@ import {
     prefixRootPath,
 } from './helpers.js';
 
+/* global Client */
+
 /**
  * Get the source path and make sure it starts with the correct root path
  *
@@ -50,6 +52,52 @@ const getRemotePath = (remotePath) => {
 };
 
 /**
+ * Connect to the FTP server
+ *
+ * @param {Client} client The FTP client
+ * @returns {Client} The connected FTP client
+ */
+const connect = async (client) => {
+    const env = process.env.FTP_ENVIRONMENT ?? 'live';
+    if (typeof process.env.FTP_SERVER === 'string' && typeof process.env.FTP_USERNAME === 'string' && typeof process.env.FTP_PASSWORD === 'string') {
+        let server = process.env.FTP_SERVER;
+        let user = process.env.FTP_USERNAME;
+        let pass = process.env.FTP_PASSWORD;
+        if (env === 'dev') {
+            if (typeof process.env.FTP_DEV_SERVER === 'string' && typeof process.env.FTP_DEV_USERNAME === 'string' && typeof process.env.FTP_DEV_PASSWORD === 'string') {
+                server = process.env.FTP_DEV_SERVER;
+                user = process.env.FTP_DEV_USERNAME;
+                pass = process.env.FTP_DEV_PASSWORD;
+            } else {
+                // eslint-disable-next-line no-console -- Need to log the error
+                fancyLog(logSymbols.error, chalk.red('The dev FTP credentials are missing'));
+                process.exit();
+            }
+        }
+        if (server && user && pass) {
+            try {
+                await client.access({
+                    host: server,
+                    user,
+                    password: pass,
+                });
+            } catch (error) {
+                fancyLog(logSymbols.error, chalk.red('FTP connection error: ', error));
+                process.exit();
+            }
+        } else {
+            // eslint-disable-next-line no-console -- Need to log the error
+            console.warn('The FTP credentials are missing');
+            process.exit();
+        }
+    } else {
+        fancyLog(logSymbols.error, chalk.red('The FTP credentials are missing'));
+        process.exit();
+    }
+    return client;
+};
+
+/**
  * Delete the file from the FTP server
  *
  * @param {string} filePath The path to the file to delete
@@ -74,20 +122,7 @@ export async function deleteFile(filePath) {
     });
 
     try {
-        await client.access({
-            host:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_SERVER
-                    : process.env.FTP_DEV_SERVER,
-            user:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_USERNAME
-                    : process.env.FTP_DEV_USERNAME,
-            password:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_PASSWORD
-                    : process.env.FTP_DEV_PASSWORD,
-        });
+        await connect(client);
         await client.remove(removePath);
         fancyLog(
             logSymbols.success,
@@ -128,20 +163,7 @@ export async function deployFile(filePath) {
     });
 
     try {
-        await client.access({
-            host:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_SERVER
-                    : process.env.FTP_DEV_SERVER,
-            user:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_USERNAME
-                    : process.env.FTP_DEV_USERNAME,
-            password:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_PASSWORD
-                    : process.env.FTP_DEV_PASSWORD,
-        });
+        await connect(client);
         await client
             .ensureDir(remotePath.substring(0, remotePath.lastIndexOf('/')))
             .then(async () => {
@@ -193,20 +215,7 @@ async function downloadFile(filePath) {
         // Make sure that the destination directory exists
         fs.ensureDirSync(path.dirname(srcPath));
 
-        await client.access({
-            host:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_SERVER
-                    : process.env.FTP_DEV_SERVER,
-            user:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_USERNAME
-                    : process.env.FTP_DEV_USERNAME,
-            password:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_PASSWORD
-                    : process.env.FTP_DEV_PASSWORD,
-        });
+        await connect(client);
         await client.downloadTo(srcPath, remotePath);
         fancyLog(
             logSymbols.success,
@@ -233,20 +242,7 @@ export async function deleteDir(dir) {
     fancyLog(chalk.magenta('Deleting directory'), chalk.cyan(dir));
 
     try {
-        await client.access({
-            host:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_SERVER
-                    : process.env.FTP_DEV_SERVER,
-            user:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_USERNAME
-                    : process.env.FTP_DEV_USERNAME,
-            password:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_PASSWORD
-                    : process.env.FTP_DEV_PASSWORD,
-        });
+        await connect(client);
         await client.removeDir(removePath);
         fancyLog(
             logSymbols.success,
@@ -281,20 +277,7 @@ async function deployDir(dir) {
     });
 
     try {
-        await client.access({
-            host:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_SERVER
-                    : process.env.FTP_DEV_SERVER,
-            user:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_USERNAME
-                    : process.env.FTP_DEV_USERNAME,
-            password:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_PASSWORD
-                    : process.env.FTP_DEV_PASSWORD,
-        });
+        await connect(client);
         await client.uploadFromDir(srcPath, remotePath);
         fancyLog(
             logSymbols.success,
@@ -330,20 +313,7 @@ async function downloadDir(dir) {
     });
 
     try {
-        await client.access({
-            host:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_SERVER
-                    : process.env.FTP_DEV_SERVER,
-            user:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_USERNAME
-                    : process.env.FTP_DEV_USERNAME,
-            password:
-                process.env.FTP_ENVIRONMENT === 'live'
-                    ? process.env.FTP_PASSWORD
-                    : process.env.FTP_DEV_PASSWORD,
-        });
+        await connect(client);
         await client.downloadToDir(localPath, remotePath);
         fancyLog(
             logSymbols.success,

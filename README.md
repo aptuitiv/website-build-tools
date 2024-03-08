@@ -23,6 +23,8 @@ The first, and recommended way is to call this from the `scripts` section of you
 }
 ```
 
+See the [Package.json](docs/configuration/Package-json-scripts.md) page for a full list of recommended scripts.
+
 The other way is using the [command line](docs/Command-line.md).
 
 ```bash
@@ -64,6 +66,7 @@ While not required for the build tools, is recommended that you also have the fo
   - [FTP](docs/actions/FTP.md)
   - [Icons](docs/actions/Icons.md)
   - [Images](docs/actions/Images.md)
+  - [Initialize](docs/actions/Initialize.md)
   - [Javascript](docs/actions/Javascript.md)
   - [Templates](docs/actions/Templates.md)
   - [Theme configuration](docs/actions/Theme.md)
@@ -71,3 +74,4 @@ While not required for the build tools, is recommended that you also have the fo
 - [Configuration](docs/Configuration.md)
   - [Configuring CSS](docs/configuration/Css.md).
   - [Configuring Javascript](docs/configuration/Javascript.md)
+  - [Recommended package.json scripts](docs/configuration/Package-json-scripts.md)

@@ -52,6 +52,7 @@ aptuitiv-build pull-template --root ../../
 - [FTP](actions/FTP.md)
 - [Icons](actions/Icons.md)
 - [Images](actions/Images.md)
+- [Initialize](actions/Initialize.md)
 - [Javascript](actions/Javascript.md)
 - [Templates](actions/Templates.md)
 - [Theme configuration](actions/Theme.md)
