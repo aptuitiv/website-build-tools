@@ -15,6 +15,7 @@ import ftpHander from './src/ftp.js';
 import { iconHandler } from './src/icons.js';
 import { imageHandler } from './src/image.js';
 import initiaizeHandler from './src/initialize.js';
+import { initiaizeHandler } from './src/initialize.js';
 import { jsHandler } from './src/javascript.js';
 import { packageJsonHandler } from './src/package-json.js';
 import { templateHandler } from './src/template.js';

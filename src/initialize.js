@@ -6,30 +6,11 @@ import chalk from 'chalk';
 import fancyLog from 'fancy-log';
 import fs from 'fs-extra';
 import logSymbols from 'log-symbols';
-import { isAbsolute, parse, resolve } from 'path';
+import { parse } from 'path';
 import * as readline from 'node:readline/promises';
 
-// // Build scripts
-import { isStringWithValue } from './lib/types.js';
-
-/**
- * Set up the root directory and change the working directory if necessary
- *
- * By default the working directory will be the directory where the command was run.
- * If the --root option is passed in then the root directory will be set to the specified directory.
- *
- * @param {object} args The command line arguments
- */
-const setupRoot = (args) => {
-    if (isStringWithValue(args.root)) {
-        let cwd = process.cwd();
-        let { root } = args;
-        if (!isAbsolute(root)) {
-            root = resolve(cwd, root);
-        }
-        cwd = root;
-    }
-};
+// Build scripts
+import { setupRoot } from './helpers.js';
 
 /**
  * Checks to see if the .env and configuration files exist
@@ -170,12 +151,11 @@ FTP_PASSWORD = ${password} `;
 };
 
 /**
- * Process the initialize request
+ * Initialize the environment
  *
  * @param {object} args The command line arguments
  */
-const initiaizeHandler = async (args) => {
-    setupRoot(args);
+export const initialize = async (args) => {
     const configFile = args.config || '.aptuitiv-buildrc.js';
     const files = checkForFiles(configFile);
     if (files.env && files.config) {
@@ -191,4 +171,12 @@ const initiaizeHandler = async (args) => {
     }
 };
 
-export default initiaizeHandler;
+/**
+ * Process the initialize request
+ *
+ * @param {object} args The command line arguments
+ */
+export const initiaizeHandler = async (args) => {
+    setupRoot(args.root);
+    await initialize(args);
+};
