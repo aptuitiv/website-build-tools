@@ -14,6 +14,7 @@ import { fontHandler } from './src/font.js';
 import ftpHander from './src/ftp.js';
 import { iconHandler } from './src/icons.js';
 import { imageHandler } from './src/image.js';
+import initiaizeHandler from './src/initialize.js';
 import { jsHandler } from './src/javascript.js';
 import { templateHandler } from './src/template.js';
 import { themeHandler } from './src/theme.js';
@@ -212,6 +213,19 @@ program
     .action(async (args) => {
         await config.init(args);
         imageHandler();
+    });
+
+/**
+ * Initialize command
+ */
+program
+    .command('initialize')
+    .alias('init')
+    .description('Initialize the project')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        initiaizeHandler(args);
     });
 
 /**
