@@ -64,6 +64,7 @@ While not required for the build tools, is recommended that you also have the fo
   - [FTP](docs/actions/FTP.md)
   - [Icons](docs/actions/Icons.md)
   - [Images](docs/actions/Images.md)
+  - [Initialize](docs/actions/Initialize.md)
   - [Javascript](docs/actions/Javascript.md)
   - [Templates](docs/actions/Templates.md)
   - [Theme configuration](docs/actions/Theme.md)
