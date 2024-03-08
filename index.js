@@ -16,6 +16,7 @@ import { iconHandler } from './src/icons.js';
 import { imageHandler } from './src/image.js';
 import initiaizeHandler from './src/initialize.js';
 import { jsHandler } from './src/javascript.js';
+import { packageJsonHandler } from './src/package-json.js';
 import { templateHandler } from './src/template.js';
 import { themeHandler } from './src/theme.js';
 import watchHandler from './src/watch.js';
@@ -259,6 +260,27 @@ program
     .action(async (args) => {
         await config.init(args);
         jsHandler('lint', args);
+    });
+
+/**
+ * Package.json command
+ */
+const packageJsonCommand = program.command('package-json').description('Process the package.json file');
+packageJsonCommand
+    .command('format')
+    .description('Format the package.json file')
+    .addOption(rootOption)
+    .option('-l, --license <license>', 'The license for the project. https://docs.npmjs.com/cli/v10/configuring-npm/package-json#license')
+    .action(async (args) => {
+        packageJsonHandler(args, 'format');
+    });
+
+packageJsonCommand
+    .command('scripts')
+    .description('Update the scripts in the package.json to the recommended ones')
+    .addOption(rootOption)
+    .action(async (args) => {
+        packageJsonHandler(args, 'scripts');
     });
 
 /**

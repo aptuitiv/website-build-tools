@@ -68,6 +68,7 @@ While not required for the build tools, is recommended that you also have the fo
   - [Images](docs/actions/Images.md)
   - [Initialize](docs/actions/Initialize.md)
   - [Javascript](docs/actions/Javascript.md)
+  - [Package.json](docs/actions/Package-json.md)
   - [Templates](docs/actions/Templates.md)
   - [Theme configuration](docs/actions/Theme.md)
   - [Watch](docs/actions/Watch.md)

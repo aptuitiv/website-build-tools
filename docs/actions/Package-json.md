@@ -1,0 +1,21 @@
+# Package.json action
+
+You can do some processing on the `package.json` file in the website project. 
+
+## Format the `package.json` file
+
+This will reorder the contents, set the correct license, update the scripts, and dev dependencies.
+
+This can be used when setting up a new site or converting a gulp-build process to use this package.
+
+```bash
+aptuitiv-build package-json format
+```
+
+## Update the `scripts` in the `package.json` file
+
+This will update the `scripts` section of the `package.json` file to use the [latest recommended ones](/docs/configuration/Package-json-scripts.md).
+
+```bash
+aptuitiv-build package-json scripts
+```
