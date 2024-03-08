@@ -23,6 +23,8 @@ The first, and recommended way is to call this from the `scripts` section of you
 }
 ```
 
+See the [Package.json](docs/configuration/Package-json-scripts.md) page for a full list of recommended scripts.
+
 The other way is using the [command line](docs/Command-line.md).
 
 ```bash
