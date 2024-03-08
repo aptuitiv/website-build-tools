@@ -18,7 +18,7 @@ You can optionally set a configuration file to override any of the default confi
 - An `aptuitiv-build` property in the `package.json` file.
 - An `.aptuitiv-buildrc` file in JSON or YAML format. We recommend that you add the correct extension to the file (e.g. `.json`) to end up with one of the following file names:
   - `.aptuitiv-buildrc.json`, `.aptuitiv-buildrc.yaml`, `.aptuitiv-buildrc.yml`
-- An `.aptuitiv-buildrc.js`, `.aptuitiv-buildrc.ts`, `.aptuitiv-buildrc.mjs`, or .`aptuitiv-buildrc.cjs` file.
+- An `.aptuitiv-buildrc.js`, `.aptuitiv-buildrc.ts`, `.aptuitiv-buildrc.mjs`, or `.aptuitiv-buildrc.cjs` file.
 - `aptuitiv-build.config.mjs` or `.aptuitiv-buildrc.mjs` file using `export default` (ES module)
 - `aptuitiv-build.config.cjs` or `.aptuitiv-buildrc.cjs` file using `module.exports` (CommonJS)
 - An `aptuitiv-buildrc`, `aptuitiv-buildrc.json`, `aptuitiv-buildrc.yaml`, `aptuitiv-buildrc.yml`, `aptuitiv-buildrc.js`, `aptuitiv-buildrc.ts`, `aptuitiv-buildrc.mjs`, or `aptuitiv-buildrc.cjs` file inside a `.config` subdirectory.
@@ -93,9 +93,9 @@ See these examples:
 | images | | [Image file configuration](configuration/Images.md). |
 | images.build | 'images' | The folder for the images within the theme build folder. (config.build.theme) |
 | images.optimizations | | [Image optimization configuration](configuration/Images.md#image-optimizations). |
-| images.optimizations.jpg | | [JPG image optimization configuration](configuration/Images.md#jpg-optimizations)
-| images.optimizations.png | | [PNG image optimization configuration](configuration/Images.md#png-optimizations)
-| images.optimizations.webp | | [WebP image optimization configuration](configuration/Images.md#webp-optimizations)
+| images.optimizations.jpg | | [JPG image optimization configuration](configuration/Images.md#jpg-optimizations) |
+| images.optimizations.png | | [PNG image optimization configuration](configuration/Images.md#png-optimizations) |
+| images.optimizations.webp | | [WebP image optimization configuration](configuration/Images.md#webp-optimizations) |
 | images.src | 'images' | The source folder for the image files within the root source folder. (config.src) |
 | javascript | | [Javascript configuration](configuration/Javascript.md). |
 | javascript.build | 'js' | The folder for the javascript files within the theme build folder. (config.build.theme) |
