@@ -2,7 +2,10 @@
     Package JSON actions
 =========================================================================== */
 
+import chalk from 'chalk';
+import fancyLog from 'fancy-log';
 import fs from 'fs-extra';
+import logSymbols from 'log-symbols';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -126,6 +129,7 @@ const setupPackageJsonScripts = async () => {
 
     // Write the updated package.json back to the file
     fs.writeJSONSync('package.json', packageJson, { spaces: 4 });
+    fancyLog(logSymbols.success, chalk.green('Updated the scripts in the package.json file'));
 };
 
 /**
@@ -194,12 +198,14 @@ export const formatPackageJson = async (args) => {
     });
 
     fs.writeJSONSync('package.json', newPackageJson, { spaces: 4 });
+    fancyLog(logSymbols.success, chalk.green('Updated the package.json file'));
 };
 
 /**
  * Set up the license file to go with the license in the package.json file
  *
- * @param {object} args The command line arguments
+ * @param {object} args The command line arguments.
+ *  - license: The license to use
  */
 export const setupLicense = (args) => {
     const license = args.license || defaultLicense;
