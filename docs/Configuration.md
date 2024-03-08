@@ -67,6 +67,7 @@ See these examples:
 - [CommonJS (cjs)](configuration/examples/cjs.md)
 - [ES Module (js)](configuration/examples/js.md)
 - [JSON](configuration/examples/json.md)
+- [YAML](configuration/examples/yaml.md)
 
 ## Configuration options
 
