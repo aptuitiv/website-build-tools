@@ -119,7 +119,7 @@ export default {
  */
 const createConfigFile = (configFile) => {
     const { ext } = parse(configFile);
-    if (ext === '.json') {
+    if (ext === '.json' || configFile === '.aptuitiv-buildrc') {
         createJsonConfigFile(configFile);
     } else if (ext === '.cjs') {
         createCommonJsConfigFile(configFile);
