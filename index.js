@@ -12,9 +12,9 @@ import { cssHandler } from './src/css.js';
 import exportHandler from './src/export.js';
 import { fontHandler } from './src/font.js';
 import ftpHander from './src/ftp.js';
+import gulpConvertHandler from './src/gulp-convert.js';
 import { iconHandler } from './src/icons.js';
 import { imageHandler } from './src/image.js';
-import initiaizeHandler from './src/initialize.js';
 import { initiaizeHandler } from './src/initialize.js';
 import { jsHandler } from './src/javascript.js';
 import { packageJsonHandler } from './src/package-json.js';
@@ -188,6 +188,18 @@ program
     .action(async (args) => {
         await config.init(args);
         ftpHander('delete', args);
+    });
+
+/**
+ * Gulp convert command
+ */
+program
+    .command('gulp-convert')
+    .description('Convert the old Gulp build process to use the build tools')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        gulpConvertHandler(args);
     });
 
 /**
