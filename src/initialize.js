@@ -18,20 +18,25 @@ import { isObjectWithValues } from './lib/types.js';
  * Checks to see if the .env and configuration files exist
  *
  * @param {string} configFile The configuration file to check for
+ * @param {boolean} [outputLog] Whether to output the log
  * @returns {object} An object containing the status of the files
  */
-const checkForFiles = (configFile) => {
+const checkForFiles = (configFile, outputLog = true) => {
     const returnValue = {
         env: false,
         config: false,
     };
     if (fs.existsSync('.env')) {
         returnValue.env = true;
-        fancyLog(logSymbols.success, chalk.green('Found the .env file'));
+        if (outputLog) {
+            fancyLog(logSymbols.success, chalk.green('Found the .env file'));
+        }
     }
     if (fs.existsSync(configFile)) {
         returnValue.config = true;
-        fancyLog(logSymbols.success, chalk.green('Found the configuration file'), chalk.cyan(configFile));
+        if (outputLog) {
+            fancyLog(logSymbols.success, chalk.green('Found the configuration file'), chalk.cyan(configFile));
+        }
     }
     return returnValue;
 };
@@ -184,12 +189,15 @@ FTP_PASSWORD = ${password} `;
  * Initialize the environment
  *
  * @param {object} args The command line arguments
+ * @param {boolean} [outputLog] Whether to output the log
  */
-export const initialize = async (args) => {
+export const initialize = async (args, outputLog = true) => {
     const configFile = args.config || '.aptuitiv-buildrc.js';
-    const files = checkForFiles(configFile);
+    const files = checkForFiles(configFile, outputLog);
     if (files.env && files.config) {
-        fancyLog(logSymbols.success, chalk.green('The environment is already set up. Go forth and build!'));
+        if (outputLog) {
+            fancyLog(logSymbols.success, chalk.green('The environment is already set up. Go forth and build!'));
+        }
     } else {
         if (!files.env) {
             await createEnvFile();
@@ -197,7 +205,9 @@ export const initialize = async (args) => {
         if (!files.config) {
             createConfigFile(configFile);
         }
-        fancyLog(logSymbols.success, chalk.green('All set! Ready for you to build.'));
+        if (outputLog) {
+            fancyLog(logSymbols.success, chalk.green('All set! Ready for you to build.'));
+        }
     }
 };
 
