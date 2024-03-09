@@ -59,6 +59,7 @@ While not required for the build tools, is recommended that you also have the fo
 
 - [Command line usage and actions](docs/Command-line.md)
   - [Build](docs/actions/Build.md)
+  - [Convert legacy gulp build process](docs/actions/Convert-gulp.md)
   - [Copy files](docs/actions/Copy-files.md)
   - [CSS](docs/actions/Css.md)
   - [Export](docs/actions/Export.md)
