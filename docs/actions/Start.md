@@ -1,0 +1,7 @@
+# Start action
+
+This will build the files and then start the watch process.
+
+```bash
+aptuitiv-build start
+```

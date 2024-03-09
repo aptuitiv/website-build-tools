@@ -56,6 +56,7 @@ aptuitiv-build pull-template --root ../../
 - [Initialize](actions/Initialize.md)
 - [Javascript](actions/Javascript.md)
 - [Package.json](actions/Package-json.md)
+- [Start](actions/Start.md)
 - [Templates](actions/Templates.md)
 - [Theme configuration](actions/Theme.md)
 - [Watch](actions/Watch.md)
