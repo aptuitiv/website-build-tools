@@ -8,9 +8,11 @@ import fs from 'fs-extra';
 import logSymbols from 'log-symbols';
 import { parse } from 'path';
 import * as readline from 'node:readline/promises';
+import yaml from 'json-to-pretty-yaml';
 
 // Build scripts
 import { setupRoot } from './helpers.js';
+import { isObjectWithValues } from './lib/types.js';
 
 /**
  * Checks to see if the .env and configuration files exist
@@ -35,18 +37,35 @@ const checkForFiles = (configFile) => {
 };
 
 /**
+ * Convert the JSON content to a Javascript string
+ *
+ * @param {string} content The JSON content
+ * @returns {string}
+ */
+const convertJsonToJs = (content) => {
+    let js = JSON.stringify(content, null, 4);
+    // Replace object keys wrapped in quotes to not be in quotes
+    js = js.replaceAll('"copy"', 'copy');
+    js = js.replaceAll('"src"', 'src');
+    js = js.replaceAll('"dest"', 'dest');
+    js = js.replaceAll('"javascript"', 'javascript');
+    js = js.replaceAll('"bundles"', 'bundles');
+    js = js.replaceAll('"build"', 'build');
+    js = js.replaceAll('"nodeModules"', 'nodeModules');
+    js = js.replaceAll('"files"', 'files');
+    // Replace double quotes with single quotes
+    js = js.replaceAll('"', "'");
+    return js;
+};
+
+/**
  * Create the JSON config file
  *
  * @param {string} configFile The configuration file name
+ * @param {object} content A JSON object containing different content to write into the file
  */
-const createJsonConfigFile = (configFile) => {
-    const contents = `{
-    "copy": [],
-    "javascript": {
-        "bundles": [],
-        "files": []
-    }
-}`;
+const createJsonConfigFile = (configFile, content) => {
+    const contents = `${JSON.stringify(content, null, 4)}`;
     fs.writeFileSync(configFile, contents);
     fancyLog(logSymbols.success, chalk.green('Config file created'), chalk.cyan(configFile));
 };
@@ -55,19 +74,14 @@ const createJsonConfigFile = (configFile) => {
  * Create the CommonJS config file
  *
  * @param {string} configFile The configuration file name
+ * @param {object} content A JSON object containing different content to write into the file
  */
-const createCommonJsConfigFile = (configFile) => {
+const createCommonJsConfigFile = (configFile, content) => {
     const contents = `/**
  * Configuration for the aptuitiv-build package.
  * See https://github.com/aptuitiv/website-build-tools/blob/main/docs/Configuration.md for more information.
  */
-module.exports = {
-    copy: [],
-    javascript: {
-        bundles: [],
-        files: [],
-    }
-};`;
+module.exports = ${convertJsonToJs(content)};`;
     fs.writeFileSync(configFile, contents);
     fancyLog(logSymbols.success, chalk.green('Config file created'), chalk.cyan(configFile));
 };
@@ -76,19 +90,14 @@ module.exports = {
  * Create the ES Module config file
  *
  * @param {string} configFile The configuration file name
+ * @param {object} content A JSON object containing different content to write into the file
  */
-const createEsModuleConfigFile = (configFile) => {
+const createEsModuleConfigFile = (configFile, content) => {
     const contents = `/**
  * Configuration for the aptuitiv-build package.
  * See https://github.com/aptuitiv/website-build-tools/blob/main/docs/Configuration.md for more information.
  */
-export default {
-    copy: [],
-    javascript: {
-        bundles: [],
-        files: [],
-    }
-};`;
+export default ${convertJsonToJs(content)};`;
     fs.writeFileSync(configFile, contents);
     fancyLog(logSymbols.success, chalk.green('Config file created'), chalk.cyan(configFile));
 };
@@ -97,14 +106,13 @@ export default {
  * Create the YAML config file
  *
  * @param {string} configFile The configuration file name
+ * @param {object} content A JSON object containing different content to write into the file
  */
-const createYamlConfigFile = (configFile) => {
+const createYamlConfigFile = (configFile, content) => {
+    const yamlContent = yaml.stringify(content);
     const contents = `# Configuration for the aptuitiv-build package.
 # See https://github.com/aptuitiv/website-build-tools/blob/main/docs/Configuration.md for more information.
-copy: null
-javascript:
-  bundles: null
-  files: null`;
+${yamlContent}`;
     fs.writeFileSync(configFile, contents);
     fancyLog(logSymbols.success, chalk.green('Config file created'), chalk.cyan(configFile));
 };
@@ -113,17 +121,39 @@ javascript:
  * Create the config file
  *
  * @param {string} configFile The config file name
+ * @param {object} content An object containing different content to write into the file
  */
-const createConfigFile = (configFile) => {
+export const createConfigFile = (configFile, content) => {
+    const configContent = {
+        copy: [],
+        javascript: {
+            bundles: [],
+            files: [],
+        },
+    };
+    if (isObjectWithValues(content)) {
+        Object.keys(content).forEach((key) => {
+            if (key === 'copy') {
+                configContent.copy = content.copy;
+            } else if (key === 'javascript') {
+                if (content.javascript.bundles) {
+                    configContent.javascript.bundles = content.javascript.bundles;
+                }
+                if (content.javascript.files) {
+                    configContent.javascript.files = content.javascript.files;
+                }
+            }
+        });
+    }
     const { ext } = parse(configFile);
     if (ext === '.json' || configFile === '.aptuitiv-buildrc') {
-        createJsonConfigFile(configFile);
+        createJsonConfigFile(configFile, configContent);
     } else if (ext === '.cjs') {
-        createCommonJsConfigFile(configFile);
+        createCommonJsConfigFile(configFile, configContent);
     } else if (['.yaml', '.yml'].includes(ext)) {
-        createYamlConfigFile(configFile);
+        createYamlConfigFile(configFile, configContent);
     } else {
-        createEsModuleConfigFile(configFile);
+        createEsModuleConfigFile(configFile, configContent);
     }
 };
 

@@ -44,6 +44,7 @@
         "glob": "^10.3.10",
         "image-type": "^5.2.0",
         "is-svg": "^5.0.0",
+        "json-to-pretty-yaml": "^1.2.2",
         "log-symbols": "^6.0.0",
         "node-notifier": "^10.0.1",
         "postcss": "^8.4.35",
