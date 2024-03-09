@@ -68,7 +68,7 @@ const getDevDependencies = (currentDevDependencies) => {
         'stylelint-selector-bem-pattern',
     ];
     const add = {
-        '@aptuitiv/website-build-tools': thisPackageJson.version,
+        '@aptuitiv/website-build-tools': `^${thisPackageJson.version}`,
     };
 
     const dependencies = currentDevDependencies || {};
