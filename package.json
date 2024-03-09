@@ -27,6 +27,8 @@
     },
     "dependencies": {
         "@aptuitiv/eslint-config-aptuitiv": "^0.6.0",
+        "acorn": "^8.11.3",
+        "acorn-walk": "^8.3.2",
         "autoprefixer": "^10.4.17",
         "basic-ftp": "^5.0.5",
         "chalk": "^5.3.0",
