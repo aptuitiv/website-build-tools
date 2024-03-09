@@ -24,6 +24,16 @@ const removeFiles = () => {
         '.eslintrc.cjs',
         '.stylelintrc',
         'gulpfile.js',
+        'gulp/copy.js',
+        'gulp/css.js',
+        'gulp/deploy.js',
+        'gulp/export-theme.js',
+        'gulp/font.js',
+        'gulp/image.js',
+        'gulp/javascript.js',
+        'gulp/svg.js',
+        'gulp/theme.js',
+        'gulp/utilities.js',
     ];
     let removed = 0;
     files.forEach((file) => {
