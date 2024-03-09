@@ -31,4 +31,4 @@ aptuitiv-build gulp-convert --config .aptuitiv-buildrc.cjs
 aptuitiv-build gulp-convert -c .aptuitiv-buildrc.cjs
 ```
 
-If the `.env` file needs to be created the follow the prompts.
+If the `.env` file needs to be created then follow the prompts.

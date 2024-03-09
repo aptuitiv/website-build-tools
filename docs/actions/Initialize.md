@@ -24,4 +24,4 @@ aptuitiv-build init --config .aptuitiv-buildrc.cjs
 aptuitiv-build init -c .aptuitiv-buildrc.cjs
 ```
 
-If the `.env` file needs to be created the follow the prompts.
+If the `.env` file needs to be created then follow the prompts.
