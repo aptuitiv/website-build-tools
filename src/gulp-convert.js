@@ -233,8 +233,10 @@ const gulpConvertHandler = async (args) => {
     initialize(args, false);
     fancyLog(logSymbols.success, chalk.green('Environment set up.'));
     fancyLog(logSymbols.success, chalk.green('Gulp build process converted.'));
-    fancyLog(chalk.blue(`Compare the ${configFile} file to the gulp/config.js file to ensure the configuration is correct.`));
-    fancyLog(chalk.blue('Then build the files with "npm run build" or start the watch process with "npm run watch".'));
+    fancyLog(chalk.blue(`Compare the ${configFile} file to the gulp/config.js file to ensure the configuration is correct.
+    Once you are done comparing the config files, remove the gulp/config.js file and the "gulp" folder.
+    Then build the files with "npm run build", or start the watch process with "npm run watch", or do both with "npm run start".
+    `));
 };
 
 export default gulpConvertHandler;
