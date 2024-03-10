@@ -186,12 +186,42 @@ FTP_PASSWORD = ${password} `;
 };
 
 /**
+ * Set up the .gitignore file
+ *
+ * Make sure that it has all of the necessary patterns
+ */
+const setupGitIgnore = () => {
+    const content = `# This includes files that will be ignored by git
+# We want to include the package-lock.json file in git so that everyone is working with the same package files.
+# The package-lock.json should not be included in this file.
+# Web projects are not dependencies in other projects so this is ok. Reference for that decision:
+# https://classic.yarnpkg.com/blog/2016/11/24/lockfiles-for-all/
+# https://dev.to/gajus/stop-using-package-lock-json-or-yarn-lock-3ddi
+# https://dev.to/saurabhdaware/but-what-the-hell-is-package-lock-json-b04
+
+# Folders to ignore
+.idea/
+.vscode/
+_export/
+dist/
+node_modules/
+
+# Files to ignore
+.DS_Store
+.env
+.stylelintcache`;
+    fs.writeFileSync('.gitignore', content);
+    fancyLog(logSymbols.success, chalk.green('Updated .gitignore file'));
+};
+
+/**
  * Initialize the environment
  *
  * @param {object} args The command line arguments
  * @param {boolean} [outputLog] Whether to output the log
  */
 export const initialize = async (args, outputLog = true) => {
+    setupGitIgnore();
     const configFile = args.config || '.aptuitiv-buildrc.js';
     const files = checkForFiles(configFile, outputLog);
     if (files.env && files.config) {
