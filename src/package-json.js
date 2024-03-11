@@ -40,7 +40,7 @@ const dependenciesToRemove = [
     'gulp-connect',
     'gulp-data',
     'gulp-eslint',
-    'gulp-header', ,
+    'gulp-header',
     'gulp-html-beautify',
     'gulp-htmlmin',
     'gulp-if',
