@@ -4,8 +4,12 @@
  * npx aptuitiv-build template --pulld
  */
 
+import chalk from 'chalk';
 import { Command, Option } from 'commander';
+import fancyLog from 'fancy-log';
+import logSymbols from 'log-symbols';
 
+// Build scripts
 import config from './src/config.js';
 import { copyHandler } from './src/copy.js';
 import { cssHandler } from './src/css.js';
@@ -236,10 +240,18 @@ program
     .command('initialize')
     .alias('init')
     .description('Initialize the project')
+    .option('--no-build', 'Do not run the build process after initializing the project')
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
-        initiaizeHandler(args);
+        await config.init(args);
+        await initiaizeHandler(args);
+        if (args.build) {
+            fancyLog(chalk.magenta('The project has been initialized. Running the build process.'));
+            await runBuild();
+            fancyLog(logSymbols.success, chalk.green('The build process has completed.'));
+            fancyLog(chalk.blue('You can now run "npm run watch" to start the watch process.'));
+        }
     });
 
 /**
