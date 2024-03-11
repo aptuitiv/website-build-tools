@@ -306,7 +306,7 @@ const gulpConvertHandler = async (args) => {
     // Rename the src/theme folder to src/templates
     renameThemeFolder();
     // Initialize the environment
-    initialize(args, false);
+    await initialize(args, false);
     fancyLog(chalk.magenta('Installing packages...'));
     childProcess.execSync('npm install', { stdio: 'inherit' });
     fancyLog(logSymbols.success, chalk.green('Environment set up.'));
