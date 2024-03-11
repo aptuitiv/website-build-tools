@@ -7,7 +7,10 @@
 import chalk from 'chalk';
 import { Command, Option } from 'commander';
 import fancyLog from 'fancy-log';
+import fs from 'fs-extra';
 import logSymbols from 'log-symbols';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 // Build scripts
 import config from './src/config.js';
@@ -26,8 +29,17 @@ import { templateHandler } from './src/template.js';
 import { themeHandler } from './src/theme.js';
 import watchHandler from './src/watch.js';
 
+// Get the directory name of the current module
+// eslint-disable-next-line no-underscore-dangle -- The dangle is used to match the __dirname variable in Node.js
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Get the current package.json information
+const thisPackageJson = fs.readJsonSync(`${__dirname}/package.json`);
+
 // Set up the command line options
 const program = new Command();
+program.description(thisPackageJson.description);
+program.version(thisPackageJson.version);
 
 // Set up shared options
 const configFileOption = new Option(
