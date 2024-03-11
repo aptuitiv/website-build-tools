@@ -19,6 +19,78 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // Default license
 const defaultLicense = 'Apache-2.0';
 
+// List of dependencies to remove from 'devDependencies' and 'dependencies'
+const dependenciesToRemove = [
+    '@aptuitiv/eslint-config-aptuitiv',
+    '@ronilaukkarinen/gulp-stylelint',
+    'autoprefixer',
+    'basic-ftp',
+    'chalk',
+    'cssnano',
+    'del',
+    'dotenv',
+    'eslint-plugin-import',
+    'fancy-log',
+    'glob-watcher',
+    'gulp',
+    'gulp-cached',
+    'gulp-changed',
+    'gulp-changed-in-place',
+    'gulp-concat',
+    'gulp-connect',
+    'gulp-data',
+    'gulp-eslint',
+    'gulp-header', ,
+    'gulp-html-beautify',
+    'gulp-htmlmin',
+    'gulp-if',
+    'gulp-image',
+    'gulp-imagemin',
+    'gulp-newer',
+    'gulp-plumber',
+    'gulp-postcss',
+    'gulp-remember',
+    'gulp-rename',
+    'gulp-sequence',
+    'gulp-svgmin',
+    'gulp-svgstore',
+    'gulp-tap',
+    'gulp-terser',
+    'gulp-uglify',
+    'gulp-using',
+    'merge-stream',
+    'moment',
+    'penthouse',
+    'pixrem',
+    'postcss',
+    'postcss-bem-linter',
+    'postcss-calc',
+    'postcss-color-function',
+    'postcss-custom-media',
+    'postcss-custom-properties',
+    'postcss-import',
+    'postcss-pseudoelements',
+    'require-glob',
+    'run-sequence',
+    'stylelint',
+    'stylelint-order',
+    'stylelint-selector-bem-pattern',
+];
+
+/**
+ * Remove unnecessary dependencies
+ *
+ * @param {object} currentDependencies The current dependencies from the package.json file
+ * @returns {object}
+ */
+const getDependencies = (currentDependencies) => {
+    const dependencies = currentDependencies || {};
+    dependenciesToRemove.forEach((item) => {
+        delete dependencies[item];
+    });
+    return dependencies;
+};
+
 /**
  * Remove unnecessary dev dependencies and add the necessary ones
  *
@@ -27,52 +99,12 @@ const defaultLicense = 'Apache-2.0';
  */
 const getDevDependencies = (currentDevDependencies) => {
     const thisPackageJson = fs.readJsonSync(`${__dirname}/../package.json`);
-    // Legacy dev dependencies to remove
-    const remove = [
-        '@aptuitiv/eslint-config-aptuitiv',
-        '@ronilaukkarinen/gulp-stylelint',
-        'autoprefixer',
-        'basic-ftp',
-        'chalk',
-        'cssnano',
-        'del',
-        'dotenv',
-        'eslint-plugin-import',
-        'fancy-log',
-        'gulp',
-        'gulp-cached',
-        'gulp-changed',
-        'gulp-changed-in-place',
-        'gulp-concat',
-        'gulp-eslint',
-        'gulp-header',
-        'gulp-if',
-        'gulp-image',
-        'gulp-newer',
-        'gulp-plumber',
-        'gulp-postcss',
-        'gulp-remember',
-        'gulp-rename',
-        'gulp-svgmin',
-        'gulp-svgstore',
-        'gulp-tap',
-        'gulp-terser',
-        'gulp-uglify',
-        'merge-stream',
-        'moment',
-        'penthouse',
-        'postcss',
-        'postcss-custom-media',
-        'postcss-import',
-        'stylelint-order',
-        'stylelint-selector-bem-pattern',
-    ];
     const add = {
         '@aptuitiv/website-build-tools': `^${thisPackageJson.version}`,
     };
 
     const dependencies = currentDevDependencies || {};
-    remove.forEach((item) => {
+    dependenciesToRemove.forEach((item) => {
         delete dependencies[item];
     });
     return { ...dependencies, ...add };
@@ -173,6 +205,9 @@ export const formatPackageJson = async (args) => {
                         'Firefox ESR',
                         'not dead',
                     ];
+                    break;
+                case 'dependencies':
+                    newPackageJson.dependencies = getDependencies(packageJson.dependencies);
                     break;
                 case 'devDependencies':
                     newPackageJson.devDependencies = getDevDependencies(packageJson.devDependencies);
