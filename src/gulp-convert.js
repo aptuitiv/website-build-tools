@@ -279,6 +279,16 @@ const parseGulpConfig = (configFile) => {
 };
 
 /**
+ * Rename the src/theme folder to src/templates
+ */
+const renameThemeFolder = () => {
+    if (fs.existsSync('src/theme')) {
+        fs.renameSync('src/theme', 'src/templates');
+        fancyLog(logSymbols.success, chalk.green('Renamed the "theme" folder to "templates"'));
+    }
+};
+
+/**
  * Process the gulp convert request
  *
  * @param {object} args The command line arguments
@@ -292,6 +302,8 @@ const gulpConvertHandler = async (args) => {
     parseGulpConfig(configFile);
     // Format the package.json file
     await formatPackageJson(args);
+    // Rename the src/theme folder to src/templates
+    renameThemeFolder();
     // Initialize the environment
     initialize(args, false);
     fancyLog(logSymbols.success, chalk.green('Environment set up.'));
