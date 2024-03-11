@@ -15,13 +15,16 @@ import { prefixPath } from './helpers.js';
 const exportFiles = async () => {
     const files = [
         `${config.data.src}/**/*`,
+        '.aptuitiv-buildrc.js',
         '.editorconfig',
-        '.eslintignore',
-        '.eslintrc.cjs',
         '.gitignore',
         '.prettierignore',
+        '.prettierrc.cjs',
         '.prettierrc.js',
+        'LICENSE',
         'package.json',
+        'package-lock.json',
+        'README.md',
     ];
 
     files.forEach((copy) => {
