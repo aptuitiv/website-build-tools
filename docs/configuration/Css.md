@@ -2,6 +2,20 @@
 
 In the [configuration file](/docs/Configuration.md) you will want to set up how the CSS files will be built. You can also configure [stylelint](https://stylelint.io/) processing.
 
+The default CSS configuration is:
+
+```js
+css: {
+    build: 'css',
+    buildFiles: '*.css',
+    src: 'css',
+}
+```
+
+- _build_: The folder for the CSS files within the theme build folder. (config.build.theme)
+- _buildFiles_: The glob for CSS file(s) that import the other CSS files.  This is used when building the files. This is within the root source folder. (config.src)
+- _src_: The source folder for the CSS files within the root source folder. (config.src)
+
 ## Processing CSS files
 
 The `css.buildFiles` configuration references the base CSS files in the source folder (`css.src`). The value can be a string or an array.
@@ -10,13 +24,17 @@ If it's a string then it should be a path to a single CSS file or a glob referen
 
 ```js
 {
-  "css": "main.css"
+  css: {
+    buildFiles: "main.css"
+  }
 }
 ```
 
 ```js
 {
-  "css": "*.css"
+  css: {
+    buildFiles: "*.css"
+  }
 }
 ```
 
@@ -24,19 +42,23 @@ If the value is an array then it should be an array of file paths or globs.
 
 ```js
 {
-  "css": [
-    "*.css",
-    "folder/other-file.css"
-  ]
+  css: {
+    buildFiles: [
+        "*.css",
+        "folder/other-file.css"
+      ]
+  }
 }
 ```
 
 ```js
 {
-  "css": [
-    "main.css",
-    "other-file.css"
-  ]
+  css: {
+    buildFiles: [
+        "main.css",
+        "other-file.css"
+      ]
+  }
 }
 ```
 
