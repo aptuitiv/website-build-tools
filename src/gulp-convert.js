@@ -49,6 +49,21 @@ const removeFiles = () => {
 };
 
 /**
+ * Parse a binary node expression from the Gulp config file and extract the value
+ *
+ * @param {object} node The source node to parse
+ * @param {string} src The "src" root path
+ * @returns {string}
+ */
+const parseGulpConfigBinaryExpression = (node, src) => {
+    let returnValue = '';
+    if (node.left.type === 'Identifier' && node.left.name === 'src' && node.right.type === 'Literal') {
+        returnValue = src + node.right.value;
+    }
+    return returnValue;
+};
+
+/**
  * Parse a Javascript node from the Gulp config file that is an array of objects.
  * Pull out the data that we need.
  *
@@ -78,15 +93,17 @@ const parseGulpConfigArrayObject = (node, keys, src) => {
                                 arrayObject[property.key.name].push(propertyElement.value);
                             } else if (propertyElement.type === 'BinaryExpression') {
                                 // The value is a binary expression. This is likely `src + '/some/path/to/file.js'`.
-                                if (propertyElement.left.type === 'Identifier' && propertyElement.left.name === 'src' && propertyElement.right.type === 'Literal') {
-                                    arrayObject[property.key.name].push(src + propertyElement.right.value);
+                                const binaryValue = parseGulpConfigBinaryExpression(propertyElement, src);
+                                if (binaryValue) {
+                                    arrayObject[property.key.name].push(binaryValue);
                                 }
                             }
                         });
                     } else if (property.value.type === 'BinaryExpression') {
                         // The value is a binary expression. This is likely `src + '/some/path/to/file.js'`.
-                        if (property.value.left.type === 'Identifier' && property.value.left.name === 'src' && property.value.right.type === 'Literal') {
-                            arrayObject[property.key.name] = src + property.value.right.value;
+                        const binaryValue = parseGulpConfigBinaryExpression(property.value, src);
+                        if (binaryValue) {
+                            arrayObject[property.key.name] = binaryValue;
                         }
                     }
                 }
@@ -111,6 +128,7 @@ const parseGulpConfig = (configFile) => {
         // Parse the Javascript code
         const ast = acorn.parse(contents, { sourceType: 'module', ecmaVersion: 2020 });
 
+        const cssSrc = [];
         let copy = [];
         let scripts = [];
 
@@ -127,7 +145,30 @@ const parseGulpConfig = (configFile) => {
             if (node.type === 'Property') {
                 // The node is a value within an object. We want certain properties
                 // within the "config" object.
-                if (node.key.name === 'copy') {
+                if (node.key.name === 'paths') {
+                    // This is the "paths" object specifying the paths for the build process.
+                    // We want to pull out the CSS build paths
+                    const srcPaths = node.value.properties.find((property) => property.key.name === 'src');
+                    const cssSrcPath = srcPaths.value.properties.find((property) => property.key.name === 'css');
+                    if (cssSrcPath) {
+                        if (cssSrcPath.value.type === 'Literal') {
+                            // A single CSS build source was specified
+                            cssSrc.push(cssSrcPath.value.value);
+                        } else if (cssSrcPath.value.type === 'ArrayExpression') {
+                            // An array of CSS build sources was specified
+                            cssSrcPath.value.elements.forEach((element) => {
+                                if (element.type === 'Literal') {
+                                    cssSrc.push(element.value);
+                                } else if (element.type === 'BinaryExpression') {
+                                    const binaryValue = parseGulpConfigBinaryExpression(element, src);
+                                    if (binaryValue) {
+                                        cssSrc.push(binaryValue);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                } else if (node.key.name === 'copy') {
                     // This is the "copy" array specifying the node_module files to copy.
                     // Parse the code to pull out the src and dest values
                     copy = parseGulpConfigArrayObject(node, ['src', 'dest'], src);
@@ -147,6 +188,23 @@ const parseGulpConfig = (configFile) => {
                 files: [],
             },
         };
+
+        // Build the CSS source data
+        if (cssSrc.length > 0) {
+            if (cssSrc.length === 1) {
+                configContents.css = {
+                    buildFiles: removePrefixes(cssSrc[0], ['src', 'css', '/']),
+                };
+            } else {
+                configContents.css = {
+                    buildFiles: [],
+                };
+                cssSrc.forEach((cssItem) => {
+                    configContents.css.buildFiles.push(removePrefixes(cssItem, ['src', 'css', '/']));
+                });
+            }
+        }
+
         // Build the copy array
         if (copy.length > 0) {
             copy.forEach((copyItem) => {
