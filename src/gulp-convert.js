@@ -23,7 +23,6 @@ const removeFiles = () => {
         '.eslintrc.js',
         '.eslintrc.cjs',
         '.stylelintrc',
-        'gulpfile.js',
         'gulp/copy.js',
         'gulp/css.js',
         'gulp/deploy.js',
@@ -35,6 +34,12 @@ const removeFiles = () => {
         'gulp/theme.js',
         'gulp/utilities.js',
     ];
+    // Only remove the gulpfile.js if the gulp/config.js file exists.
+    // If the gulp/config.js file does not exist, then this is a really old gulp implimentation
+    // and the configuration is in the gulpfile.js file.
+    if (fs.existsSync('gulp/config.js')) {
+        files.push('gulpfile.js');
+    }
     let removed = 0;
     files.forEach((file) => {
         if (fs.existsSync(file)) {
