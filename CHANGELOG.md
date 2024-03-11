@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.5.1 - March 11, 2024
+
+- Fixed issue when copying an array of files.
+
 ## v1.5 - March 11, 2024
 
 - Added support for converting a legacy gulp build process to use these build tools.

@@ -4,13 +4,17 @@
     build folder.
 =========================================================================== */
 
+import chalk from 'chalk';
+import fancyLog from 'fancy-log';
 import { globSync, hasMagic } from 'glob';
+import logSymbols from 'log-symbols';
 import { parse } from 'path';
 
 // Build scripts
 import config from './config.js';
 import { copyFileToThemeBuild } from './files.js';
 import { removeRootPrefix } from './helpers.js';
+import { isStringWithValue } from './lib/types.js';
 
 /**
  * Copy a file that was changed in the "copy files" watch process
@@ -25,20 +29,21 @@ export const copyWatchFile = (src, srcRoot, dest) => {
 };
 
 /**
- * Copy the files
+ * Prepares the data for copying files
+ *
+ * @returns {Array} An array of objects containing the files to copy, the source root path, and the destination path
  */
-const copyFiles = async () => {
+export const prepareCopyData = () => {
+    const returnData = [];
     if (Array.isArray(config.data.copy)) {
+        // Format the copy data
         config.data.copy.forEach((copy) => {
-            if (typeof copy.dest === 'string' && copy.dest.length > 0) {
+            if (isStringWithValue(copy.dest)) {
                 let filesToCopy = [];
                 // Need to set the correct source root path for the file(s) to copy
                 // so that the destination path can be built correctly
                 let srcRoot = '';
-                if (
-                    (typeof copy.src === 'string' && copy.src.length > 0)
-                    || (Array.isArray(copy.src) && copy.src.length > 0)
-                ) {
+                if (isStringWithValue(copy.src)) {
                     filesToCopy = globSync(copy.src);
                     if (hasMagic(copy.src)) {
                         // Get the source root path before the first "*" (i.e. before the glob pattern)
@@ -47,13 +52,55 @@ const copyFiles = async () => {
                         // The source is not a glob so the source root path will be the directory of the source file
                         srcRoot = parse(copy.src).dir;
                     }
-                }
-                if (filesToCopy.length > 0) {
-                    filesToCopy.forEach((file) => {
-                        copyFileToThemeBuild(file, srcRoot, copy.dest);
+                    if (filesToCopy.length > 0) {
+                        returnData.push({
+                            files: filesToCopy,
+                            srcRoot,
+                            dest: copy.dest,
+                        });
+                    }
+                } else if (Array.isArray(copy.src) && copy.src.length > 0) {
+                    // An array of files/globs was specified.
+                    // Need to treat each one individually to get the correct source root path.
+                    copy.src.forEach((file) => {
+                        if (isStringWithValue(file)) {
+                            filesToCopy = globSync(file);
+                            if (hasMagic(file)) {
+                                // Get the source root path before the first "*" (i.e. before the glob pattern)
+                                srcRoot = file.split('*').shift();
+                            } else {
+                                // The source is not a glob so the source root path will be the directory of the source file
+                                srcRoot = parse(file).dir;
+                            }
+                            if (filesToCopy.length > 0) {
+                                returnData.push({
+                                    files: filesToCopy,
+                                    srcRoot,
+                                    dest: copy.dest,
+                                });
+                            }
+                        } else {
+                            fancyLog(logSymbols.error, chalk.red('The file path is not a string'), chalk.cyan(file));
+                        }
                     });
                 }
             }
+        });
+    }
+    return returnData;
+};
+
+/**
+ * Copy the files
+ */
+const copyFiles = async () => {
+    const copyData = prepareCopyData();
+    // Copy the files
+    if (copyData.length > 0) {
+        copyData.forEach((copy) => {
+            copy.files.forEach((file) => {
+                copyFileToThemeBuild(file, copy.srcRoot, copy.dest);
+            });
         });
     }
 };
