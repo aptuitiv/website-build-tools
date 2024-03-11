@@ -85,26 +85,23 @@ const getThemeBuildPath = (path, filename) => prefixPath(filename, prefixThemeBu
  * @param {string} msgDest The message to display for the destination path
  */
 const copyFile = (src, dest, msgSrc, msgDest) => {
-    fancyLog(
-        chalk.magenta('Copying'),
-        chalk.cyan(msgSrc),
-        chalk.magenta('to'),
-        chalk.cyan(msgDest),
-    );
     if (fs.existsSync(src)) {
-        fs.copySync(src, dest);
-        fancyLog(
-            logSymbols.success,
-            chalk.green('Done copying'),
-            chalk.cyan(msgSrc),
-            chalk.green('to'),
-            chalk.cyan(msgDest),
-        );
+        const stat = fs.statSync(src);
+        if (stat.isFile()) {
+            fs.copySync(src, dest);
+            fancyLog(
+                logSymbols.success,
+                chalk.green('Copied'),
+                chalk.cyan(msgSrc),
+                chalk.green('to'),
+                chalk.cyan(msgDest),
+            );
+        }
     } else {
         fancyLog(
             logSymbols.warning,
             chalk.yellow(
-                'Nothing to copy because the source folder does not exist',
+                'Nothing to copy because the source file does not exist',
             ),
             chalk.cyan(msgSrc),
         );
