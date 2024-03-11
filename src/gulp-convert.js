@@ -8,6 +8,7 @@ import chalk from 'chalk';
 import fancyLog from 'fancy-log';
 import fs from 'fs-extra';
 import logSymbols from 'log-symbols';
+import * as childProcess from 'child_process';
 
 // Build scripts
 import { setupRoot, removePrefixes } from './helpers.js';
@@ -306,6 +307,8 @@ const gulpConvertHandler = async (args) => {
     renameThemeFolder();
     // Initialize the environment
     initialize(args, false);
+    fancyLog(chalk.magenta('Installing packages...'));
+    childProcess.execSync('npm install', { stdio: 'inherit' });
     fancyLog(logSymbols.success, chalk.green('Environment set up.'));
     fancyLog(logSymbols.success, chalk.green('Gulp build process converted.'));
     fancyLog(chalk.blue(`Compare the ${configFile} file to the gulp/config.js file to ensure the configuration is correct.
