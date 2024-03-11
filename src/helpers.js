@@ -7,7 +7,7 @@ import { isAbsolute, resolve } from 'path';
 
 // Build scripts
 import config from './config.js';
-import { isStringWithValue } from './lib/types.js';
+import { isStringWithValue, isObjectWithValues } from './lib/types.js';
 
 /**
  * Get the processed glob path
@@ -244,4 +244,29 @@ export const setupRoot = (rootPath) => {
         }
         cwd = root;
     }
+};
+
+/**
+ * Recursively get the keys from an object
+ *
+ * @param {object} obj The object to get keys from
+ * @returns {string[]} An array of keys
+ */
+export const getObjectKeysRecursive = (obj) => {
+    let keys = [];
+    if (isObjectWithValues(obj)) {
+        Object.keys(obj).forEach((key) => {
+            if (typeof obj[key] === 'object') {
+                if (Array.isArray(obj[key])) {
+                    obj[key].forEach((item) => {
+                        keys = keys.concat(getObjectKeysRecursive(item));
+                    });
+                } else {
+                    keys = keys.concat(getObjectKeysRecursive(obj[key]));
+                }
+            }
+            keys.push(key);
+        });
+    }
+    return [...new Set(keys)];
 };

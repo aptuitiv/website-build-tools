@@ -11,7 +11,7 @@ import * as readline from 'node:readline/promises';
 import yaml from 'json-to-pretty-yaml';
 
 // Build scripts
-import { setupRoot } from './helpers.js';
+import { getObjectKeysRecursive, setupRoot } from './helpers.js';
 import { isObjectWithValues } from './lib/types.js';
 
 /**
@@ -50,14 +50,10 @@ const checkForFiles = (configFile, outputLog = true) => {
 const convertJsonToJs = (content) => {
     let js = JSON.stringify(content, null, 4);
     // Replace object keys wrapped in quotes to not be in quotes
-    js = js.replaceAll('"copy"', 'copy');
-    js = js.replaceAll('"src"', 'src');
-    js = js.replaceAll('"dest"', 'dest');
-    js = js.replaceAll('"javascript"', 'javascript');
-    js = js.replaceAll('"bundles"', 'bundles');
-    js = js.replaceAll('"build"', 'build');
-    js = js.replaceAll('"nodeModules"', 'nodeModules');
-    js = js.replaceAll('"files"', 'files');
+    const keys = getObjectKeysRecursive(content);
+    keys.forEach((key) => {
+        js = js.replaceAll(`"${key}"`, key);
+    });
     // Replace double quotes with single quotes
     js = js.replaceAll('"', "'");
     return js;
@@ -140,6 +136,8 @@ export const createConfigFile = (configFile, content) => {
         Object.keys(content).forEach((key) => {
             if (key === 'copy') {
                 configContent.copy = content.copy;
+            } else if (key === 'css') {
+                configContent.css = content.css;
             } else if (key === 'javascript') {
                 if (content.javascript.bundles) {
                     configContent.javascript.bundles = content.javascript.bundles;
@@ -150,15 +148,21 @@ export const createConfigFile = (configFile, content) => {
             }
         });
     }
+    // Sort the configContent object by keys
+    const sortedConfigContent = Object.keys(configContent).sort().reduce((acc, key) => {
+        acc[key] = configContent[key];
+        return acc;
+    }, {});
+
     const { ext } = parse(configFile);
     if (ext === '.json' || configFile === '.aptuitiv-buildrc') {
-        createJsonConfigFile(configFile, configContent);
+        createJsonConfigFile(configFile, sortedConfigContent);
     } else if (ext === '.cjs') {
-        createCommonJsConfigFile(configFile, configContent);
+        createCommonJsConfigFile(configFile, sortedConfigContent);
     } else if (['.yaml', '.yml'].includes(ext)) {
-        createYamlConfigFile(configFile, configContent);
+        createYamlConfigFile(configFile, sortedConfigContent);
     } else {
-        createEsModuleConfigFile(configFile, configContent);
+        createEsModuleConfigFile(configFile, sortedConfigContent);
     }
 };
 
