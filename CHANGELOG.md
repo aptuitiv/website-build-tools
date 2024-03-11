@@ -1,5 +1,10 @@
 # Change Log
 
+## v1.5 - March 11, 2024
+
+- Added support for converting a legacy gulp build process to use these build tools.
+- Added `package-json` actions to format the package.json file.
+
 ## v1.4.1 - March 8, 2024
 
 - Removed console.log.

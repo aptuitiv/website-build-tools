@@ -1,0 +1,34 @@
+# Convert gulp action
+
+This command is useful to convert the legacy Gulp build process to use these build tools.
+
+This will do a few things things:
+
+1. Remove legacy build files that aren't needed anymore.
+2. Parse the `gulp/config.js` file and extract the `copy` and `scripts` configuration. That will be used to create the build tool configuration file.
+3. Create the build tool configuration file.
+4. Check to make sure that the `.env` and the configuration file are in place.
+5. Create the `.env` file with the FTP credentials if the file doesn't exist.
+
+To use this command first install the build tools.
+
+```bash
+npm i - D @aptuitiv/website-build-tools
+```
+
+Then run the following command on the command line:
+
+```bash
+aptuitiv-build gulp-convert
+```
+
+By default the configuration file built will be `.aptuitiv-buildrc.js`. You can specify a different name if you prefer. See the [Configuration](/docs/Configuration.md) page for valid file names.
+
+The following are equivalent:
+
+```bash
+aptuitiv-build gulp-convert --config .aptuitiv-buildrc.cjs
+aptuitiv-build gulp-convert -c .aptuitiv-buildrc.cjs
+```
+
+If the `.env` file needs to be created then follow the prompts.

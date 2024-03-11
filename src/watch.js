@@ -1,7 +1,8 @@
 import chokidar from 'chokidar';
 import chalk from 'chalk';
 import fancyLog from 'fancy-log';
-import { globSync } from 'glob';
+import { globSync, hasMagic } from 'glob';
+import { parse } from 'path';
 
 // Build scripts
 import config from './config.js';
@@ -164,17 +165,30 @@ const watchHandler = async () => {
     config.data.copy.forEach((copy) => {
         if (typeof copy.dest === 'string' && copy.dest.length > 0) {
             let filesToCopy = [];
+            // Need to set the correct source root path for the file(s) to copy
+            // so that the destination path can be built correctly
+            let srcRoot = '';
             if (
                 (typeof copy.src === 'string' && copy.src.length > 0)
                 || (Array.isArray(copy.src) && copy.src.length > 0)
             ) {
                 filesToCopy = globSync(copy.src);
+                if (hasMagic(copy.src)) {
+                    // Get the source root path before the first "*" (i.e. before the glob pattern)
+                    srcRoot = copy.src.split('*').shift();
+                } else {
+                    // The source is not a glob so the source root path will be the directory of the source file
+                    srcRoot = parse(copy.src).dir;
+                }
             }
             if (filesToCopy.length > 0) {
                 filesToCopy.forEach((file) => {
                     const sourceFile = prefixRootPath(file);
                     copyFilesToWatch.push(sourceFile);
-                    copyFilesMap[sourceFile] = copy.dest;
+                    copyFilesMap[sourceFile] = {
+                        dest: copy.dest,
+                        srcRoot,
+                    };
                 });
             }
         }
@@ -189,7 +203,7 @@ const watchHandler = async () => {
         chokidar
             .watch(copyFilesToWatch, { ignoreInitial: true })
             .on('change', (path) => {
-                copyWatchFile(path, copyFilesMap[path]);
+                copyWatchFile(path, copyFilesMap[path].srcRoot, copyFilesMap[path].dest);
             });
     }
 };

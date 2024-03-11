@@ -3,7 +3,11 @@
 =========================================================================== */
 
 import { globSync } from 'glob';
+import { isAbsolute, resolve } from 'path';
+
+// Build scripts
 import config from './config.js';
+import { isStringWithValue, isObjectWithValues } from './lib/types.js';
 
 /**
  * Get the processed glob path
@@ -222,3 +226,47 @@ export const removeRootSrcPrefix = (path, additionalPrefixes) => {
  * @returns {string}
  */
 export const removeRootThemeBuildPrefix = (path) => removePrefixes(path, [config.data.build.theme, config.data.root]);
+
+/**
+ * Set up the root directory and change the working directory if necessary
+ *
+ * By default the working directory will be the directory where the command was run.
+ * If the --root option is passed in then the root directory will be set to the specified directory.
+ *
+ * @param {string} rootPath The root path to set up
+ */
+export const setupRoot = (rootPath) => {
+    if (isStringWithValue(rootPath)) {
+        let cwd = process.cwd();
+        let root = rootPath;
+        if (!isAbsolute(root)) {
+            root = resolve(cwd, root);
+        }
+        cwd = root;
+    }
+};
+
+/**
+ * Recursively get the keys from an object
+ *
+ * @param {object} obj The object to get keys from
+ * @returns {string[]} An array of keys
+ */
+export const getObjectKeysRecursive = (obj) => {
+    let keys = [];
+    if (isObjectWithValues(obj)) {
+        Object.keys(obj).forEach((key) => {
+            if (typeof obj[key] === 'object') {
+                if (Array.isArray(obj[key])) {
+                    obj[key].forEach((item) => {
+                        keys = keys.concat(getObjectKeysRecursive(item));
+                    });
+                } else {
+                    keys = keys.concat(getObjectKeysRecursive(obj[key]));
+                }
+            }
+            keys.push(key);
+        });
+    }
+    return [...new Set(keys)];
+};

@@ -1,6 +1,6 @@
 {
     "name": "@aptuitiv/website-build-tools",
-    "version": "1.4.1",
+    "version": "1.5.0",
     "description": "Build tools to help with building and deploying websites at Aptuitiv",
     "main": "index.js",
     "scripts": {
@@ -27,6 +27,8 @@
     },
     "dependencies": {
         "@aptuitiv/eslint-config-aptuitiv": "^0.6.0",
+        "acorn": "^8.11.3",
+        "acorn-walk": "^8.3.2",
         "autoprefixer": "^10.4.17",
         "basic-ftp": "^5.0.5",
         "chalk": "^5.3.0",
@@ -42,6 +44,7 @@
         "glob": "^10.3.10",
         "image-type": "^5.2.0",
         "is-svg": "^5.0.0",
+        "json-to-pretty-yaml": "^1.2.2",
         "log-symbols": "^6.0.0",
         "node-notifier": "^10.0.1",
         "postcss": "^8.4.35",

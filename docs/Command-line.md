@@ -45,6 +45,7 @@ aptuitiv-build pull-template --root ../../
 ## Actions
 
 - [Build](actions/Build.md)
+- [Convert legacy gulp build process](actions/Convert-gulp.md)
 - [Copy files](actions/Copy-files.md)
 - [CSS](actions/Css.md)
 - [Export](actions/Export.md)
@@ -54,6 +55,8 @@ aptuitiv-build pull-template --root ../../
 - [Images](actions/Images.md)
 - [Initialize](actions/Initialize.md)
 - [Javascript](actions/Javascript.md)
+- [Package.json](actions/Package-json.md)
+- [Start](actions/Start.md)
 - [Templates](actions/Templates.md)
 - [Theme configuration](actions/Theme.md)
 - [Watch](actions/Watch.md)

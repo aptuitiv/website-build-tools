@@ -4,24 +4,42 @@
  * npx aptuitiv-build template --pulld
  */
 
+import chalk from 'chalk';
 import { Command, Option } from 'commander';
+import fancyLog from 'fancy-log';
+import fs from 'fs-extra';
+import logSymbols from 'log-symbols';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
+// Build scripts
 import config from './src/config.js';
 import { copyHandler } from './src/copy.js';
 import { cssHandler } from './src/css.js';
 import exportHandler from './src/export.js';
 import { fontHandler } from './src/font.js';
 import ftpHander from './src/ftp.js';
+import gulpConvertHandler from './src/gulp-convert.js';
 import { iconHandler } from './src/icons.js';
 import { imageHandler } from './src/image.js';
-import initiaizeHandler from './src/initialize.js';
+import { initiaizeHandler } from './src/initialize.js';
 import { jsHandler } from './src/javascript.js';
+import { packageJsonHandler } from './src/package-json.js';
 import { templateHandler } from './src/template.js';
 import { themeHandler } from './src/theme.js';
 import watchHandler from './src/watch.js';
 
+// Get the directory name of the current module
+// eslint-disable-next-line no-underscore-dangle -- The dangle is used to match the __dirname variable in Node.js
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Get the current package.json information
+const thisPackageJson = fs.readJsonSync(`${__dirname}/package.json`);
+
 // Set up the command line options
 const program = new Command();
+program.description(thisPackageJson.description);
+program.version(thisPackageJson.version);
 
 // Set up shared options
 const configFileOption = new Option(
@@ -189,6 +207,18 @@ program
     });
 
 /**
+ * Gulp convert command
+ */
+program
+    .command('gulp-convert')
+    .description('Convert the old Gulp build process to use the build tools')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        gulpConvertHandler(args);
+    });
+
+/**
  * Icon commands
  */
 program
@@ -222,10 +252,18 @@ program
     .command('initialize')
     .alias('init')
     .description('Initialize the project')
+    .option('--no-build', 'Do not run the build process after initializing the project')
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
-        initiaizeHandler(args);
+        await config.init(args);
+        await initiaizeHandler(args);
+        if (args.build) {
+            fancyLog(chalk.magenta('The project has been initialized. Running the build process.'));
+            await runBuild();
+            fancyLog(logSymbols.success, chalk.green('The build process has completed.'));
+            fancyLog(chalk.blue('You can now run "npm run watch" to start the watch process.'));
+        }
     });
 
 /**
@@ -259,6 +297,27 @@ program
     .action(async (args) => {
         await config.init(args);
         jsHandler('lint', args);
+    });
+
+/**
+ * Package.json command
+ */
+const packageJsonCommand = program.command('package-json').description('Process the package.json file');
+packageJsonCommand
+    .command('format')
+    .description('Format the package.json file')
+    .addOption(rootOption)
+    .option('-l, --license <license>', 'The license for the project. https://docs.npmjs.com/cli/v10/configuring-npm/package-json#license')
+    .action(async (args) => {
+        packageJsonHandler(args, 'format');
+    });
+
+packageJsonCommand
+    .command('scripts')
+    .description('Update the scripts in the package.json to the recommended ones')
+    .addOption(rootOption)
+    .action(async (args) => {
+        packageJsonHandler(args, 'scripts');
     });
 
 /**

@@ -59,6 +59,7 @@ While not required for the build tools, is recommended that you also have the fo
 
 - [Command line usage and actions](docs/Command-line.md)
   - [Build](docs/actions/Build.md)
+  - [Convert legacy gulp build process](docs/actions/Convert-gulp.md)
   - [Copy files](docs/actions/Copy-files.md)
   - [CSS](docs/actions/Css.md)
   - [Export](docs/actions/Export.md)
@@ -68,6 +69,8 @@ While not required for the build tools, is recommended that you also have the fo
   - [Images](docs/actions/Images.md)
   - [Initialize](docs/actions/Initialize.md)
   - [Javascript](docs/actions/Javascript.md)
+  - [Package.json](docs/actions/Package-json.md)
+  - [Start](docs/actions/Start.md)
   - [Templates](docs/actions/Templates.md)
   - [Theme configuration](docs/actions/Theme.md)
   - [Watch](docs/actions/Watch.md)

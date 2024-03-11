@@ -17,6 +17,7 @@ import {
     prefixThemeBuildPath,
     prefixSrcPath,
     removeRootSrcPrefix,
+    removeRootPrefix,
 } from './helpers.js';
 
 /**
@@ -84,26 +85,23 @@ const getThemeBuildPath = (path, filename) => prefixPath(filename, prefixThemeBu
  * @param {string} msgDest The message to display for the destination path
  */
 const copyFile = (src, dest, msgSrc, msgDest) => {
-    fancyLog(
-        chalk.magenta('Copying'),
-        chalk.cyan(msgSrc),
-        chalk.magenta('to'),
-        chalk.cyan(msgDest),
-    );
     if (fs.existsSync(src)) {
-        fs.copySync(src, dest);
-        fancyLog(
-            logSymbols.success,
-            chalk.green('Done copying'),
-            chalk.cyan(msgSrc),
-            chalk.green('to'),
-            chalk.cyan(msgDest),
-        );
+        const stat = fs.statSync(src);
+        if (stat.isFile()) {
+            fs.copySync(src, dest);
+            fancyLog(
+                logSymbols.success,
+                chalk.green('Copied'),
+                chalk.cyan(msgSrc),
+                chalk.green('to'),
+                chalk.cyan(msgDest),
+            );
+        }
     } else {
         fancyLog(
             logSymbols.warning,
             chalk.yellow(
-                'Nothing to copy because the source folder does not exist',
+                'Nothing to copy because the source file does not exist',
             ),
             chalk.cyan(msgSrc),
         );
@@ -136,19 +134,21 @@ export const copySrcFileToThemeBuild = (path, srcPath, destPath) => {
  * Copy the file from the specified path to the theme build path
  *
  * @param {string} path The path to the file not including the root path. Includes the file name.
+ * @param {string} srcRoot The root path to the source file. This is used to remove the root path from the file path to help
+ *      build the correct destination path. This is useful when the source path was originally a glob pattern.
  * @param {string} destPath The destination path to the file in the "build" folder
  */
-export const copyFileToThemeBuild = (path, destPath) => {
+export const copyFileToThemeBuild = (path, srcRoot, destPath) => {
     // Get the file name
-    const filename = getFileName(path);
+    const filePath = removeRootPrefix(path, [srcRoot]);
 
     // Get the paths to the source and destination files
     const copySrc = prefixRootPath(path);
-    const copyDest = getRootThemeBuildPath(destPath, filename);
+    const copyDest = getRootThemeBuildPath(destPath, filePath);
 
     // Get the message paths for the source and destination file paths
     const msgSrc = path;
-    const msgDest = getThemeBuildPath(destPath, filename);
+    const msgDest = getThemeBuildPath(destPath, filePath);
 
     copyFile(copySrc, copyDest, msgSrc, msgDest);
 };
