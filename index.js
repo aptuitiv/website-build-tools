@@ -216,6 +216,7 @@ program
     .alias('upgrade-gulp')
     .alias('gulp-upgrade')
     .description('Convert the old Gulp build process to use the build tools')
+    .option('-l, --license <license>', 'The license for the project. https://docs.npmjs.com/cli/v10/configuring-npm/package-json#license')
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
