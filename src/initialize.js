@@ -52,7 +52,7 @@ const convertJsonToJs = (content) => {
     // Replace object keys wrapped in quotes to not be in quotes
     const keys = getObjectKeysRecursive(content);
     keys.forEach((key) => {
-        js = js.replaceAll(`"${key}"`, key);
+        js = js.replaceAll(`"${key}":`, `${key}:`);
     });
     // Replace double quotes with single quotes
     js = js.replaceAll('"', "'");
