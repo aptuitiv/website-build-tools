@@ -282,10 +282,18 @@ const parseGulpConfig = (configFile) => {
 /**
  * Rename the src/theme folder to src/templates
  */
-const renameThemeFolder = () => {
+const renameFolders = () => {
     if (fs.existsSync('src/theme')) {
         fs.renameSync('src/theme', 'src/templates');
         fancyLog(logSymbols.success, chalk.green('Renamed the "theme" folder to "templates"'));
+    }
+    if (fs.existsSync('src/scripts')) {
+        fs.renameSync('src/scripts', 'src/js');
+        fancyLog(logSymbols.success, chalk.green('Renamed the "scripts" folder to "js"'));
+    }
+    if (fs.existsSync('src/styles')) {
+        fs.renameSync('src/styles', 'src/css');
+        fancyLog(logSymbols.success, chalk.green('Renamed the "styles" folder to "css"'));
     }
 };
 
@@ -304,7 +312,7 @@ const gulpConvertHandler = async (args) => {
     // Format the package.json file
     await formatPackageJson(args);
     // Rename the src/theme folder to src/templates
-    renameThemeFolder();
+    renameFolders();
     // Initialize the environment
     await initialize(args, false);
     fancyLog(chalk.magenta('Installing packages...'));
