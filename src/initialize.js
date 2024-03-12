@@ -206,6 +206,7 @@ const setupGitIgnore = () => {
 # Folders to ignore
 .idea/
 .vscode/
+_build/
 _export/
 dist/
 node_modules/
