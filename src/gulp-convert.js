@@ -349,7 +349,7 @@ const parseGulpConfig = (configFile) => {
                         } else {
                             // This is a source from the Javascript source folder.
                             // Get the value without the "src" and "js" prefixes
-                            scriptSrc.push(removePrefixes(srcItem, ['src', 'js', '/']));
+                            scriptSrc.push(removePrefixes(srcItem, ['src', 'js', 'scripts', '/']));
                         }
                     });
                 } else if (script.src.startsWith('node_modules')) {
