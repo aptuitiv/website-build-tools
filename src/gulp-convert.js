@@ -24,6 +24,7 @@ const removeFiles = () => {
         '.eslintrc.js',
         '.eslintrc.cjs',
         '.stylelintrc',
+        '.stylelintrc.cjs',
         'gulp/copy.js',
         'gulp/css.js',
         'gulp/deploy.js',
