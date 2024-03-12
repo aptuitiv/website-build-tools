@@ -173,6 +173,7 @@ program
  */
 program
     .command('upload')
+    .alias('deploy')
     .description('Upload a file, a folder, or a glob')
     .option('-p, --path <filePath>', 'Upload a file, a folder, or a glob')
     .option('-t --theme', 'Upload all theme files')
