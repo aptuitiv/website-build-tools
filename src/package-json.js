@@ -196,38 +196,44 @@ export const formatPackageJson = async (args) => {
 
     const newPackageJson = {};
     sections.forEach((section) => {
-        if (typeof packageJson[section] !== 'undefined') {
+        if (section === 'browserlist') {
+            newPackageJson.browserslist = [
+                '> 0.5%',
+                'last 2 years',
+                'Firefox ESR',
+                'not dead',
+            ];
+        } else if (section === 'engines') {
+            newPackageJson.engines = {
+                node: '^12.20.0 || ^14.13.1 || >=16.0.0',
+            };
+        } else if (section === 'license') {
+            newPackageJson[section] = license;
+        } else if (section === 'type') {
+            newPackageJson.type = 'module';
+        } else if (typeof packageJson[section] !== 'undefined') {
+            // Some sections make use of the existing data instead of overwriting them
             switch (section) {
-                case 'browserslist':
-                    newPackageJson.browserslist = [
-                        '> 0.5%',
-                        'last 2 years',
-                        'Firefox ESR',
-                        'not dead',
-                    ];
-                    break;
                 case 'dependencies':
-                    newPackageJson.dependencies = getDependencies(packageJson.dependencies);
+                    newPackageJson[section] = getDependencies(packageJson[section]);
                     break;
                 case 'devDependencies':
-                    newPackageJson.devDependencies = getDevDependencies(packageJson.devDependencies);
-                    break;
-                case 'engines':
-                    newPackageJson.engines = {
-                        node: '^12.20.0 || ^14.13.1 || >=16.0.0',
-                    };
-                    break;
-                case 'license':
-                    newPackageJson[section] = license;
+                    newPackageJson[section] = getDevDependencies(packageJson[section]);
                     break;
                 case 'scripts':
-                    newPackageJson.scripts = getScripts(packageJson.scripts);
-                    break;
-                case 'type':
-                    newPackageJson.type = 'module';
+                    newPackageJson[section] = getScripts(packageJson[section]);
                     break;
                 default:
                     newPackageJson[section] = packageJson[section];
+            }
+        } else if (['dependencies', 'devDependencies', 'scripts'].includes(section)) {
+            // One or more of these sections don't exist in the package.json file. Add them.
+            if (section === 'dependencies') {
+                newPackageJson.dependencies = getDependencies({});
+            } else if (section === 'devDependencies') {
+                newPackageJson.devDependencies = getDevDependencies({});
+            } else if (section === 'scripts') {
+                newPackageJson.scripts = getScripts({});
             }
         }
     });
