@@ -212,6 +212,9 @@ program
  */
 program
     .command('gulp-convert')
+    .alias('convert-gulp')
+    .alias('upgrade-gulp')
+    .alias('gulp-upgrade')
     .description('Convert the old Gulp build process to use the build tools')
     .addOption(configFileOption)
     .addOption(rootOption)
