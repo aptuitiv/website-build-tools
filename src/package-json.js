@@ -21,6 +21,8 @@ const defaultLicense = 'Apache-2.0';
 
 // List of dependencies to remove from 'devDependencies' and 'dependencies'
 const dependenciesToRemove = [
+    '@aptuitiv/gulp-clean-css',
+    '@aptuitiv/gulp-eslint',
     '@aptuitiv/eslint-config-aptuitiv',
     '@ronilaukkarinen/gulp-stylelint',
     'autoprefixer',
@@ -29,6 +31,7 @@ const dependenciesToRemove = [
     'cssnano',
     'del',
     'dotenv',
+    'eslint',
     'eslint-plugin-import',
     'fancy-log',
     'glob-watcher',
@@ -60,6 +63,7 @@ const dependenciesToRemove = [
     'gulp-using',
     'merge-stream',
     'moment',
+    'node-notifier',
     'penthouse',
     'pixrem',
     'postcss',
@@ -73,8 +77,10 @@ const dependenciesToRemove = [
     'require-glob',
     'run-sequence',
     'stylelint',
+    'stylelint-config-standard',
     'stylelint-order',
     'stylelint-selector-bem-pattern',
+    'through2'
 ];
 
 /**
