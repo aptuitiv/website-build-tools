@@ -11,7 +11,7 @@ import * as readline from 'node:readline/promises';
 import yaml from 'json-to-pretty-yaml';
 
 // Build scripts
-import { getObjectKeysRecursive, setupRoot } from './helpers.js';
+import { getObjectKeysRecursive, setupRoot, sortObjectByKeys } from './helpers.js';
 import { isObjectWithValues } from './lib/types.js';
 
 /**
@@ -149,10 +149,7 @@ export const createConfigFile = (configFile, content) => {
         });
     }
     // Sort the configContent object by keys
-    const sortedConfigContent = Object.keys(configContent).sort().reduce((acc, key) => {
-        acc[key] = configContent[key];
-        return acc;
-    }, {});
+    const sortedConfigContent = sortObjectByKeys(configContent);
 
     const { ext } = parse(configFile);
     if (ext === '.json' || configFile === '.aptuitiv-buildrc') {
