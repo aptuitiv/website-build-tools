@@ -1,5 +1,12 @@
 # Change Log
 
+## v1.7 - March 13, 2024
+
+- Update to the gulp convert proces.
+- Improvements to setting up the package.json scripts section.
+- Improvements to exporting a site.
+- Added support for running npm install during the initialization task.
+
 ## v1.6 - March 12, 2024
 
 - Added support for converting older legacy gulp build processes to using this build tool.
