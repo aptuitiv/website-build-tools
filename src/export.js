@@ -3,6 +3,7 @@
 =========================================================================== */
 
 import { globSync } from 'glob';
+import { parse } from 'path';
 
 // Build files
 import config from './config.js';
@@ -31,12 +32,7 @@ const exportFiles = async () => {
         const filesToCopy = globSync(copy);
         if (filesToCopy.length > 0) {
             filesToCopy.forEach((file) => {
-                let dest = file;
-                if (file.indexOf('/') === -1) {
-                    // This is a file in the root directory.
-                    // Set the destination to the root directory
-                    dest = '';
-                }
+                let dest = parse(file).dir;
                 copyFileToDest(file, prefixPath(dest, '_export'));
             });
         }
