@@ -10,7 +10,7 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 // Build scripts
-import { setupRoot } from './helpers.js';
+import { setupRoot, sortObjectByKeys } from './helpers.js';
 
 // Get the directory name of the current module
 // eslint-disable-next-line no-underscore-dangle -- The dangle is used to match the __dirname variable in Node.js
@@ -21,6 +21,8 @@ const defaultLicense = 'Apache-2.0';
 
 // List of dependencies to remove from 'devDependencies' and 'dependencies'
 const dependenciesToRemove = [
+    '@aptuitiv/gulp-clean-css',
+    '@aptuitiv/gulp-eslint',
     '@aptuitiv/eslint-config-aptuitiv',
     '@ronilaukkarinen/gulp-stylelint',
     'autoprefixer',
@@ -29,6 +31,7 @@ const dependenciesToRemove = [
     'cssnano',
     'del',
     'dotenv',
+    'eslint',
     'eslint-plugin-import',
     'fancy-log',
     'glob-watcher',
@@ -60,6 +63,7 @@ const dependenciesToRemove = [
     'gulp-using',
     'merge-stream',
     'moment',
+    'node-notifier',
     'penthouse',
     'pixrem',
     'postcss',
@@ -73,8 +77,10 @@ const dependenciesToRemove = [
     'require-glob',
     'run-sequence',
     'stylelint',
+    'stylelint-config-standard',
     'stylelint-order',
     'stylelint-selector-bem-pattern',
+    'through2'
 ];
 
 /**
@@ -117,9 +123,10 @@ const getDevDependencies = (currentDevDependencies) => {
  * @returns {object}
  */
 const getScripts = (currentScripts) => {
-    const scripts = currentScripts || {};
+    let scripts = currentScripts || {};
     // Scripts to remove
     const remove = [
+        'lint',
         'updateBrowsersList',
     ];
     // Scripts to make sure that they exists
@@ -146,7 +153,8 @@ const getScripts = (currentScripts) => {
     remove.forEach((item) => {
         delete scripts[item];
     });
-    return { ...scripts, ...add };
+    scripts = { ...scripts, ...add };
+    return sortObjectByKeys(scripts);
 };
 
 /**

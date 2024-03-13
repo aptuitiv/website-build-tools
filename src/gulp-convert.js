@@ -13,7 +13,7 @@ import * as childProcess from 'child_process';
 // Build scripts
 import { setupRoot, removePrefixes } from './helpers.js';
 import { initialize, createConfigFile } from './initialize.js';
-import { formatPackageJson } from './package-json.js';
+import { formatPackageJson, setupLicense } from './package-json.js';
 
 /**
  * Remove legacy files
@@ -24,6 +24,7 @@ const removeFiles = () => {
         '.eslintrc.js',
         '.eslintrc.cjs',
         '.stylelintrc',
+        '.stylelintrc.cjs',
         'gulp/copy.js',
         'gulp/css.js',
         'gulp/deploy.js',
@@ -417,6 +418,7 @@ const gulpConvertHandler = async (args) => {
     parseGulpConfig(configFile);
     // Format the package.json file
     await formatPackageJson(args);
+    setupLicense(args);
     // Rename the src/theme folder to src/templates
     renameFolders();
     // Initialize the environment

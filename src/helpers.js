@@ -270,3 +270,17 @@ export const getObjectKeysRecursive = (obj) => {
     }
     return [...new Set(keys)];
 };
+
+/**
+ * Sorts an object by it's keys
+ *
+ * @param {object} obj The object to sort
+ * @returns {object}
+ */
+export const sortObjectByKeys = (obj) => {
+    const sorted = {};
+    Object.keys(obj).sort().forEach((key) => {
+        sorted[key] = obj[key];
+    });
+    return sorted;
+}

@@ -173,6 +173,7 @@ program
  */
 program
     .command('upload')
+    .alias('deploy')
     .description('Upload a file, a folder, or a glob')
     .option('-p, --path <filePath>', 'Upload a file, a folder, or a glob')
     .option('-t --theme', 'Upload all theme files')
@@ -211,7 +212,11 @@ program
  */
 program
     .command('gulp-convert')
+    .alias('convert-gulp')
+    .alias('upgrade-gulp')
+    .alias('gulp-upgrade')
     .description('Convert the old Gulp build process to use the build tools')
+    .option('-l, --license <license>', 'The license for the project. https://docs.npmjs.com/cli/v10/configuring-npm/package-json#license')
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
