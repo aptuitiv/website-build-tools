@@ -3,6 +3,7 @@
 =========================================================================== */
 
 import chalk from 'chalk';
+import * as childProcess from 'child_process';
 import fancyLog from 'fancy-log';
 import fs from 'fs-extra';
 import logSymbols from 'log-symbols';
@@ -217,6 +218,14 @@ node_modules/
 };
 
 /**
+ * Install NPM packages
+ */
+const installNpm = () => {
+    fancyLog(chalk.magenta('Installing packages...'));
+    childProcess.execSync('npm install', { stdio: 'inherit' });
+}
+
+/**
  * Initialize the environment
  *
  * @param {object} args The command line arguments
@@ -226,20 +235,15 @@ export const initialize = async (args, outputLog = true) => {
     setupGitIgnore();
     const configFile = args.config || '.aptuitiv-buildrc.js';
     const files = checkForFiles(configFile, outputLog);
-    if (files.env && files.config) {
-        if (outputLog) {
-            fancyLog(logSymbols.success, chalk.green('The environment is already set up. Go forth and build!'));
-        }
-    } else {
-        if (!files.env) {
-            await createEnvFile();
-        }
-        if (!files.config) {
-            createConfigFile(configFile);
-        }
-        if (outputLog) {
-            fancyLog(logSymbols.success, chalk.green('All set! Ready for you to build.'));
-        }
+    if (!files.env) {
+        await createEnvFile();
+    }
+    if (!files.config) {
+        createConfigFile(configFile);
+    }
+    installNpm();
+    if (outputLog) {
+        fancyLog(logSymbols.success, chalk.green('The build environment is set up now.'));
     }
 };
 
