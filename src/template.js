@@ -45,18 +45,19 @@ export const removeTemplateFileFromBuild = (path) => {
  *
  * @param {string} action The action to take
  */
-export const templateHandler = (action) => {
+export const templateHandler = async (action) => {
     if (action === 'pull') {
-        copyBuildFolderToSrc(
+        await copyBuildFolderToSrc(
             prefixThemeBuildPath(config.data.templates.build),
             prefixSrcPath(config.data.templates.src),
             'templates',
         );
     } else if (action === 'push') {
-        copySrcFolderToBuild(
+        await copySrcFolderToBuild(
             prefixSrcPath(config.data.templates.src),
             prefixThemeBuildPath(config.data.templates.build),
             'templates',
+            ['*.md'], // Skip any markdown files
         );
     }
 };

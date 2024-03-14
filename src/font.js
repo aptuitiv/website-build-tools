@@ -39,18 +39,19 @@ export const removeFontFileFromBuild = (path) => {
  *
  * @param {string} action The action to take
  */
-export const fontHandler = (action) => {
+export const fontHandler = async (action) => {
     if (action === 'pull') {
-        copyBuildFolderToSrc(
+        await copyBuildFolderToSrc(
             prefixThemeBuildPath(config.data.fonts.build),
             prefixSrcPath(config.data.fonts.src),
             'fonts',
         );
     } else if (action === 'push') {
-        copySrcFolderToBuild(
+        await copySrcFolderToBuild(
             prefixSrcPath(config.data.fonts.src),
             prefixThemeBuildPath(config.data.fonts.build),
             'fonts',
+            ['*.md'], // Skip any markdown files
         );
     }
 };
