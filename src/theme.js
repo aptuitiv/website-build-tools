@@ -44,7 +44,7 @@ export const removeThemeFileFromBuild = (path) => {
  */
 export const themeHandler = async (action) => {
     if (action === 'pull') {
-        copyBuildFolderToSrc(
+        await copyBuildFolderToSrc(
             prefixThemeBuildPath(config.data.themeConfig.build),
             prefixSrcPath(config.data.themeConfig.src),
             'theme config files',
@@ -55,10 +55,11 @@ export const themeHandler = async (action) => {
             config.data.build.theme,
         );
     } else if (action === 'push') {
-        copySrcFolderToBuild(
+        await copySrcFolderToBuild(
             prefixSrcPath(config.data.themeConfig.src),
             prefixThemeBuildPath(config.data.themeConfig.build),
             'theme config files',
+            ['*.md'], // Skip any markdown files
         );
         copySrcFileToThemeBuild(
             'theme.json',

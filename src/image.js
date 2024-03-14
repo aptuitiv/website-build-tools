@@ -224,27 +224,37 @@ export const processImage = async (imageSrc) => {
  */
 const processImages = async () => new Promise((resolve) => {
     const imageSrc = prefixRootSrcPath(config.data.images.src);
-    // Get all the files in the images folder
-    const files = globSync(`${imageSrc}/**/*`);
-    if (files.length > 0) {
-        fancyLog(
-            chalk.magenta(
-                `Processing ${files.length} files in the ${config.data.images.src} folder`,
-            ),
-        );
-        const filePromises = [];
-        files.forEach((file) => {
-            filePromises.push(processImage(file));
-        });
-        Promise.all(filePromises).then(() => {
-            fancyLog(logSymbols.success, chalk.green('Done processing images'));
+    if (fs.existsSync(imageSrc)) {
+        // Get all the files in the images folder
+        const files = globSync(`${imageSrc}/**/*`);
+        if (files.length > 0) {
+            fancyLog(
+                chalk.magenta(
+                    `Processing ${files.length} files in the ${config.data.images.src} folder`,
+                ),
+            );
+            const filePromises = [];
+            files.forEach((file) => {
+                filePromises.push(processImage(file));
+            });
+            Promise.all(filePromises).then(() => {
+                fancyLog(logSymbols.success, chalk.green('Done processing images'));
+                resolve();
+            });
+        } else {
+            fancyLog(
+                logSymbols.warning,
+                chalk.yellow(
+                    `No images to process in the ${config.data.images.src} folder`,
+                ),
+            );
             resolve();
-        });
+        }
     } else {
         fancyLog(
             logSymbols.warning,
             chalk.yellow(
-                `Nothing to process as there are no images found in the ${config.data.images.src} folder`,
+                `Nothing images to process as there is no ${config.data.images.src} folder`,
             ),
         );
         resolve();

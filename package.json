@@ -1,6 +1,6 @@
 {
     "name": "@aptuitiv/website-build-tools",
-    "version": "1.7.0",
+    "version": "1.8.0",
     "description": "Build tools to help with building and deploying websites at Aptuitiv",
     "main": "index.js",
     "scripts": {
@@ -53,6 +53,7 @@
         "postcss-reporter": "^7.1.0",
         "prettier": "^3.2.5",
         "read-chunk": "^4.0.3",
+        "recursive-readdir": "^2.2.3",
         "resolve-from": "^5.0.0",
         "sharp": "^0.33.2",
         "stylelint": "^16.2.1",

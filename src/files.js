@@ -7,6 +7,7 @@ import chalk from 'chalk';
 import fancyLog from 'fancy-log';
 import logSymbols from 'log-symbols';
 import { parse } from 'path';
+import recursiveReadDir from 'recursive-readdir';
 
 // Buld files
 import {
@@ -181,18 +182,41 @@ export const copyFileToDest = (path, destPath) => {
  * @param {string} destPath The destination path in the build folder. This is not an absolute path.
  * @param {string} startMessage The message to display when starting the copy
  * @param {string} successMessage The message to display when the copy is successful
+ * @param {string[]} skipFiles The files to skip when copying. This can be an array of file names, or glob patterns.
+ *      See https://www.npmjs.com/package/recursive-readdir for more information.
  */
-const copyFolder = (srcPath, destPath, startMessage, successMessage) => {
+const copyFolder = async (srcPath, destPath, startMessage, successMessage, skipFiles = []) => {
     fancyLog(chalk.magenta(startMessage));
-    const rootSrcPath = prefixRootPath(srcPath);
-    if (fs.existsSync(rootSrcPath)) {
-        fs.copySync(rootSrcPath, prefixRootPath(destPath));
-        fancyLog(logSymbols.success, chalk.green(successMessage));
+    if (fs.existsSync(prefixRootPath(srcPath))) {
+        await recursiveReadDir(prefixRootPath(srcPath), skipFiles)
+            .then((files) => {
+                if (Array.isArray(files) && files.length > 0) {
+                    files.forEach((file) => {
+                        const fileWithoutRoot = removeRootPrefix(file, [srcPath]);
+                        const fileDest = getRootPath(destPath, fileWithoutRoot);
+                        fancyLog(chalk.cyan(`Copying ${removeRootPrefix(file)}`), '=>', chalk.cyan(prefixPath(fileWithoutRoot, destPath)));
+                        fs.copySync(file, fileDest);
+                    });
+                    fancyLog(logSymbols.success, chalk.green(successMessage));
+                } else {
+                    let msg = `Nothing to copy because ${srcPath} is empty`;
+                    if (skipFiles.length > 0) {
+                        msg += ` or there are no files that don't match the skip patterns: ${skipFiles.join(', ')}`;
+                    }
+                    fancyLog(
+                        logSymbols.warning,
+                        chalk.yellow(msg),
+                    );
+                }
+            })
+            .catch((err) => {
+                // eslint-disable-next-line no-console -- Need to output the error message
+                console.error('Error reading files: ', err);
+            });
     } else {
         fancyLog(
             logSymbols.warning,
-            chalk.yellow('Nothing to copy because the folder does not exist'),
-            chalk.cyan(srcPath),
+            chalk.yellow(`Nothing to copy because ${srcPath} does not exist`),
         );
     }
 };
@@ -203,13 +227,16 @@ const copyFolder = (srcPath, destPath, startMessage, successMessage) => {
  * @param {string} srcPath The path to the source folder. This is not an absolute path.
  * @param {string} destPath The destination path in the build folder. This is not an absolute path.
  * @param {string} type The type of file being copied
+ * @param {string[]} skipFiles The files to skip when copying. This can be an array of file names, or glob patterns.
+ *      See https://www.npmjs.com/package/recursive-readdir for more information.
  */
-export const copyBuildFolderToSrc = (srcPath, destPath, type) => {
-    copyFolder(
+export const copyBuildFolderToSrc = async (srcPath, destPath, type, skipFiles = []) => {
+    await copyFolder(
         srcPath,
         destPath,
         `Copying ${type} from build folder to source folder`,
         `Done copying ${type} from build folder to source folder`,
+        skipFiles,
     );
 };
 
@@ -219,13 +246,16 @@ export const copyBuildFolderToSrc = (srcPath, destPath, type) => {
  * @param {string} srcPath The path to the source folder. This is not an absolute path.
  * @param {string} destPath The destination path in the build folder. This is not an absolute path.
  * @param {string} type The type of file being copied
+ * @param {string[]} skipFiles The files to skip when copying. This can be an array of file names, or glob patterns.
+ *      See https://www.npmjs.com/package/recursive-readdir for more information.
  */
-export const copySrcFolderToBuild = (srcPath, destPath, type) => {
-    copyFolder(
+export const copySrcFolderToBuild = async (srcPath, destPath, type, skipFiles = []) => {
+    await copyFolder(
         srcPath,
         destPath,
         `Copying ${type} from source folder to build folder`,
         `Done copying ${type} from source folder to build folder`,
+        skipFiles,
     );
 };
 

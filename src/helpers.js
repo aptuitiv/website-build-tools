@@ -283,4 +283,4 @@ export const sortObjectByKeys = (obj) => {
         sorted[key] = obj[key];
     });
     return sorted;
-}
+};

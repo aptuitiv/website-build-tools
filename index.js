@@ -57,11 +57,11 @@ const rootOption = new Option(
 const runBuild = async () => {
     await copyHandler();
     await cssHandler('css', {});
-    fontHandler('push');
+    await fontHandler('push');
     await iconHandler();
     await imageHandler();
     await jsHandler('process', {});
-    templateHandler('push');
+    await templateHandler('push');
     themeHandler('push');
 };
 
