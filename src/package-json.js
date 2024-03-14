@@ -80,7 +80,7 @@ const dependenciesToRemove = [
     'stylelint-config-standard',
     'stylelint-order',
     'stylelint-selector-bem-pattern',
-    'through2'
+    'through2',
 ];
 
 /**

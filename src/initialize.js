@@ -223,7 +223,7 @@ node_modules/
 const installNpm = () => {
     fancyLog(chalk.magenta('Installing packages...'));
     childProcess.execSync('npm install', { stdio: 'inherit' });
-}
+};
 
 /**
  * Initialize the environment

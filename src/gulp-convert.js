@@ -169,7 +169,7 @@ const parseGulpConfigSrc = (node, variables) => {
         }
     }
     return returnValue;
-}
+};
 
 /**
  * Parse the Gulp config file and pull out the copy and scripts arrays to include
@@ -198,7 +198,7 @@ const parseGulpConfig = (configFile) => {
         let scripts = [];
 
         // Variables in the config file. These are typically at the top of the file.
-        let variables = {};
+        const variables = {};
 
         // Walk through the code and pull out the parts we need
         acornWalk.fullAncestor(ast, (node) => {
