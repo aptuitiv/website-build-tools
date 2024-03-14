@@ -1,5 +1,10 @@
 # Change Log
 
+## v1.8 - March 14, 2024
+
+- Improved messaging for different actions.
+- Added support for skipping certain files when copying folders.
+
 ## v1.7 - March 13, 2024
 
 - Update to the gulp convert proces.
