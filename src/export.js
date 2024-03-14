@@ -32,7 +32,7 @@ const exportFiles = async () => {
         const filesToCopy = globSync(copy);
         if (filesToCopy.length > 0) {
             filesToCopy.forEach((file) => {
-                let dest = parse(file).dir;
+                const dest = parse(file).dir;
                 copyFileToDest(file, prefixPath(dest, '_export'));
             });
         }
