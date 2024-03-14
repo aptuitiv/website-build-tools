@@ -173,7 +173,7 @@ const runPostCss = (filePath) => new Promise((resolve) => {
                 } else {
                     fancyLog(
                         chalk.yellow(
-                            `Skipping ${filePath} because the built content is the same as ${dest}`,
+                            `Skipping ${removeRootPrefix(filePath)} because the built content is the same as ${removeRootPrefix(dest)}`,
                         ),
                     );
                     resolve();
