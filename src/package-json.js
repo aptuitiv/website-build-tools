@@ -39,6 +39,7 @@ const dependenciesToRemove = [
     'gulp-cached',
     'gulp-changed',
     'gulp-changed-in-place',
+    'gulp-clean-css',
     'gulp-concat',
     'gulp-connect',
     'gulp-data',
