@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.9 - April 10, 2024
+
+- Added additional packages to remove when replacing gulp.
+
 ## v1.8 - March 14, 2024
 
 - Improved messaging for different actions.
