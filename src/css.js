@@ -17,6 +17,7 @@ import stylelint from 'stylelint';
 import autoprefixer from 'autoprefixer';
 import cssnano from 'cssnano';
 import postcssCustomMedia from 'postcss-custom-media';
+import postcssExtend from 'postcss-extend';
 import postcssImport from 'postcss-import';
 import postcssReporter from 'postcss-reporter';
 
@@ -81,6 +82,11 @@ const runStylelint = async (fileGlob) => {
             reportInvalidScopeDisables: true, // https://github.com/stylelint/stylelint/blob/main/docs/user-guide/options.md#reportinvalidscopedisables
             reportNeedlessDisables: true, // https://github.com/stylelint/stylelint/blob/main/docs/user-guide/options.md#reportneedlessdisables
             rules: {
+                'at-rule-no-unknown': [true, {
+                    // Done to support the @extend, @define-placeholder, @define-extend, and @extend-define rule from https://github.com/travco/postcss-extend
+                    ignoreAtRules: ['extend', 'define-placeholder', 'define-extend', 'extend-define'],
+                },
+                ],
                 'color-named': 'never',
                 // Override the stylelint-config-standard rule to allow custom properties in formats that aren't kebab-case
                 'custom-property-pattern': null,
@@ -147,6 +153,7 @@ const runPostCss = (filePath) => new Promise((resolve) => {
         postcss([
             postcssReporter({ clearReportedMessages: true }),
             postcssImport(),
+            postcssExtend,
             postcssCustomMedia,
             autoprefixer,
             // cssnano needs to be run last

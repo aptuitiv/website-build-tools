@@ -79,6 +79,10 @@ The default configuration is:
     reportInvalidScopeDisables: true, // https://github.com/stylelint/stylelint/blob/main/docs/user-guide/options.md#reportinvalidscopedisables
     reportNeedlessDisables: true, // https://github.com/stylelint/stylelint/blob/main/docs/user-guide/options.md#reportneedlessdisables
     rules: {
+        'at-rule-no-unknown': [true, {
+            // Done to support the @extend, @define-placeholder, @define-extend, and @extend-define rule from https://github.com/travco/postcss-extend
+            ignoreAtRules: ['extend', 'define-placeholder', 'define-extend', 'extend-define'],
+        },
         'color-named': 'never',
         // Override the stylelint-config-standard rule to allow custom properties in formats that aren't kebab-case
         'custom-property-pattern': null,
