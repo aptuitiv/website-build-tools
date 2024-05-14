@@ -2,14 +2,14 @@
 
 ## Testing locally with another project
 
-In the `website-build-scripts` library path use `npm link` to add the project to the local npm registry.
+In the `website-build-tools` library path use `npm link` to add the project to the local npm registry.
 
 ```bash
 cd ./route-to-library
 npm link
 ```
 
-In the project's folder that you want to use this library, use `npm link @aptuitiv/website-build-scripts` to install the package locally.
+In the project's folder that you want to use this library, use `npm link @aptuitiv/website-build-tools` to install the package locally.
 
 If you need to update the rets-client library do the following.
 
@@ -24,7 +24,7 @@ You should unlink the local project for any of these situations:
 First, in the project that uses this library:
 
 ```bash
-npm unlink @aptuitiv/website-build-scripts --no-save
+npm unlink @aptuitiv/website-build-tools --no-save
 ```
 
 The `--no-save` flag keeps the original live version of this package from NPM.

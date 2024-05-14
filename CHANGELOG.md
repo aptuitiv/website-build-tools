@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.10 - May 14, 2024
+
+- Added support for [postcss extend plugin](https://github.com/travco/postcss-extend) that allows a developer to use `@extend` syntax.
+
 ## v1.9 - April 10, 2024
 
 - Added additional packages to remove when replacing gulp.

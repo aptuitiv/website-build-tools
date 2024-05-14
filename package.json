@@ -1,6 +1,6 @@
 {
     "name": "@aptuitiv/website-build-tools",
-    "version": "1.9.0",
+    "version": "1.10.0",
     "description": "Build tools to help with building and deploying websites at Aptuitiv",
     "main": "index.js",
     "scripts": {
@@ -49,6 +49,7 @@
         "node-notifier": "^10.0.1",
         "postcss": "^8.4.35",
         "postcss-custom-media": "^10.0.3",
+        "postcss-extend": "^1.0.5",
         "postcss-import": "^16.0.1",
         "postcss-reporter": "^7.1.0",
         "prettier": "^3.2.5",
