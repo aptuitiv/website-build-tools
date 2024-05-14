@@ -15,7 +15,7 @@
 
 ## v1.7 - March 13, 2024
 
-- Update to the gulp convert proces.
+- Update to the gulp convert process.
 - Improvements to setting up the package.json scripts section.
 - Improvements to exporting a site.
 - Added support for running npm install during the initialization task.
