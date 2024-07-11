@@ -1,5 +1,10 @@
 # Change Log
 
+## v1.11 - July 11, 2024
+
+- Updated aptuitiv eslint config library.
+- Updated other packages.
+
 ## v1.10 - May 14, 2024
 
 - Added support for [postcss extend plugin](https://github.com/travco/postcss-extend) that allows a developer to use `@extend` syntax.
