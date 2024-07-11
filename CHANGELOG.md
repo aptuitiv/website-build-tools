@@ -1,5 +1,10 @@
 # Change Log
 
+## v1.11 - July 11, 2024
+
+- Updated aptuitiv eslint config library.
+- Updated other packages.
+
 ## v1.10 - May 14, 2024
 
 - Added support for [postcss extend plugin](https://github.com/travco/postcss-extend) that allows a developer to use `@extend` syntax.
@@ -15,7 +20,7 @@
 
 ## v1.7 - March 13, 2024
 
-- Update to the gulp convert proces.
+- Update to the gulp convert process.
 - Improvements to setting up the package.json scripts section.
 - Improvements to exporting a site.
 - Added support for running npm install during the initialization task.
