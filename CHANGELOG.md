@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.12 - July 23, 2024
+
+- Added support for matching a javascript file in multiple bundles.
+
 ## v1.11 - July 11, 2024
 
 - Updated aptuitiv eslint config library.
