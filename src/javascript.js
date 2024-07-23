@@ -132,7 +132,8 @@ const lintJs = async (fileGlob) => {
             chalk.cyan(removeRootPrefix(filesToLint)),
         );
     } else if (Array.isArray(filesToLint)) {
-        filesToLint.forEach((file) => {
+        // Make sure that the files are unique
+        filesToLint.filter((value, index, arr) => arr.indexOf(value) === index).forEach((file) => {
             fancyLog(
                 chalk.magenta('Linting Javascript'),
                 chalk.cyan(removeRootPrefix(file)),
@@ -315,12 +316,21 @@ export const processJsFile = async (filePath, lint = true) => {
     file = prefixRootSrcPath(file, [config.data.javascript.src]);
 
     // Find the file in the bundles or the individual files
-    const matchedBundle = bundles.find((bundle) => bundle.src.includes(file) || bundle.dest === file);
-    if (matchedBundle) {
+    // The file could be in one or more bundles
+    const matchedBundles = bundles.filter((bundle) => bundle.src.includes(file) || bundle.dest === file);
+    if (matchedBundles.length > 0) {
         if (lint) {
-            await lintJs(matchedBundle.lint);
+            // Join all of the files to lint from each bundle together
+            let filesToLint = [];
+            matchedBundles.forEach((bundle) => {
+                filesToLint = [...filesToLint, ...bundle.lint];
+            });
+            await lintJs(filesToLint);
         }
-        processBundle(matchedBundle);
+        // Process each bundle
+        matchedBundles.forEach((bundle) => {
+            processBundle(bundle);
+        });
     } else {
         const matchedFile = files.find((f) => f === file);
         if (matchedFile) {
