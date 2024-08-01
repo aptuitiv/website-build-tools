@@ -59,6 +59,7 @@ const getRemotePath = (remotePath) => {
  */
 const connect = async (client) => {
     const env = process.env.FTP_ENVIRONMENT ?? 'live';
+    fancyLog(chalk.green('FTP environment: '), chalk.cyan(env));
     if (typeof process.env.FTP_SERVER === 'string' && typeof process.env.FTP_USERNAME === 'string' && typeof process.env.FTP_PASSWORD === 'string') {
         let server = process.env.FTP_SERVER;
         let user = process.env.FTP_USERNAME;
