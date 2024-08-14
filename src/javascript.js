@@ -232,8 +232,13 @@ const processFile = async (filePath) => {
         fs.writeFileSync(buildFile, contents);
     } else {
         // Minify the code
-        const results = await minify(contents, minifyOptions);
-        fs.writeFileSync(buildFile, results.code);
+        try {
+            const results = await minify(contents, minifyOptions);
+            fs.writeFileSync(buildFile, results.code);
+        } catch (error) {
+            fancyLog(logSymbols.error, chalk.red('Error minifying Javascript file'), chalk.cyan(fileToProcess));
+            fancyLog(chalk.red(error));
+        }
     }
     fancyLog(logSymbols.success, chalk.green('Javascript file processing finished', chalk.cyan(fileToProcess)));
 };
@@ -248,11 +253,31 @@ const processBundle = async (bundle) => {
     // Make sure the directory exists
     fs.ensureDirSync(parse(bundle.dest).dir);
 
-    // Create stream
-    const stream = fs.createWriteStream(bundle.dest, { flags: 'w' });
+    // Create stream.
+    // This writes to a temporary file first and then copies it to the destination file if the write is successful.
+    // This is done so that a partially written file isn't FTP'd to the server.
+    const abortController = new AbortController();
+    const tempDest = `${config.data.build.temp}/file.tmp`;
+    const stream = fs.createWriteStream(tempDest, { flags: 'w', signal: abortController.signal });
+
+    stream.on('error', () => {
+        // There was an error writing the file.
+        // This was likely because it was aborted in the code below.
+        // Remove the temp file
+        fs.removeSync(tempDest);
+    });
+
+    stream.on('finish', () => {
+        // The stream successfully finished.
+        // Copy the temp file to the destination file
+        fs.copySync(tempDest, bundle.dest);
+        fs.removeSync(tempDest);
+    });
 
     // Get the minify optins
     const minifyOptions = getMinifyOptions();
+
+    let hasError = false;
 
     // Process each file in the bundle
     // Cannot use forEach as it doesn't work with async/await. https://stackoverflow.com/a/37576787
@@ -264,15 +289,30 @@ const processBundle = async (bundle) => {
             stream.write(contents);
         } else {
             // Minify the code
-            // eslint-disable-next-line no-await-in-loop -- The files are added sequentially to the stream so we need to wait
-            const results = await minify(contents, minifyOptions);
-            stream.write(results.code);
+            try {
+                // eslint-disable-next-line no-await-in-loop -- The files are added sequentially to the stream so we need to wait
+                const results = await minify(contents, minifyOptions);
+                stream.write(results.code);
+            } catch (error) {
+                fancyLog(logSymbols.error, chalk.red('Error minifying Javascript file'), chalk.cyan(file));
+
+                // eslint-disable-next-line no-console -- We need to output the error. console.log() is used to make it more visible.
+                console.log('\n', logSymbols.error, chalk.red(error), '\n');
+                abortController.abort('Error minifying Javascript file');
+                hasError = true;
+                break;
+            }
         }
     }
 
     // Close stream
-    stream.end();
-    fancyLog(logSymbols.success, chalk.green('Javascript bundle processing finished', chalk.cyan(removeRootThemeBuildPrefix(bundle.dest))));
+    if (!hasError) {
+        stream.end();
+        fancyLog(logSymbols.success, chalk.green('Javascript bundle processing finished', chalk.cyan(removeRootThemeBuildPrefix(bundle.dest))));
+    } else {
+        stream.end();
+        fancyLog(logSymbols.error, chalk.red('Javascript bundle processing failed'));
+    }
 };
 
 /**

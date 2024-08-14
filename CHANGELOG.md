@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.13 - August 14, 2024
+
+- Added support for gracefully handling Javascript processing errors.
+
 ## v1.12 - July 23, 2024
 
 - Added support for matching a javascript file in multiple bundles.
