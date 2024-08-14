@@ -257,12 +257,15 @@ const processBundle = async (bundle) => {
     // This writes to a temporary file first and then copies it to the destination file if the write is successful.
     // This is done so that a partially written file isn't FTP'd to the server.
     const abortController = new AbortController();
-    const tempDest = `${config.data.build.temp}/file.tmp`;
+    const tempDest = prefixRootPath(`${config.data.build.temp}/file.tmp`);
+    fs.ensureDirSync(prefixRootPath(config.data.build.temp));
     const stream = fs.createWriteStream(tempDest, { flags: 'w', signal: abortController.signal });
 
-    stream.on('error', () => {
+    stream.on('error', (error) => {
         // There was an error writing the file.
         // This was likely because it was aborted in the code below.
+        // eslint-disable-next-line no-console -- We need to output the error.
+        console.error(error);
         // Remove the temp file
         fs.removeSync(tempDest);
     });
