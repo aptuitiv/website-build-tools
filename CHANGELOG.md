@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.13.1 - August 14, 2024
+
+- Fixed build path.
+
 ## v1.13 - August 14, 2024
 
 - Added support for gracefully handling Javascript processing errors.
