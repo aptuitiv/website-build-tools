@@ -260,9 +260,11 @@ const processBundle = async (bundle) => {
     const tempDest = `${config.data.build.temp}/file.tmp`;
     const stream = fs.createWriteStream(tempDest, { flags: 'w', signal: abortController.signal });
 
-    stream.on('error', () => {
+    stream.on('error', (error) => {
         // There was an error writing the file.
         // This was likely because it was aborted in the code below.
+        // eslint-disable-next-line no-console -- We need to output the error.
+        console.error(error);
         // Remove the temp file
         fs.removeSync(tempDest);
     });
