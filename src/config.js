@@ -22,6 +22,8 @@ const defaultConfig = {
     build: {
         // The root build folder for the files to publish to the website. This is used when uploading files via FTP.
         base: 'dist',
+        // Temporary building location for files that are being processed.
+        temp: '_build',
         // The build folder path for all files for the theme. This is used when uploading files via FTP.
         theme: 'dist/theme/custom',
     },
