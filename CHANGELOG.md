@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.13.2 - September 4, 2024
+
+- Don't remove the temp file when building code. This was sometimes causing an `ENOENT: no such file or directory` error when building files.
+
 ## v1.13.1 - August 14, 2024
 
 - Fixed build path.
