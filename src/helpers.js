@@ -2,6 +2,7 @@
     Helper functions for the build scripts
 =========================================================================== */
 
+import fs from 'fs-extra';
 import { globSync } from 'glob';
 import { isAbsolute, resolve } from 'path';
 
@@ -283,4 +284,19 @@ export const sortObjectByKeys = (obj) => {
         sorted[key] = obj[key];
     });
     return sorted;
+};
+
+/**
+ * Really basic function to test and see if the file contents are different
+ *
+ * @param {string} sourceFile The source file contents
+ * @param {string} targetPath The path for the target file
+ * @returns {boolean}
+ */
+export const areFilesDifferent = (sourceFile, targetPath) => {
+    if (fs.pathExistsSync(targetPath)) {
+        const targetData = fs.readFileSync(targetPath, 'utf-8');
+        return sourceFile !== targetData;
+    }
+    return true;
 };

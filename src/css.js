@@ -24,6 +24,7 @@ import postcssReporter from 'postcss-reporter';
 // Build scripts
 import config from './config.js';
 import {
+    areFilesDifferent,
     processGlobPath,
     prefixPath,
     prefixRootPath,
@@ -45,21 +46,6 @@ const getSrcPath = (filePath) => {
     const basePath = prefixRootPath(sourcePath);
     return prefixPath(filePath, basePath, sourcePath);
 };
-
-/**
- * Really basic function to test and see if the file contents are different
- *
- * @param {string} sourceFile The source file contents
- * @param {string} targetPath The path for the target file
- * @returns {boolean}
- */
-function areFilesDifferent(sourceFile, targetPath) {
-    if (fs.pathExistsSync(targetPath)) {
-        const targetData = fs.readFileSync(targetPath, 'utf-8');
-        return sourceFile !== targetData;
-    }
-    return true;
-}
 
 /**
  * Run stylelint on the css files
