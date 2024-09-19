@@ -81,7 +81,7 @@ const watchHandler = async () => {
         });
 
     // Watch for any CSS changes
-    const jsfolder = prefixRootSrcPath(`${config.data.javascript.src}/**/*.js`);
+    const jsfolder = prefixRootSrcPath(`${config.data.javascript.src}/**/*.{js,cjs,mjs}`);
     fancyLog(
         chalk.magenta('Watching for changes in the Javascript folder'),
         chalk.cyan(prefixSrcPath(config.data.javascript.src)),
