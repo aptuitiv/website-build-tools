@@ -34,13 +34,21 @@ const watchHandler = async () => {
     // If you want to delete a folder via FTP then run
     // aptuitiv-build delete -p path/to/folder
     const rootDistFolder = prefixRootPath(config.data.build.base);
-    const distFolder = `${rootDistFolder}/**/*`;
+    const distFolder = rootDistFolder;
     fancyLog(
         chalk.magenta('Watching for changes in the dist folder'),
         chalk.cyan(config.data.build.base),
     );
     chokidar
-        .watch(distFolder, { ignoreInitial: true })
+        .watch(distFolder, {
+            ignoreInitial: true,
+            // Wait for 500ms before deploying the file. This is to prevent
+            // deploying a file that is still being written to.
+            // https://github.com/paulmillr/chokidar?tab=readme-ov-file#performance
+            // Also, sometimes chokidar detects multiple changes on a file, even if it's small.
+            // This is intended to prevent uploading the file multiple times.
+            awaitWriteFinish: { stabilityThreshold: 500 },
+        })
         .on('add', (path) => {
             deployFile(removePrefix(path, rootDistFolder));
         })
@@ -52,18 +60,23 @@ const watchHandler = async () => {
         });
 
     // Watch for any CSS changes
-    const cssFolder = prefixRootSrcPath(`${config.data.css.src}/**/*.css`);
+    const cssFolder = prefixRootSrcPath(config.data.css.src);
     fancyLog(
         chalk.magenta('Watching for changes in the CSS folder'),
         chalk.cyan(prefixSrcPath(config.data.css.src)),
     );
-    chokidar.watch(cssFolder, { ignoreInitial: true }).on('all', () => {
+    chokidar.watch(cssFolder, {
+        // Only watch CSS files
+        // https://github.com/paulmillr/chokidar?tab=readme-ov-file#upgrading
+        ignored: (path, stats) => stats?.isFile() && !path.endsWith('.css'),
+        ignoreInitial: true,
+    }).on('all', () => {
         processCss();
     });
 
     // Watch for any font changes
     const fontSrcFolder = prefixSrcPath(config.data.fonts.src);
-    const fontFolder = `${prefixRootPath(fontSrcFolder)}/**/*`;
+    const fontFolder = prefixRootPath(fontSrcFolder);
     fancyLog(
         chalk.magenta('Watching for changes in the font folder'),
         chalk.cyan(fontSrcFolder),
@@ -81,12 +94,17 @@ const watchHandler = async () => {
         });
 
     // Watch for any CSS changes
-    const jsfolder = prefixRootSrcPath(`${config.data.javascript.src}/**/*.{js,cjs,mjs}`);
+    const jsfolder = prefixRootSrcPath(config.data.javascript.src);
     fancyLog(
         chalk.magenta('Watching for changes in the Javascript folder'),
         chalk.cyan(prefixSrcPath(config.data.javascript.src)),
     );
-    chokidar.watch(jsfolder, { ignoreInitial: true }).on('all', (event, path) => {
+    chokidar.watch(jsfolder, {
+        // Only watch JS files
+        // https://github.com/paulmillr/chokidar?tab=readme-ov-file#upgrading
+        ignored: (path, stats) => stats?.isFile() && !/\.js$|\.cjs$|\.mjs$/.test(path),
+        ignoreInitial: true,
+    }).on('all', (event, path) => {
         processJsFile(path);
     });
 
@@ -96,13 +114,18 @@ const watchHandler = async () => {
         chalk.magenta('Watching for changes in the icons folder'),
         chalk.cyan(prefixSrcPath(config.data.icons.src)),
     );
-    chokidar.watch(iconFolder, { ignoreInitial: true }).on('all', () => {
+    chokidar.watch(iconFolder, {
+        // Only watch SVG files
+        // https://github.com/paulmillr/chokidar?tab=readme-ov-file#upgrading
+        ignored: (path, stats) => stats?.isFile() && !path.endsWith('.svg'),
+        ignoreInitial: true,
+    }).on('all', () => {
         createIconSprite();
     });
 
     // Watch for any image file changes
     const imageSrcFolder = prefixSrcPath(config.data.images.src);
-    const imageFolder = `${prefixRootPath(imageSrcFolder)}/**/*`;
+    const imageFolder = prefixRootPath(imageSrcFolder);
     fancyLog(
         chalk.magenta('Watching for changes in the images folder'),
         chalk.cyan(imageSrcFolder),
@@ -121,7 +144,7 @@ const watchHandler = async () => {
 
     // Watch for any template file changes
     const templateSrcFolder = prefixSrcPath(config.data.templates.src);
-    const templateFolder = `${prefixRootPath(templateSrcFolder)}/**/*`;
+    const templateFolder = prefixRootPath(templateSrcFolder);
     fancyLog(
         chalk.magenta('Watching for changes in the template folder'),
         chalk.cyan(templateSrcFolder),
@@ -140,7 +163,7 @@ const watchHandler = async () => {
 
     // Watch for any theme configuration file changes
     const themeSrcFolder = prefixSrcPath(config.data.themeConfig.src);
-    const themeFolder = `${prefixRootPath(themeSrcFolder)}/**/*`;
+    const themeFolder = prefixRootPath(themeSrcFolder);
     fancyLog(
         chalk.magenta('Watching for changes in the theme folder'),
         chalk.cyan(themeSrcFolder),
