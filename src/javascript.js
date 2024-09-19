@@ -3,16 +3,18 @@
 =========================================================================== */
 
 import chalk from 'chalk';
+import * as esbuild from 'esbuild';
 import { ESLint } from 'eslint';
 import fancyLog from 'fancy-log';
 import fs from 'fs-extra';
 import logSymbols from 'log-symbols';
-import { parse } from 'path';
+import { dirname, parse } from 'path';
 import { minify } from 'terser';
 
 // Build scripts
 import config from './config.js';
 import {
+    areFilesDifferent,
     getGlob,
     processGlobPath,
     prefixPath,
@@ -28,6 +30,7 @@ import { isObjectWithValues, isString, isStringWithValue } from './lib/types.js'
 
 let isProcessed = false;
 const bundles = [];
+const entryPoints = [];
 let files = [];
 
 /**
@@ -35,6 +38,7 @@ let files = [];
  */
 const prepareJsConfig = () => {
     if (!isProcessed) {
+        // Process Javascript files that should be bundled together and minified
         if (Array.isArray(config.data.javascript.bundles)) {
             config.data.javascript.bundles.forEach((bundle) => {
                 if (isStringWithValue(bundle.build)) {
@@ -90,7 +94,28 @@ const prepareJsConfig = () => {
                 }
             });
         }
-        // Prefix the root source path to each file
+
+        // Process files with esbuild
+        if (Array.isArray(config.data.javascript.entryPoints)) {
+            config.data.javascript.entryPoints.forEach((entryPoint) => {
+                if (isStringWithValue(entryPoint)) {
+                    const entryPointFile = prefixRootSrcPath(entryPoint, [config.data.javascript.src]);
+                    entryPoints.push(entryPointFile);
+                } else if (isObjectWithValues(entryPoint) && isStringWithValue(entryPoint.in)) {
+                    const entryPointFile = prefixRootSrcPath(entryPoint.in, [config.data.javascript.src]);
+                    const ep = { in: entryPointFile };
+                    if (isStringWithValue(entryPoint.out)) {
+                        ep.out = entryPoint.out;
+                    }
+                    if (isObjectWithValues(entryPoint.config)) {
+                        ep.config = entryPoint.config;
+                    }
+                    entryPoints.push(ep);
+                }
+            });
+        }
+
+        // Process individual files
         if (Array.isArray(config.data.javascript.files)) {
             // Prefix each file with the root source path and the javascript source path
             const processedFiles = config.data.javascript.files.map((file) => prefixRootSrcPath(file, [config.data.javascript.src]));
@@ -100,7 +125,7 @@ const prepareJsConfig = () => {
             });
         }
 
-        // Mark the files as processed
+        // Mark the configuration as processed
         isProcessed = true;
     }
 };
@@ -317,6 +342,117 @@ const processBundle = async (bundle) => {
 };
 
 /**
+ * Process the Javascript files with esbuild
+ *
+ * https://esbuild.github.io/
+ *
+ * The format of the build is IIFE (Immediately Invoked Function Expression)
+ * https://esbuild.github.io/api/#format-iife
+ * If your entry point has exports that you want to expose as a global in the browser, you can configure that global's name using the global name setting.
+ * https://esbuild.github.io/api/#global-name
+ *
+ * @param {string|object} entry The entry points for the build
+ */
+const processEsbuild = async (entry) => {
+    // Set up the entry point data
+    let entryFile = '';
+    let entryConfig = {};
+    if (isString(entry)) {
+        entryFile = entry;
+    } else if (isObjectWithValues(entry) && isStringWithValue(entry.in)) {
+        if (isStringWithValue(entry.out)) {
+            entryFile = { in: entry.in, out: entry.out };
+        } else {
+            entryFile = entry.in;
+        }
+        if (isObjectWithValues(entry.config)) {
+            entryConfig = entry.config;
+        }
+    }
+    fancyLog(chalk.magenta('Building Javascript'));
+
+    const buildPath = prefixRootThemeBuildPath(config.data.javascript.build);
+
+    // Set up the default configuration
+    let esConfig = {
+        minify: true,
+    };
+
+    // Combine the user configuration with the default configuration
+    if (isObjectWithValues(config.data.javascript.esConfig)) {
+        esConfig = { ...esConfig, ...config.data.javascript.esConfig };
+    }
+
+    // Set some configuration options that should not be overwritten.
+    // Also include the configuration specific to the entry point.
+    esConfig = {
+        ...esConfig,
+        ...entryConfig,
+        bundle: true,
+        entryPoints: [entryFile],
+        format: 'iife',
+        outdir: buildPath,
+        platform: 'browser',
+        write: false,
+    };
+
+    // Get the esbuild context
+    const ctx = await esbuild.context(esConfig);
+
+    // Build/rebuild the files
+    const result = await ctx.rebuild();
+
+    result.outputFiles.forEach((out) => {
+        if (areFilesDifferent(out.text, out.path)) {
+            // Make sure that the destination directory exists
+            const destDir = dirname(out.path);
+            if (!fs.existsSync(destDir)) {
+                fs.mkdirSync(destDir, { recursive: true });
+            }
+            // The file is different so write it to the build directory
+            fs.writeFileSync(out.path, out.text);
+            fancyLog(
+                logSymbols.success,
+                chalk.green('Javascript built:'),
+                chalk.cyan(removeRootPrefix(out.path)),
+            );
+        } else {
+            fancyLog(
+                chalk.yellow(
+                    `Skipping ${removeRootPrefix(out.path)} because the built content is the same as the destination file`,
+                ),
+            );
+        }
+    });
+
+    // Call "dispose" when you're done to free up resources
+    ctx.dispose();
+
+    fancyLog(logSymbols.success, chalk.green('Javascript build finished'));
+};
+
+/**
+ * Process all of the entry points with esbuild.
+ *
+ * esbuild supports multiple entry points passed to the "entryPoint" option.
+ * However, we are processing them separately so that we can have different configuration
+ * for each entry point, if necessary. This allows the web developer to have different
+ * configurations for different entry points.
+ *
+ * @param {Array} entries The entry points for the build
+ * @returns {Promise}
+ */
+const processEsbuilds = (entries) => new Promise((resolve) => {
+    const promises = [];
+    entries.forEach((entry) => {
+        promises.push(processEsbuild(entry));
+    });
+    Promise.all(promises).then(() => {
+        resolve();
+    });
+});
+
+/**
  * Process all the Javascript files
  *
  * @returns {Promise}
@@ -328,6 +464,9 @@ const processAllJs = async () => new Promise((resolve) => {
     bundles.forEach((bundle) => {
         jsPromises.push(processBundle(bundle));
     });
+    if (entryPoints.length > 0) {
+        jsPromises.push(processEsbuilds(entryPoints));
+    }
     files.forEach((file) => {
         jsPromises.push(processFile(file));
     });
@@ -379,6 +518,12 @@ export const processJsFile = async (filePath, lint = true) => {
                 await lintJs(file);
             }
             processFile(file);
+        } else if (entryPoints.length > 0) {
+            // Assume that this file is part of a build
+            if (lint) {
+                await lintJs(file);
+            }
+            processEsbuilds(entryPoints);
         } else {
             fancyLog(logSymbols.error, chalk.red('The file could not be found in the Javascript configuration'), chalk.cyan(filePath));
         }
