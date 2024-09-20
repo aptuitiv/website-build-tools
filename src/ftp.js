@@ -70,7 +70,6 @@ const connect = async (client) => {
                 user = process.env.FTP_DEV_USERNAME;
                 pass = process.env.FTP_DEV_PASSWORD;
             } else {
-                // eslint-disable-next-line no-console -- Need to log the error
                 fancyLog(logSymbols.error, chalk.red('The dev FTP credentials are missing'));
                 process.exit();
             }
