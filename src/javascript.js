@@ -10,6 +10,7 @@ import fs from 'fs-extra';
 import logSymbols from 'log-symbols';
 import { dirname, parse } from 'path';
 import { minify } from 'terser';
+import aptuitivEslint from '@aptuitiv/eslint-config-aptuitiv';
 
 // Build scripts
 import config from './config.js';
@@ -170,21 +171,28 @@ const lintJs = async (fileGlob) => {
     // This is the configuration for the eslint API.
     // See options at https://eslint.org/docs/latest/integrate/nodejs-api#-new-eslintoptions
     const options = {
-        // Need to set the current working directory to the package root so that the any
-        // "extend" configurations are found. They are looked for in the node_modules of this package,
-        // not the site's package. The "extends" configuration is the one thing that the developer
-        // can't overwrite because their packages won't be found.
-        cwd: config.data.packageRoot,
         // Default configuration for eslint.
         // https://eslint.org/docs/latest/use/configure/
-        baseConfig: {
-            extends: ['@aptuitiv/eslint-config-aptuitiv'],
-        },
+        baseConfig: [
+            // Because @aptuitiv/eslint-config-aptuitiv exports an array of objects, we need to use the spread operator.
+            ...aptuitivEslint,
+            {
+                rules: {
+                    // Allow importing Javascript files
+                    'import/extensions': 'off',
+                },
+            },
+        ],
         fix: true,
+        overrideConfigFile: true,
         overrideConfig: null,
     };
     // Get the override configuration from the configuration file in the website project.
     if (isObjectWithValues(config.data.eslint)) {
+        if (Array.isArray(config.data.eslint.ignores)) {
+            // Make sure that the each ignores pattern includes the javascript source path
+            config.data.eslint.ignores = config.data.eslint.ignores.map((ignore) => prefixSrcPath(ignore, [config.data.javascript.src]));
+        }
         options.overrideConfig = config.data.eslint;
     }
 

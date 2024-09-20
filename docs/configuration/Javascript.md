@@ -6,7 +6,7 @@ In the [configuration file](/docs/Configuration.md) you will want to set up how 
   - [Processing Javscript files](#processing-javscript-files)
     - [Javascript bundles](#javascript-bundles)
     - [Single Javascript files](#single-javascript-files)
-    - [Building Javascript files with eslint](#building-javascript-files-with-eslint)
+    - [Building Javascript files with esbuild](#building-javascript-files-with-esbuild)
       - [Configure the entry point files](#configure-the-entry-point-files)
       - [Configuring esbuild](#configuring-esbuild)
   - [Linting Javascript](#linting-javascript)
@@ -119,7 +119,7 @@ The `javascript.files` array is an array of file paths where the file path start
 
 The files are minified and output in the build directory in the Javascript build directory (`javascript.build`) with the same file name and path.
 
-### Building Javascript files with eslint
+### Building Javascript files with esbuild
 
 If your Javascript is more complex and you want to utilize importing files then this is the best option.
 
@@ -244,27 +244,21 @@ Javascript files are linted with [eslint](https://eslint.org/). Only files withi
 
 You can override the existing [eslint configuration](https://eslint.org/docs/latest/use/configure/) with your own configuration in the `eslint` section of the configuration file.
 
-The base configuration is simple and only extends [@aptuitiv/eslint-config-aptuitiv](https://github.com/aptuitiv/eslint-config-aptuitiv).
-
-```js
-{
-    extends: ['@aptuitiv/eslint-config-aptuitiv']
-}
-```
+The base configuration is simple and only includes [@aptuitiv/eslint-config-aptuitiv](https://github.com/aptuitiv/eslint-config-aptuitiv).
 
 This means that you are safe to set any valid eslint configuration and it won't completely overwrite an existing configuration.
-
-> **The only thing you cannot overwrite is the `extends` configuration.** The packages referenced in the `extends` configuration are loaded from the `@aptuitiv/website-build-tools` package. If you try to set your own `extends` configuration then your packages won't load because they don't exist in the `@aptuitiv/website-build-tools` package. Instead, consider an update to the `@aptuitiv/website-build-tools` package or use the `rules` eslint configuration.
 
 Typically, the only configuration that you may need to do is to add some ignore patterns. For example, to ignore the Javascript for [fslightbox](https://fslightbox.com/) you might do something like this:
 
 ```js
 eslint: {
-    ignorePatterns: ['fslightbox.js']
+    ignores: ['fslightbox.js']
 }
 ```
 
-If you're just ignoring files, you could also add a `.eslintignore` file in your project root. But, for consistency with keeping all build functionality in one place, we recommend that you put any eslint ignores in the configuration file as described above.
+The ignore path should start in the `javascript.src` directory.
+
+If you're just ignoring files, you could also add a `.eslintignore` file in your project root. But, for consistency with keeping all build functionality in one place, we recommend that you put any eslint ignores in the configuration file as described above. (If you do use the `.eslintignore` file then be sure to include the `javascript.src` dirctory in the ignore path.)
 
 ## Minify Javascript
 

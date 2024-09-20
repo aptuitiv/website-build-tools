@@ -4,10 +4,10 @@
     "description": "Build tools to help with building and deploying websites at Aptuitiv",
     "main": "index.js",
     "scripts": {
-        "eslint": "eslint --fix .",
+        "eslint": "eslint --fix --no-warn-ignored .",
         "prettier": "prettier --write .",
         "updateBrowsersList": "npx browserslist@latest --update-db",
-        "watch": "esw -w --color --fix ."
+        "watch": "watch-eslint -no-warn-ignored --fix --color ."
     },
     "repository": {
         "type": "git",
@@ -23,10 +23,10 @@
         "aptuitiv-build": "./index.js"
     },
     "devDependencies": {
-        "eslint-watch": "^8.0.0"
+        "watch-eslint": "^1.1.0"
     },
     "dependencies": {
-        "@aptuitiv/eslint-config-aptuitiv": "^0.8.0",
+        "@aptuitiv/eslint-config-aptuitiv": "^1.0.0",
         "acorn": "^8.12.1",
         "acorn-walk": "^8.3.4",
         "autoprefixer": "^10.4.20",
@@ -38,8 +38,8 @@
         "cssnano": "^7.0.6",
         "deepmerge": "^4.3.1",
         "dotenv": "^16.4.5",
-        "eslint": "^8.57.0",
         "esbuild": "0.23.1",
+        "eslint": "^9.10.0",
         "fancy-log": "^2.0.0",
         "fs-extra": "^11.2.0",
         "glob": "^11.0.0",
