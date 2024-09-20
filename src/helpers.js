@@ -124,9 +124,10 @@ export const prefixRootBuildPath = (path) => prefixRootPath(prefixBuildPath(path
  * Prefix the src path
  *
  * @param {string} path The file/glob path
+ * @param {Array} [additionalPrefixes] An array of additional prefixes to add to the path
  * @returns {string}
  */
-export const prefixSrcPath = (path) => prefixPath(path, config.data.src);
+export const prefixSrcPath = (path, additionalPrefixes) => prefixPath(prefixPaths(path, additionalPrefixes), config.data.src);
 
 /**
  * Prefix the src and root paths
