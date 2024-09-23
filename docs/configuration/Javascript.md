@@ -11,6 +11,7 @@ In the [configuration file](/docs/Configuration.md) you will want to set up how 
       - [Configuring esbuild](#configuring-esbuild)
     - [Setting global variable](#setting-global-variable)
     - [Importing other files](#importing-other-files)
+    - [Beware of circular import/require](#beware-of-circular-importrequire)
   - [Linting Javascript](#linting-javascript)
   - [Minify Javascript](#minify-javascript)
 
@@ -301,6 +302,14 @@ exports.variable2 = variable2;
 You can import other files in your code. It's recommended that if you export something in a file that the file is a Common JS file with `.cjs` as the file extension. You would use `module.exports` to export your variable.
 
 If you keep your file as a `.js` file and use `exports.default` then you have to use `.default` when accessing the imported variable. That's why it's better to use the CommonJS `module.exports`.
+
+### Beware of circular import/require
+
+If you import a file with `import` or `require` and that file imports the file that imported it, then you have circular imports. This will cause issues with your code. The most common issue is that the thing you're trying to import will be an empty object.
+
+When there are circular `require()` calls, a module might not have finished executing when it is returned, which can result in an empty object being returned.
+
+See <https://github.com/evanw/esbuild/issues/1894#issuecomment-1035707059>, <https://github.com/evanw/esbuild/issues/2037>, and <https://nodejs.org/api/modules.html#modules_cycles> for more information.
 
 ## Linting Javascript
 
