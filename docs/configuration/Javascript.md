@@ -9,6 +9,8 @@ In the [configuration file](/docs/Configuration.md) you will want to set up how 
     - [Building Javascript files with esbuild](#building-javascript-files-with-esbuild)
       - [Configure the entry point files](#configure-the-entry-point-files)
       - [Configuring esbuild](#configuring-esbuild)
+    - [Setting global variable](#setting-global-variable)
+    - [Importing other files](#importing-other-files)
   - [Linting Javascript](#linting-javascript)
   - [Minify Javascript](#minify-javascript)
 
@@ -237,6 +239,68 @@ If no configuration is set in the file object and the `javascript.esConfig` opti
 If the `javascript.esConfig` option is set and the `config` value is set in the file option, then they will both be merged into the esbuild configuration. First the `javascript.esConfig` value and then the `config` value for the individual entry point.
 
 You can use any of the configuration parameters for [esbuild](https://esbuild.github.io/).
+
+### Setting global variable
+
+The IIFE format wraps the code in a self executing function, thus isolating any variables. If you need to expose a variable to other Javascript (like perhaps some inline Javascript on a page) then you need to set the [globalName](https://esbuild.github.io/api/#global-name) parameter.
+
+In order to properly export the global variable the entry point file that does the export needs to be a Common JS file and have `.csj` as the extension.
+
+There are two ways to export.
+
+First, use `module.exports`.
+
+```js
+const thingToExport = {};
+
+module.exports = thingToExport;
+```
+
+Secondly, use `exports.default`.
+
+```js
+const thingToExport = {};
+
+exports.default = thingToExport;
+```
+
+If you use `exports` and you only export one thing then you need to use `.default` to access the value. For example:
+
+```js
+thingsToExport.default;
+```
+
+If you want to export multiple variables you can do it like this:
+
+```js
+module.exports = {
+    variable1,
+    variable2
+}
+```
+
+or
+
+```js
+exports.variable1 = 'something';
+exports.variable2 = 'something';
+```
+
+or
+
+```js
+const variable1 = 'something';
+const variable2 = 'something';
+
+exports.variable1 = variable1;
+exports.variable2 = variable2;
+```
+
+### Importing other files
+
+You can import other files in your code. It's recommended that if you export something in a file that the file is a Common JS file with `.cjs` as the file extension. You would use `module.exports` to export your variable.
+
+If you keep your file as a `.js` file and use `exports.default` then you have to use `.default` when accessing the imported variable. That's why it's better to use the CommonJS `module.exports`.
 
 ## Linting Javascript
 
