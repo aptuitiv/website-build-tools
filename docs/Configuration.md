@@ -100,6 +100,8 @@ See these examples:
 | javascript | | [Javascript configuration](configuration/Javascript.md). |
 | javascript.build | 'js' | The folder for the javascript files within the theme build folder. (config.build.theme) |
 | javascript.bundles | [] | An array of file globs to bundle and their destination folder. |
+| javascript.entryPoints | [] | An array entry point files to build within the src folder using [esbuild](https://esbuild.github.io/). |
+| javascript.esConfig | {} | An object containing custom configuration for [esbuild](https://esbuild.github.io/). |
 | javascript.files | [] | An array of file globs to process. |
 | javascript.minify | {} | Minification options for terser. |
 | javascript.src | 'js' | The source folder for the javascript files within the root source folder. (config.src) |

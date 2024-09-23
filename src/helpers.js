@@ -2,6 +2,7 @@
     Helper functions for the build scripts
 =========================================================================== */
 
+import fs from 'fs-extra';
 import { globSync } from 'glob';
 import { isAbsolute, resolve } from 'path';
 
@@ -123,9 +124,10 @@ export const prefixRootBuildPath = (path) => prefixRootPath(prefixBuildPath(path
  * Prefix the src path
  *
  * @param {string} path The file/glob path
+ * @param {Array} [additionalPrefixes] An array of additional prefixes to add to the path
  * @returns {string}
  */
-export const prefixSrcPath = (path) => prefixPath(path, config.data.src);
+export const prefixSrcPath = (path, additionalPrefixes) => prefixPath(prefixPaths(path, additionalPrefixes), config.data.src);
 
 /**
  * Prefix the src and root paths
@@ -283,4 +285,19 @@ export const sortObjectByKeys = (obj) => {
         sorted[key] = obj[key];
     });
     return sorted;
+};
+
+/**
+ * Really basic function to test and see if the file contents are different
+ *
+ * @param {string} sourceFile The source file contents
+ * @param {string} targetPath The path for the target file
+ * @returns {boolean}
+ */
+export const areFilesDifferent = (sourceFile, targetPath) => {
+    if (fs.pathExistsSync(targetPath)) {
+        const targetData = fs.readFileSync(targetPath, 'utf-8');
+        return sourceFile !== targetData;
+    }
+    return true;
 };

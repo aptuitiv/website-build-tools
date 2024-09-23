@@ -85,9 +85,18 @@ const defaultConfig = {
     javascript: {
         // The folder for the javascript files within the theme build folder. (config.build.theme)
         build: 'js',
-        // An array of file globs to bundle and their destination folder
+        // An array of file globs to bundle and their destination folder.
+        // This will combine the files together, minify them, and copy to the build folder.
         bundles: [],
+        // The entry point files to build within the src folder.
+        // This uses esbuild to bundle the files together. Unlike the bundles option, you can import files
+        // within the entry point files.
+        // This will build the files, minify them, and copy them to the build folder.
+        entryPoints: [],
+        // The esbuild configuration options.
+        esConfig: {},
         // An array of file globs to process.
+        // This will just minify the files and copy them to the build folder.
         files: [],
         // Minification options for terser.
         // https://terser.org/docs/options/
