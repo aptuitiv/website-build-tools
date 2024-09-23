@@ -1,5 +1,12 @@
 # Change Log
 
+## v1.14.0 - September 23, 2024
+
+- Expanded the Javascript watch to include cjs and mjs files.
+- Added support for processing Javascript with esbuild.
+- Updated packages.
+- Updated eslint to version 9.
+
 ## v1.13.2 - September 4, 2024
 
 - Don't remove the temp file when building code. This was sometimes causing an `ENOENT: no such file or directory` error when building files.
