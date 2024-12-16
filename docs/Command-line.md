@@ -48,6 +48,7 @@ aptuitiv-build pull-template --root ../../
 - [Convert legacy gulp build process](actions/Convert-gulp.md)
 - [Copy files](actions/Copy-files.md)
 - [CSS](actions/Css.md)
+- [Environment file](actions/Environment.md)
 - [Export](actions/Export.md)
 - [Fonts](actions/Fonts.md)
 - [FTP](actions/FTP.md)
