@@ -16,6 +16,7 @@ import { fileURLToPath } from 'url';
 import config from './src/config.js';
 import { copyHandler } from './src/copy.js';
 import { cssHandler } from './src/css.js';
+import { envHandler } from './src/env.js';
 import exportHandler from './src/export.js';
 import { fontHandler } from './src/font.js';
 import ftpHander from './src/ftp.js';
@@ -131,6 +132,17 @@ program
     .action(async (args) => {
         await config.init(args);
         cssHandler('lint', args);
+    });
+
+/**
+ * Environment commands
+ */
+program
+    .command('env')
+    .description('Set up the environment file')
+    .addOption(rootOption)
+    .action(async (args) => {
+        await envHandler(args);
     });
 
 /**

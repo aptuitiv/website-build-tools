@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.15.0 - December 16, 2024
+
+- Added the `env` action to build a missing `.env` file for FTP.
+
 ## v1.14.0 - September 23, 2024
 
 - Expanded the Javascript watch to include cjs and mjs files.

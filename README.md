@@ -4,6 +4,14 @@ Build tools to help with building and deploying websites at [Aptuitiv](https://w
 
 ## Install
 
+We recommend installing the library globally so that you can use `aptuitiv-build` on the command line to run some commands.
+
+```bash
+npm i -g @aptuitiv/website-build-tools
+```
+
+You can also install the library for a single project:
+
 ```bash
 npm i - D @aptuitiv/website-build-tools
 ```
