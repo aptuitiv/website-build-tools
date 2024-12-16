@@ -11,6 +11,8 @@ import { parse } from 'path';
 import * as readline from 'node:readline/promises';
 import yaml from 'json-to-pretty-yaml';
 
+import { createEnvFile } from './env.js';
+
 // Build scripts
 import { getObjectKeysRecursive, setupRoot, sortObjectByKeys } from './helpers.js';
 import { isObjectWithValues } from './lib/types.js';
@@ -162,29 +164,6 @@ export const createConfigFile = (configFile, content) => {
     } else {
         createEsModuleConfigFile(configFile, sortedConfigContent);
     }
-};
-
-/**
- * Create the .env file
- */
-const createEnvFile = async () => {
-    fancyLog(chalk.magenta('Creating the .env file'));
-    fancyLog(chalk.blue('Setting up the FTP credentials. You can get the username and password from the Settings -> Domain / FTP / DNS  section in the website administration.'));
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
-    const name = await rl.question('What is the name of this website? ');
-    const username = await rl.question('What is the FTP username? ');
-    const password = await rl.question('What is the FTP password? ');
-    rl.close();
-    const contents = `# ${name} FTP
-FTP_ENVIRONMENT = live
-FTP_SERVER = ftp1.branchcms.com
-FTP_USERNAME = ${username}
-FTP_PASSWORD = ${password} `;
-    fs.writeFileSync('.env', contents);
-    fancyLog(logSymbols.success, chalk.green('Environment file created'), chalk.cyan('.env'));
 };
 
 /**
