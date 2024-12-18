@@ -22,7 +22,7 @@ Below is an example:
         }
     ],
     "eslint": {
-        "ignorePatterns": ["fslightbox.js"]
+        "ignores": ["fslightbox.js"]
     },
     "javascript": {
         "bundles": [
