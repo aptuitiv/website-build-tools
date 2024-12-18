@@ -18,7 +18,7 @@ module.exports = {
         }
     ],
     eslint: {
-        'ignorePatterns': ['fslightbox.js']
+        'ignores': ['fslightbox.js']
     },
     javascript: {
         bundles: [

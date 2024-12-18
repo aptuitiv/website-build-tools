@@ -16,7 +16,7 @@ copy:
   - src: node_modules/just-validate/dist/just-validate.production.min.js
     dest: just-validate
 eslint:
-  ignorePatterns:
+  ignores:
     - fslightbox.js
 javascript:
   bundles:
