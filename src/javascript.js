@@ -170,6 +170,7 @@ const getSrcPath = (filePath) => {
  * @param {string} [fileGlob] The file glob to lint
  */
 const lintJs = async (fileGlob) => {
+    console.log('lintJs filei glob', fileGlob);
     // Get the glob of files to lint
     const filesToLint = fileGlob || prefixRootSrcPath(`${config.data.javascript.src}/**/*.js`);
 
@@ -218,28 +219,45 @@ const lintJs = async (fileGlob) => {
     }
 
     // Create an instance of ESLint with the configuration passed to the function
-    const eslint = new ESLint(options);
+    try {
+        const eslint = new ESLint(options);
 
-    let results = await eslint.lintFiles(filesToLint);
+        let results = await eslint.lintFiles(filesToLint);
 
-    // Apply automatic fixes and output fixed code
-    await ESLint.outputFixes(results);
+        // Apply automatic fixes and output fixed code
+        await ESLint.outputFixes(results);
 
-    // Format the results to remove the root directory from the file paths.
-    results = results.map((result) => {
-        const returnValue = result;
-        returnValue.filePath = removeRootPrefix(result.filePath);
-        return returnValue;
-    });
+        // Format the results to remove the root directory from the file paths.
+        results = results.map((result) => {
+            const returnValue = result;
+            returnValue.filePath = removeRootPrefix(result.filePath);
+            return returnValue;
+        });
 
-    // Format and output the results
-    await eslint.loadFormatter('stylish').then((formatter) => {
-        const formatResults = formatter.format(results);
-        if (formatResults.length > 0) {
-            // eslint-disable-next-line no-console -- Need to output the results
-            console.log(formatResults);
+        // Format and output the results
+        await eslint.loadFormatter('stylish').then((formatter) => {
+            const formatResults = formatter.format(results);
+            if (formatResults.length > 0) {
+                // eslint-disable-next-line no-console -- Need to output the results
+                console.log(formatResults);
+            }
+        });
+    } catch (error) {
+        if (isStringWithValue(error.messageTemplate)) {
+            let errorFile = '';
+            if (isObjectWithValues(error.messageData) && isStringWithValue(error.messageData.pattern)) {
+                errorFile = error.messageData.pattern;
+            }
+            if (error.messageTemplate == 'file-not-found') {
+                fancyLog(logSymbols.warning, chalk.yellow('Could not find file to lint'), errorFile);
+            } else {
+                fancyLog(logSymbols.error, chalk.red('Error running ESLint'), error);
+            }
+        } else {
+            fancyLog(logSymbols.error, chalk.red('Error running ESLint'), error);
         }
-    });
+
+    }
 
     fancyLog(logSymbols.success, chalk.green('Javascript linting finished'));
 };
