@@ -302,9 +302,12 @@ const processFile = async (filePath) => {
  *
  * @param {Array} bundle The bundle configuration
  * @param {string} additionalFileContents Additional file contents to add to the bundle
+ * @param {bool} log Whether to log the bundle process
  */
-const processBundle = async (bundle, additionalFileContents = '') => {
-    fancyLog(chalk.magenta('Processing Javascript bundle: '), chalk.cyan(removeRootThemeBuildPrefix(bundle.dest)));
+const processBundle = async (bundle, additionalFileContents = '', log = true) => {
+    if (log) {
+        fancyLog(chalk.magenta('Processing Javascript bundle: '), chalk.cyan(removeRootThemeBuildPrefix(bundle.dest)));
+    }
     // Make sure the directory exists
     fs.ensureDirSync(parse(bundle.dest).dir);
 
@@ -369,7 +372,9 @@ const processBundle = async (bundle, additionalFileContents = '') => {
     // Close stream
     if (!hasError) {
         stream.end();
-        fancyLog(logSymbols.success, chalk.green('Javascript bundle processing finished', chalk.cyan(removeRootThemeBuildPrefix(bundle.dest))));
+        if (log) {
+            fancyLog(logSymbols.success, chalk.green('Javascript bundle processing finished', chalk.cyan(removeRootThemeBuildPrefix(bundle.dest))));
+        }
     } else {
         stream.end();
         fancyLog(logSymbols.error, chalk.red('Javascript bundle processing failed'));
@@ -391,12 +396,15 @@ const processBundle = async (bundle, additionalFileContents = '') => {
 const processEsbuild = async (entry) => {
     // Set up the entry point data
     let entryFile = '';
+    let logEntryFile = '';
     let entryConfig = {};
     if (isString(entry)) {
         entryFile = entry;
+        logEntryFile = entry;
     } else if (isObjectWithValues(entry) && isStringWithValue(entry.in)) {
         if (isStringWithValue(entry.out)) {
             entryFile = { in: entry.in, out: entry.out };
+            logEntryFile = entry.in;
         } else {
             entryFile = entry.in;
         }
@@ -404,7 +412,7 @@ const processEsbuild = async (entry) => {
             entryConfig = entry.config;
         }
     }
-    fancyLog(chalk.magenta('Building Javascript'));
+    fancyLog(chalk.magenta('Building Javascript'), chalk.cyan(removeRootPrefix(logEntryFile)));
 
     const buildPath = prefixRootThemeBuildPath(config.data.javascript.build);
 
@@ -446,7 +454,7 @@ const processEsbuild = async (entry) => {
             const bundleData = prepareBundle(entry.bundle, out.path);
             if (isObjectWithValues(bundleData)) {
                 processAsBundle = true;
-                processBundle(bundleData, out.text);
+                processBundle(bundleData, out.text, false);
             }
         }
         if (!processAsBundle) {
@@ -478,7 +486,7 @@ const processEsbuild = async (entry) => {
     // Call "dispose" when you're done to free up resources
     ctx.dispose();
 
-    fancyLog(logSymbols.success, chalk.green('Javascript build finished'));
+    fancyLog(logSymbols.success, chalk.green('Javascript build finished'), chalk.cyan(removeRootPrefix(logEntryFile)));
 };
 
 /**
