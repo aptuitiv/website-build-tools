@@ -170,7 +170,6 @@ const getSrcPath = (filePath) => {
  * @param {string} [fileGlob] The file glob to lint
  */
 const lintJs = async (fileGlob) => {
-    console.log('lintJs filei glob', fileGlob);
     // Get the glob of files to lint
     const filesToLint = fileGlob || prefixRootSrcPath(`${config.data.javascript.src}/**/*.js`);
 
