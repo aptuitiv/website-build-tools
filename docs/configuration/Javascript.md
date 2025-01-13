@@ -12,6 +12,7 @@ In the [configuration file](/docs/Configuration.md) you will want to set up how 
     - [Setting global variable](#setting-global-variable)
     - [Importing other files](#importing-other-files)
     - [Beware of circular import/require](#beware-of-circular-importrequire)
+    - [Bundle the esbuild output with another file](#bundle-the-esbuild-output-with-another-file)
   - [Linting Javascript](#linting-javascript)
   - [Minify Javascript](#minify-javascript)
 
@@ -125,6 +126,8 @@ The files are minified and output in the build directory in the Javascript build
 ### Building Javascript files with esbuild
 
 If your Javascript is more complex and you want to utilize importing files then this is the best option.
+
+You can also bundle the esbuild output with another Javascript file. This is useful if you have a library that you want to include on all pages but you don't want to do another network request from the browser to get it.
 
 #### Configure the entry point files
 
@@ -310,6 +313,62 @@ If you import a file with `import` or `require` and that file imports the file t
 When there are circular `require()` calls, a module might not have finished executing when it is returned, which can result in an empty object being returned.
 
 See <https://github.com/evanw/esbuild/issues/1894#issuecomment-1035707059>, <https://github.com/evanw/esbuild/issues/2037>, and <https://nodejs.org/api/modules.html#modules_cycles> for more information.
+
+### Bundle the esbuild output with another file
+
+You can bundle the esbuild output with another Javascript file. This is useful if you have a library that you want to include on all pages but you don't want to do another network request from the browser to get it.
+
+To do that you include `bundle` information in the esbuild configuration.
+
+For example:
+
+```js
+{
+    javascript: {
+        entryPoints: [
+            {
+                in: 'somefile.cjs',
+                out: 'out-file-name',
+                config: { globalName: 'globalVar' },
+                bundle: {
+                    nodeModules: [
+                        'nouislider/dist/nouislider.min.js'
+                    ]
+                }
+            }
+        ]
+    } 
+}
+```
+
+The above configuration will bundle the esbuild output and the `node_modules/nouislider/dist/nouislider.min.js` file in the `out-file-name.js` file.
+
+The `bundle` configuration is the same as the [regular bundle](#javascript-bundles) configuration. You can include `node_module` files and/or other Javascript files in your code.
+
+Here is another example that includes a node_modules file and a few local Javascript files.
+
+```js
+{
+    javascript: {
+        entryPoints: [
+            {
+                in: 'main.cjs',
+                out: 'main',
+                config: { globalName: 'main' },
+                bundle: {
+                    nodeModules: [
+                        'micromodal/dist/micromodal.min.js'
+                    ],
+                    src: [
+                        'form.js',
+                        'script-loader.js'
+                    ]
+                }
+            }
+        ]
+    } 
+}
+```
 
 ## Linting Javascript
 

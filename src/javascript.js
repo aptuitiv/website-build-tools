@@ -35,6 +35,71 @@ const entryPoints = [];
 let files = [];
 
 /**
+ * Prepare the bundle for processing
+ *
+ * @param {object} bundle The bundle data
+ * @param {string} [buildPath] An optional build path for the bundle. This is used when combining a bundle with an esbuild build.
+ * @returns {object|undefined} The bundle data or undefined if the bundle could not be processed
+ */
+const prepareBundle = (bundle, buildPath) => {
+    if (!isStringWithValue(buildPath) && isStringWithValue(bundle.build)) {
+        // Set up the absolute build path
+        buildPath = prefixRootThemeBuildPath(bundle.build, [config.data.javascript.build]);
+    }
+    if (isStringWithValue(buildPath)) {
+        // Set up the bundle files
+        let bundleFiles = [];
+        // Set up a separate array of files to lint.
+        // This is done so that we can exclude the node_modules files from the linting.
+        let lintFiles = [];
+        // Process any node_modules files if there are any
+        if (typeof bundle.nodeModules !== 'undefined') {
+            if (isStringWithValue(bundle.nodeModules)) {
+                bundleFiles = bundleFiles.concat(getGlob(prefixRootPath(bundle.nodeModules, ['node_modules'])));
+            } else if (Array.isArray(bundle.nodeModules)) {
+                bundle.nodeModules.forEach((srcPath) => {
+                    // Each source value should be a string
+                    if (isStringWithValue(srcPath)) {
+                        bundleFiles = bundleFiles.concat(getGlob(prefixRootPath(srcPath, ['node_modules'])));
+                    }
+                });
+            }
+        }
+        // Process the src files
+        if (typeof bundle.src !== 'undefined') {
+            if (isStringWithValue(bundle.src)) {
+                // Set up the bundle files from the string value and treat as a glob
+                const src = prefixRootSrcPath(bundle.src, [config.data.javascript.src]);
+                const srcGlob = getGlob(src);
+                bundleFiles = bundleFiles.concat(srcGlob);
+                lintFiles = lintFiles.concat(srcGlob);
+            } else if (Array.isArray(bundle.src)) {
+                // Process the array of source files and treat them as a glob
+                bundle.src.forEach((srcPath) => {
+                    // Each source value should be a string
+                    if (isStringWithValue(srcPath)) {
+                        const processedSrc = prefixRootSrcPath(srcPath, [config.data.javascript.src]);
+                        const srcGlob = getGlob(processedSrc);
+                        bundleFiles = bundleFiles.concat(srcGlob);
+                        lintFiles = lintFiles.concat(srcGlob);
+                    }
+                });
+            }
+        }
+
+        let returnData;
+        if (bundleFiles.length > 0) {
+            returnData = {
+                dest: buildPath,
+                lint: lintFiles,
+                src: bundleFiles,
+            };
+        }
+        return returnData;
+    }
+}
+
+/**
  * Prepare the source Javascript files for processing
  */
 const prepareJsConfig = () => {
@@ -42,56 +107,9 @@ const prepareJsConfig = () => {
         // Process Javascript files that should be bundled together and minified
         if (Array.isArray(config.data.javascript.bundles)) {
             config.data.javascript.bundles.forEach((bundle) => {
-                if (isStringWithValue(bundle.build)) {
-                    // Set up the absolute build path
-                    const buildPath = prefixRootThemeBuildPath(bundle.build, [config.data.javascript.build]);
-                    // Set up the bundle files
-                    let bundleFiles = [];
-                    // Set up a separate array of files to lint.
-                    // This is done so that we can exclude the node_modules files from the linting.
-                    let lintFiles = [];
-                    // Process any node_modules files if there are any
-                    if (typeof bundle.nodeModules !== 'undefined') {
-                        if (isStringWithValue(bundle.nodeModules)) {
-                            bundleFiles = bundleFiles.concat(getGlob(prefixRootPath(bundle.nodeModules, ['node_modules'])));
-                        } else if (Array.isArray(bundle.nodeModules)) {
-                            bundle.nodeModules.forEach((srcPath) => {
-                                // Each source value should be a string
-                                if (isStringWithValue(srcPath)) {
-                                    bundleFiles = bundleFiles.concat(getGlob(prefixRootPath(srcPath, ['node_modules'])));
-                                }
-                            });
-                        }
-                    }
-                    // Process the src files
-                    if (typeof bundle.src !== 'undefined') {
-                        if (isStringWithValue(bundle.src)) {
-                            // Set up the bundle files from the string value and treat as a glob
-                            const src = prefixRootSrcPath(bundle.src, [config.data.javascript.src]);
-                            const srcGlob = getGlob(src);
-                            bundleFiles = bundleFiles.concat(srcGlob);
-                            lintFiles = lintFiles.concat(srcGlob);
-                        } else if (Array.isArray(bundle.src)) {
-                            // Process the array of source files and treat them as a glob
-                            bundle.src.forEach((srcPath) => {
-                                // Each source value should be a string
-                                if (isStringWithValue(srcPath)) {
-                                    const processedSrc = prefixRootSrcPath(srcPath, [config.data.javascript.src]);
-                                    const srcGlob = getGlob(processedSrc);
-                                    bundleFiles = bundleFiles.concat(srcGlob);
-                                    lintFiles = lintFiles.concat(srcGlob);
-                                }
-                            });
-                        }
-                    }
-
-                    if (bundleFiles.length > 0) {
-                        bundles.push({
-                            dest: buildPath,
-                            lint: lintFiles,
-                            src: bundleFiles,
-                        });
-                    }
+                const bundleData = prepareBundle(bundle);
+                if (isObjectWithValues(bundleData)) {
+                    bundles.push(bundleData);
                 }
             });
         }
@@ -110,6 +128,9 @@ const prepareJsConfig = () => {
                     }
                     if (isObjectWithValues(entryPoint.config)) {
                         ep.config = entryPoint.config;
+                    }
+                    if (isObjectWithValues(entryPoint.bundle)) {
+                        ep.bundle = entryPoint.bundle;
                     }
                     entryPoints.push(ep);
                 }
@@ -197,28 +218,45 @@ const lintJs = async (fileGlob) => {
     }
 
     // Create an instance of ESLint with the configuration passed to the function
-    const eslint = new ESLint(options);
+    try {
+        const eslint = new ESLint(options);
 
-    let results = await eslint.lintFiles(filesToLint);
+        let results = await eslint.lintFiles(filesToLint);
 
-    // Apply automatic fixes and output fixed code
-    await ESLint.outputFixes(results);
+        // Apply automatic fixes and output fixed code
+        await ESLint.outputFixes(results);
 
-    // Format the results to remove the root directory from the file paths.
-    results = results.map((result) => {
-        const returnValue = result;
-        returnValue.filePath = removeRootPrefix(result.filePath);
-        return returnValue;
-    });
+        // Format the results to remove the root directory from the file paths.
+        results = results.map((result) => {
+            const returnValue = result;
+            returnValue.filePath = removeRootPrefix(result.filePath);
+            return returnValue;
+        });
 
-    // Format and output the results
-    await eslint.loadFormatter('stylish').then((formatter) => {
-        const formatResults = formatter.format(results);
-        if (formatResults.length > 0) {
-            // eslint-disable-next-line no-console -- Need to output the results
-            console.log(formatResults);
+        // Format and output the results
+        await eslint.loadFormatter('stylish').then((formatter) => {
+            const formatResults = formatter.format(results);
+            if (formatResults.length > 0) {
+                // eslint-disable-next-line no-console -- Need to output the results
+                console.log(formatResults);
+            }
+        });
+    } catch (error) {
+        if (isStringWithValue(error.messageTemplate)) {
+            let errorFile = '';
+            if (isObjectWithValues(error.messageData) && isStringWithValue(error.messageData.pattern)) {
+                errorFile = error.messageData.pattern;
+            }
+            if (error.messageTemplate == 'file-not-found') {
+                fancyLog(logSymbols.warning, chalk.yellow('Could not find file to lint'), errorFile);
+            } else {
+                fancyLog(logSymbols.error, chalk.red('Error running ESLint'), error);
+            }
+        } else {
+            fancyLog(logSymbols.error, chalk.red('Error running ESLint'), error);
         }
-    });
+
+    }
 
     fancyLog(logSymbols.success, chalk.green('Javascript linting finished'));
 };
@@ -280,9 +318,13 @@ const processFile = async (filePath) => {
  * Process a bundle from the config.javascriopt.bundles array
  *
  * @param {Array} bundle The bundle configuration
+ * @param {string} additionalFileContents Additional file contents to add to the bundle
+ * @param {bool} log Whether to log the bundle process
  */
-const processBundle = async (bundle) => {
-    fancyLog(chalk.magenta('Processing Javascript bundle: '), chalk.cyan(removeRootThemeBuildPrefix(bundle.dest)));
+const processBundle = async (bundle, additionalFileContents = '', log = true) => {
+    if (log) {
+        fancyLog(chalk.magenta('Processing Javascript bundle: '), chalk.cyan(removeRootThemeBuildPrefix(bundle.dest)));
+    }
     // Make sure the directory exists
     fs.ensureDirSync(parse(bundle.dest).dir);
 
@@ -339,10 +381,17 @@ const processBundle = async (bundle) => {
         }
     }
 
+    // Add additional file contents if necessary
+    if (isStringWithValue(additionalFileContents)) {
+        stream.write(additionalFileContents);
+    }
+
     // Close stream
     if (!hasError) {
         stream.end();
-        fancyLog(logSymbols.success, chalk.green('Javascript bundle processing finished', chalk.cyan(removeRootThemeBuildPrefix(bundle.dest))));
+        if (log) {
+            fancyLog(logSymbols.success, chalk.green('Javascript bundle processing finished', chalk.cyan(removeRootThemeBuildPrefix(bundle.dest))));
+        }
     } else {
         stream.end();
         fancyLog(logSymbols.error, chalk.red('Javascript bundle processing failed'));
@@ -364,12 +413,15 @@ const processBundle = async (bundle) => {
 const processEsbuild = async (entry) => {
     // Set up the entry point data
     let entryFile = '';
+    let logEntryFile = '';
     let entryConfig = {};
     if (isString(entry)) {
         entryFile = entry;
+        logEntryFile = entry;
     } else if (isObjectWithValues(entry) && isStringWithValue(entry.in)) {
         if (isStringWithValue(entry.out)) {
             entryFile = { in: entry.in, out: entry.out };
+            logEntryFile = entry.in;
         } else {
             entryFile = entry.in;
         }
@@ -377,7 +429,7 @@ const processEsbuild = async (entry) => {
             entryConfig = entry.config;
         }
     }
-    fancyLog(chalk.magenta('Building Javascript'));
+    fancyLog(chalk.magenta('Building Javascript'), chalk.cyan(removeRootPrefix(logEntryFile)));
 
     const buildPath = prefixRootThemeBuildPath(config.data.javascript.build);
 
@@ -411,32 +463,47 @@ const processEsbuild = async (entry) => {
     const result = await ctx.rebuild();
 
     result.outputFiles.forEach((out) => {
-        if (areFilesDifferent(out.text, out.path)) {
-            // Make sure that the destination directory exists
-            const destDir = dirname(out.path);
-            if (!fs.existsSync(destDir)) {
-                fs.mkdirSync(destDir, { recursive: true });
+        let processAsBundle = false;
+        if (entry.bundle) {
+            // The build contents are included with other Javascript files in a bundle.
+            // This is useful if you want to build with esbuild and you want to include
+            // some other libraries in a single Javascript file.
+            const bundleData = prepareBundle(entry.bundle, out.path);
+            if (isObjectWithValues(bundleData)) {
+                processAsBundle = true;
+                processBundle(bundleData, out.text, false);
             }
-            // The file is different so write it to the build directory
-            fs.writeFileSync(out.path, out.text);
-            fancyLog(
-                logSymbols.success,
-                chalk.green('Javascript built:'),
-                chalk.cyan(removeRootPrefix(out.path)),
-            );
-        } else {
-            fancyLog(
-                chalk.yellow(
-                    `Skipping ${removeRootPrefix(out.path)} because the built content is the same as the destination file`,
-                ),
-            );
+        }
+        if (!processAsBundle) {
+            // The build contents are simply written to a file
+            // and are not included in a bundle with other javascript files.
+            if (areFilesDifferent(out.text, out.path)) {
+                // Make sure that the destination directory exists
+                const destDir = dirname(out.path);
+                if (!fs.existsSync(destDir)) {
+                    fs.mkdirSync(destDir, { recursive: true });
+                }
+                // The file is different so write it to the build directory
+                fs.writeFileSync(out.path, out.text);
+                fancyLog(
+                    logSymbols.success,
+                    chalk.green('Javascript built:'),
+                    chalk.cyan(removeRootPrefix(out.path)),
+                );
+            } else {
+                fancyLog(
+                    chalk.yellow(
+                        `Skipping ${removeRootPrefix(out.path)} because the built content is the same as the destination file`,
+                    ),
+                );
+            }
         }
     });
 
     // Call "dispose" when you're done to free up resources
     ctx.dispose();
 
-    fancyLog(logSymbols.success, chalk.green('Javascript build finished'));
+    fancyLog(logSymbols.success, chalk.green('Javascript build finished'), chalk.cyan(removeRootPrefix(logEntryFile)));
 };
 
 /**

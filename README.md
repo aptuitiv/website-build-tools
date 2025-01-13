@@ -70,6 +70,7 @@ While not required for the build tools, is recommended that you also have the fo
   - [Convert legacy gulp build process](docs/actions/Convert-gulp.md)
   - [Copy files](docs/actions/Copy-files.md)
   - [CSS](docs/actions/Css.md)
+  - [Environment file](docs/actions/Environment.md)
   - [Export](docs/actions/Export.md)
   - [Fonts](docs/actions/Fonts.md)
   - [FTP](docs/actions/FTP.md)
