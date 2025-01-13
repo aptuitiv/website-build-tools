@@ -1,5 +1,11 @@
 # Change Log
 
+## v1.16.0 - January 13, 2024
+
+- Added support for bundling an esbuild output with other files.
+- Improved Javascript console logging.
+- Improved Javascript error handling.
+
 ## v1.15.0 - December 16, 2024
 
 - Added the `env` action to build a missing `.env` file for FTP.
