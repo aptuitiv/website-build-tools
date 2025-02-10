@@ -8,7 +8,6 @@ import fancyLog from 'fancy-log';
 import fs from 'fs-extra';
 import logSymbols from 'log-symbols';
 import { parse } from 'path';
-import * as readline from 'node:readline/promises';
 import yaml from 'json-to-pretty-yaml';
 
 import { createEnvFile } from './env.js';
