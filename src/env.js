@@ -50,8 +50,6 @@ const checkForFiles = () => {
 
 /**
  * Process the env request
- *
- * @param {object} args The command line arguments
  */
 export const envHandler = async () => {
     const files = checkForFiles();
