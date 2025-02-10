@@ -42,11 +42,13 @@ let files = [];
  * @returns {object|undefined} The bundle data or undefined if the bundle could not be processed
  */
 const prepareBundle = (bundle, buildPath) => {
-    if (!isStringWithValue(buildPath) && isStringWithValue(bundle.build)) {
+    let returnData;
+    let buildPathParam = buildPath;
+    if (!isStringWithValue(buildPathParam) && isStringWithValue(bundle.build)) {
         // Set up the absolute build path
-        buildPath = prefixRootThemeBuildPath(bundle.build, [config.data.javascript.build]);
+        buildPathParam = prefixRootThemeBuildPath(bundle.build, [config.data.javascript.build]);
     }
-    if (isStringWithValue(buildPath)) {
+    if (isStringWithValue(buildPathParam)) {
         // Set up the bundle files
         let bundleFiles = [];
         // Set up a separate array of files to lint.
@@ -87,17 +89,16 @@ const prepareBundle = (bundle, buildPath) => {
             }
         }
 
-        let returnData;
         if (bundleFiles.length > 0) {
             returnData = {
-                dest: buildPath,
+                dest: buildPathParam,
                 lint: lintFiles,
                 src: bundleFiles,
             };
         }
-        return returnData;
     }
-}
+    return returnData;
+};
 
 /**
  * Prepare the source Javascript files for processing
@@ -247,7 +248,7 @@ const lintJs = async (fileGlob) => {
             if (isObjectWithValues(error.messageData) && isStringWithValue(error.messageData.pattern)) {
                 errorFile = error.messageData.pattern;
             }
-            if (error.messageTemplate == 'file-not-found') {
+            if (error.messageTemplate === 'file-not-found') {
                 fancyLog(logSymbols.warning, chalk.yellow('Could not find file to lint'), errorFile);
             } else {
                 fancyLog(logSymbols.error, chalk.red('Error running ESLint'), error);
@@ -255,7 +256,6 @@ const lintJs = async (fileGlob) => {
         } else {
             fancyLog(logSymbols.error, chalk.red('Error running ESLint'), error);
         }
-
     }
 
     fancyLog(logSymbols.success, chalk.green('Javascript linting finished'));
@@ -319,7 +319,7 @@ const processFile = async (filePath) => {
  *
  * @param {Array} bundle The bundle configuration
  * @param {string} additionalFileContents Additional file contents to add to the bundle
- * @param {bool} log Whether to log the bundle process
+ * @param {boolean} log Whether to log the bundle process
  */
 const processBundle = async (bundle, additionalFileContents = '', log = true) => {
     if (log) {
