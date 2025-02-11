@@ -7,7 +7,7 @@
         "eslint": "eslint --fix --no-warn-ignored .",
         "prettier": "prettier --write .",
         "updateBrowsersList": "npx browserslist@latest --update-db",
-        "watch": "watch-eslint -no-warn-ignored --fix --color ."
+        "watch": "watch-eslint  --fix --color ."
     },
     "repository": {
         "type": "git",
