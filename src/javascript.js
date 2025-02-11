@@ -332,7 +332,10 @@ const processBundle = async (bundle, additionalFileContents = '', log = true) =>
     // This writes to a temporary file first and then copies it to the destination file if the write is successful.
     // This is done so that a partially written file isn't FTP'd to the server.
     const abortController = new AbortController();
-    const tempDest = prefixRootPath(`${config.data.build.temp}/jsbundle.tmp`);
+    // The temporary file gets a random name so that it's unique. This is to prevent any issues with the file being written to
+    // while another processBundle() call is happening. That can give some weird results where files don't have all
+    // the contents that they should.
+    const tempDest = prefixRootPath(`${config.data.build.temp}/jsbundle-${Math.random().toString(20).substring(2, 10)}.tmp`);
     fs.ensureDirSync(prefixRootPath(config.data.build.temp));
     const stream = fs.createWriteStream(tempDest, { flags: 'w', signal: abortController.signal });
 
@@ -348,6 +351,8 @@ const processBundle = async (bundle, additionalFileContents = '', log = true) =>
         // The stream successfully finished.
         // Copy the temp file to the destination file
         fs.copySync(tempDest, bundle.dest);
+        // Remove the temporary file
+        fs.removeSync(tempDest);
     });
 
     // Get the minify optins
