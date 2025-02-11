@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.17.0 - February 11, 2024
+
+- Fixed issue where processing multiple bundles at the same time could end up with empty or incomplete files. The solution was to make sure that the temporary file had a unique name.
+
 ## v1.16.0 - January 13, 2024
 
 - Added support for bundling an esbuild output with other files.

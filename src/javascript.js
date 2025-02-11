@@ -42,11 +42,13 @@ let files = [];
  * @returns {object|undefined} The bundle data or undefined if the bundle could not be processed
  */
 const prepareBundle = (bundle, buildPath) => {
-    if (!isStringWithValue(buildPath) && isStringWithValue(bundle.build)) {
+    let returnData;
+    let buildPathParam = buildPath;
+    if (!isStringWithValue(buildPathParam) && isStringWithValue(bundle.build)) {
         // Set up the absolute build path
-        buildPath = prefixRootThemeBuildPath(bundle.build, [config.data.javascript.build]);
+        buildPathParam = prefixRootThemeBuildPath(bundle.build, [config.data.javascript.build]);
     }
-    if (isStringWithValue(buildPath)) {
+    if (isStringWithValue(buildPathParam)) {
         // Set up the bundle files
         let bundleFiles = [];
         // Set up a separate array of files to lint.
@@ -87,17 +89,16 @@ const prepareBundle = (bundle, buildPath) => {
             }
         }
 
-        let returnData;
         if (bundleFiles.length > 0) {
             returnData = {
-                dest: buildPath,
+                dest: buildPathParam,
                 lint: lintFiles,
                 src: bundleFiles,
             };
         }
-        return returnData;
     }
-}
+    return returnData;
+};
 
 /**
  * Prepare the source Javascript files for processing
@@ -247,7 +248,7 @@ const lintJs = async (fileGlob) => {
             if (isObjectWithValues(error.messageData) && isStringWithValue(error.messageData.pattern)) {
                 errorFile = error.messageData.pattern;
             }
-            if (error.messageTemplate == 'file-not-found') {
+            if (error.messageTemplate === 'file-not-found') {
                 fancyLog(logSymbols.warning, chalk.yellow('Could not find file to lint'), errorFile);
             } else {
                 fancyLog(logSymbols.error, chalk.red('Error running ESLint'), error);
@@ -255,7 +256,6 @@ const lintJs = async (fileGlob) => {
         } else {
             fancyLog(logSymbols.error, chalk.red('Error running ESLint'), error);
         }
-
     }
 
     fancyLog(logSymbols.success, chalk.green('Javascript linting finished'));
@@ -319,7 +319,7 @@ const processFile = async (filePath) => {
  *
  * @param {Array} bundle The bundle configuration
  * @param {string} additionalFileContents Additional file contents to add to the bundle
- * @param {bool} log Whether to log the bundle process
+ * @param {boolean} log Whether to log the bundle process
  */
 const processBundle = async (bundle, additionalFileContents = '', log = true) => {
     if (log) {
@@ -332,7 +332,10 @@ const processBundle = async (bundle, additionalFileContents = '', log = true) =>
     // This writes to a temporary file first and then copies it to the destination file if the write is successful.
     // This is done so that a partially written file isn't FTP'd to the server.
     const abortController = new AbortController();
-    const tempDest = prefixRootPath(`${config.data.build.temp}/jsbundle.tmp`);
+    // The temporary file gets a random name so that it's unique. This is to prevent any issues with the file being written to
+    // while another processBundle() call is happening. That can give some weird results where files don't have all
+    // the contents that they should.
+    const tempDest = prefixRootPath(`${config.data.build.temp}/jsbundle-${Math.random().toString(20).substring(2, 10)}.tmp`);
     fs.ensureDirSync(prefixRootPath(config.data.build.temp));
     const stream = fs.createWriteStream(tempDest, { flags: 'w', signal: abortController.signal });
 
@@ -348,6 +351,8 @@ const processBundle = async (bundle, additionalFileContents = '', log = true) =>
         // The stream successfully finished.
         // Copy the temp file to the destination file
         fs.copySync(tempDest, bundle.dest);
+        // Remove the temporary file
+        fs.removeSync(tempDest);
     });
 
     // Get the minify optins
