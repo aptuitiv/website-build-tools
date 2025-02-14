@@ -85,5 +85,7 @@ While not required for the build tools, is recommended that you also have the fo
   - [Watch](docs/actions/Watch.md)
 - [Configuration](docs/Configuration.md)
   - [Configuring CSS](docs/configuration/Css.md).
+  - [Configuring Icons](docs/configuration/Icons.md)
+  - [Configuring Images](docs/configuration/Images.md)
   - [Configuring Javascript](docs/configuration/Javascript.md)
   - [Recommended package.json scripts](docs/configuration/Package-json-scripts.md)

@@ -244,9 +244,11 @@ program
     .alias('icons')
     .addOption(configFileOption)
     .addOption(rootOption)
+    .option('-p, --path <folderPath>', 'Path to the icon folder. For example, "icons".')
+    .option('-o, --output <filePath>', 'The path, including the file name, for the output Twig file within the "templates" folder. For example, "snippets/svg-icons.twig".')
     .action(async (args) => {
         await config.init(args);
-        iconHandler();
+        iconHandler(args);
     });
 
 /**

@@ -13,17 +13,28 @@ import Sprite from 'svg-sprite';
 
 // Build files
 import config from './config.js';
-import { prefixPath, prefixRootSrcPath, removePrefix } from './helpers.js';
+import {
+    prefixPath, prefixRootSrcPath, removePrefix, removeRootSrcPrefix,
+} from './helpers.js';
+import { isObjectWithValues, isStringWithValue } from './lib/types.js';
 
 /**
  * Create the icon sprite
  *
+ * @param {string} srcFolderPath  The path to the icon source folder. i.e. "icons".
+ * @param {string} outputPath The path to the output file. i.e. "snippets/svg-icons.twig".
  * @returns {Promise}
  */
-export const createIconSprite = async () => {
-    fancyLog(chalk.magenta('Creating icon sprite'));
+export const createIconSprite = async (srcFolderPath, outputPath) => {
     // Get the absolute path to the icons folder
-    const iconPath = prefixRootSrcPath(config.data.icons.src);
+    const iconPath = prefixRootSrcPath(srcFolderPath);
+    let buildPath = prefixRootSrcPath(
+        prefixPath(outputPath, config.data.templates.src),
+    );
+    if (!buildPath.endsWith('.twig')) {
+        buildPath = `${buildPath}.twig`;
+    }
+    fancyLog(chalk.magenta('Creating icon sprite from folder'), chalk.cyan(removeRootSrcPrefix(iconPath)), chalk.magenta('to file'), chalk.cyan(removeRootSrcPrefix(buildPath)));
 
     // Get all the svg files in the icons folder
     const files = globSync(`${iconPath}/**/*.svg`);
@@ -70,10 +81,7 @@ export const createIconSprite = async () => {
         // Generate the sprite
         const { data } = await spriteObj.compileAsync();
 
-        // Set up the build path and make sure that the folder exists
-        const buildPath = prefixRootSrcPath(
-            prefixPath(config.data.icons.build, config.data.templates.src),
-        );
+        // Make sure that the build folder folder exists
         fs.ensureDirSync(dirname(buildPath));
 
         // The result sprite contains some code that we don't want so we use
@@ -95,8 +103,51 @@ export const createIconSprite = async () => {
 };
 
 /**
- * Process the icon request
+ * Process all the icon folders, or a single folder
+ *
+ * @param {object} args The command line arguments, if there are any
+ * @returns {Promise}
  */
-export const iconHandler = async () => {
-    await createIconSprite();
+const processIcons = async (args) => new Promise((resolve) => {
+    const promises = [];
+    if (isObjectWithValues(args)) {
+        if (isStringWithValue(args.path) && isStringWithValue(args.output)) {
+            promises.push(createIconSprite(args.path, args.output));
+        } else if (isStringWithValue(args.path)) {
+            config.data.icons.forEach((iconConfig) => {
+                if (isStringWithValue(iconConfig.src) && iconConfig.src === args.path) {
+                    promises.push(createIconSprite(iconConfig.src, iconConfig.build));
+                }
+            });
+            if (promises.length === 0) {
+                fancyLog(
+                    logSymbols.error,
+                    chalk.red(`The path "${args.path}" was not found in the icons configuration`),
+                );
+            }
+        } else {
+            fancyLog(
+                logSymbols.error,
+                chalk.red(`The "path" and "output" arguments are required. You passed: ${Object.keys(args).join(', ')}`),
+            );
+        }
+    } else if (Array.isArray(config.data.icons)) {
+        config.data.icons.forEach((iconConfig) => {
+            if (isStringWithValue(iconConfig.src) && isStringWithValue(iconConfig.build)) {
+                promises.push(createIconSprite(iconConfig.src, iconConfig.build));
+            }
+        });
+    }
+    Promise.all(promises).then(() => {
+        resolve();
+    });
+});
+
+/**
+ * Process the icon request
+ *
+ * @param {object} args The command line arguments
+ */
+export const iconHandler = async (args) => {
+    await processIcons(args);
 };

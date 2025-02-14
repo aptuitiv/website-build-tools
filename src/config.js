@@ -51,12 +51,14 @@ const defaultConfig = {
         // Whether to do a growl notification when a file is uploaded or deleted via FTP.
         notify: true,
     },
-    icons: {
-        // The path to the Twig file within the src templates folder that the icon sprite will be created in
-        build: 'snippets/svg-icons.twig',
-        // The source folder for the svg icon files within the root source folder. (config.src)
-        src: 'icons',
-    },
+    icons: [
+        {
+            // The path to the Twig file within the src templates folder that the icon sprite will be created in
+            build: 'snippets/svg-icons.twig',
+            // The source folder for the svg icon files within the root source folder. (config.src)
+            src: 'icons',
+        },
+    ],
     images: {
         // The folder for the images within the theme build folder. (config.build.theme)
         build: 'images',
@@ -191,8 +193,10 @@ class Config {
                 ) {
                     foundConfig = cosmiconfigResult.config;
                 }
-                // Merge the default configuration with the configuration file contents
-                return deepmerge(defaultConfig, foundConfig);
+                // Merge the default configuration with the configuration file contents.
+                // If there are arrays, overwrite the default array with the found array.
+                // https://github.com/TehShrike/deepmerge?tab=readme-ov-file#arraymerge
+                return deepmerge(defaultConfig, foundConfig, { arrayMerge: (destinationArray, sourceArray) => sourceArray });
             },
             searchStrategy: 'project',
         });

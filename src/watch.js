@@ -22,6 +22,7 @@ import {
     removeTemplateFileFromBuild,
 } from './template.js';
 import { copyThemeSrcToBuild, removeThemeFileFromBuild } from './theme.js';
+import { isStringWithValue } from './lib/types.js';
 
 /**
  * Process the watch request
@@ -109,19 +110,25 @@ const watchHandler = async () => {
     });
 
     // Watch for any icon changes
-    const iconFolder = prefixRootSrcPath(config.data.icons.src);
-    fancyLog(
-        chalk.magenta('Watching for changes in the icons folder'),
-        chalk.cyan(prefixSrcPath(config.data.icons.src)),
-    );
-    chokidar.watch(iconFolder, {
-        // Only watch SVG files
-        // https://github.com/paulmillr/chokidar?tab=readme-ov-file#upgrading
-        ignored: (path, stats) => stats?.isFile() && !path.endsWith('.svg'),
-        ignoreInitial: true,
-    }).on('all', () => {
-        createIconSprite();
-    });
+    if (Array.isArray(config.data.icons)) {
+        config.data.icons.forEach((iconConfig) => {
+            if (isStringWithValue(iconConfig.src) && isStringWithValue(iconConfig.build)) {
+                const iconFolder = prefixRootSrcPath(iconConfig.src);
+                fancyLog(
+                    chalk.magenta('Watching for changes in the icons folder'),
+                    chalk.cyan(prefixSrcPath(iconConfig.src)),
+                );
+                chokidar.watch(iconFolder, {
+                    // Only watch SVG files
+                    // https://github.com/paulmillr/chokidar?tab=readme-ov-file#upgrading
+                    ignored: (path, stats) => stats?.isFile() && !path.endsWith('.svg'),
+                    ignoreInitial: true,
+                }).on('all', () => {
+                    createIconSprite(iconConfig.src, iconConfig.build);
+                });
+            }
+        });
+    }
 
     // Watch for any image file changes
     const imageSrcFolder = prefixSrcPath(config.data.images.src);

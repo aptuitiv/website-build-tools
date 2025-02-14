@@ -6,7 +6,6 @@
     - [Build configuration](#build-configuration)
     - [Font configuration](#font-configuration)
     - [FTP configuration](#ftp-configuration)
-    - [Icon configuration](#icon-configuration)
     - [Template configuration](#template-configuration)
     - [Theme configuration files configuration](#theme-configuration-files-configuration)
   - [More information](#more-information)
@@ -87,9 +86,7 @@ See these examples:
 | fonts.src | 'fonts' | The source folder for the fonts within the root source folder. (config.src) |
 | ftp | | FTP configuration. |
 | ftp.notify | true | Whether to do a growl notification when a file is uploaded or deleted via FTP. |
-| icons | | [Icon file configuration](#icon-configuration). |
-| icons.build | 'snippets/svg-icons.twig' | The path to the Twig file within the src templates folder that the icon sprite will be created in. |
-| icons.src | 'icons' | The source folder for the svg icon files within the root source folder. (config.src) |
+| icons | `[{build: 'snippets/svg-icons.twig', src: 'icons'}]` | [Icon file configuration](configuration/Icons). |
 | images | | [Image file configuration](configuration/Images.md). |
 | images.build | 'images' | The folder for the images within the theme build folder. (config.build.theme) |
 | images.optimizations | | [Image optimization configuration](configuration/Images.md#image-optimizations). |
@@ -149,19 +146,6 @@ You can configure the FTP behavior with the `ftp` configuration.
 {
     ftp: {
         notify: false
-    }
-}
-```
-
-### Icon configuration
-
-You can configure the Twig file to build to and the source folder for the icons with the `icon` configuration.
-
-```js
-{
-    icons: {
-        build: 'snippets/svg-icons.twig',
-        src: 'icons',
     }
 }
 ```
