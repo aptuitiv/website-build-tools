@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.18.0 - February 14, 2024
+
+- Added support for processing multiple SVG icon folders. This involved updating the `icons` configuration to be an array of objects and adding support for `path` and `output` options to the `icons` CLI.
+
 ## v1.17.0 - February 11, 2024
 
 - Fixed issue where processing multiple bundles at the same time could end up with empty or incomplete files. The solution was to make sure that the temporary file had a unique name.
