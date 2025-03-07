@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.19.0 - March 7, 2024
+
+- Include cjs and mjs files when linting Javascript.
+
 ## v1.18.0 - February 14, 2024
 
 - Added support for processing multiple SVG icon folders. This involved updating the `icons` configuration to be an array of objects and adding support for `path` and `output` options to the `icons` CLI.
