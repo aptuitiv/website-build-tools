@@ -172,7 +172,7 @@ const getSrcPath = (filePath) => {
  */
 const lintJs = async (fileGlob) => {
     // Get the glob of files to lint
-    const filesToLint = fileGlob || prefixRootSrcPath(`${config.data.javascript.src}/**/*.js`);
+    const filesToLint = fileGlob || prefixRootSrcPath(`${config.data.javascript.src}/**/*.{js,cjs,mjs}`);
 
     if (isString(filesToLint)) {
         fancyLog(
