@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.20.0 - March 7, 2024
+
+- Added additional scripts to the package.json file.
+
 ## v1.19.0 - March 7, 2024
 
 - Include cjs and mjs files when linting Javascript.
