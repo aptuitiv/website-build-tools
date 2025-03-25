@@ -11,6 +11,7 @@ import logSymbols from 'log-symbols';
 import { dirname, parse } from 'path';
 import { minify } from 'terser';
 import aptuitivEslint from '@aptuitiv/eslint-config-aptuitiv';
+import inlineWorkerPlugin from './esbuild/plugin-inline-worker/index.js';
 
 // Build scripts
 import config from './config.js';
@@ -459,6 +460,7 @@ const processEsbuild = async (entry) => {
         outdir: buildPath,
         platform: 'browser',
         write: false,
+        plugins: [inlineWorkerPlugin()]
     };
 
     // Get the esbuild context

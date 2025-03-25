@@ -13,6 +13,7 @@ In the [configuration file](/docs/Configuration.md) you will want to set up how 
     - [Importing other files](#importing-other-files)
     - [Beware of circular import/require](#beware-of-circular-importrequire)
     - [Bundle the esbuild output with another file](#bundle-the-esbuild-output-with-another-file)
+    - [Web workers with esbuild](#web-workers-with-esbuild)
   - [Linting Javascript](#linting-javascript)
   - [Minify Javascript](#minify-javascript)
 
@@ -368,6 +369,47 @@ Here is another example that includes a node_modules file and a few local Javasc
         ]
     } 
 }
+```
+
+### Web workers with esbuild
+
+[Web workers](https://developer.mozilla.org/en-US/docs/Web/API/Worker) provide a way to run some code outside of the main thread. They are useful for performance improvements. However, they require importing a JS file from a URL. If you don't want to do that then you can use a slightly different format to setup the web worker and the JS code for the web worker can be imported locally into your file.
+
+Our esbuild plugin is based on [esbuild-plugin-inline-worker](https://github.com/mitschabaude/esbuild-plugin-inline-worker) with a few modifications.
+
+Your web worker file name must end in one of the following:
+
+- `.worker.js`
+- `.worker.cjs`
+- `.worker.jsx`
+- `.worker.ts`
+- `.worker.tsx`
+
+In your web worker file have your code without any exports. For example:
+
+```js
+// example.worker.js
+onmessage = (e) => {
+    console.log('Received data: ', e.data);
+}
+
+postMessage('Some data to send back');
+```
+
+In your file that will use the web worker, import your web worker file.
+
+```js
+// example.js
+
+// Import the web worker file. esbuild will convert "Worker" to a web worker Worker constructor.
+// You could use anything for the "Worker" variable.
+// https://developer.mozilla.org/en-US/docs/Web/API/Worker
+import Worker from './example.worker.js';
+
+// Create the web worker object
+const myWorker = new Worker();
+// use the web worker object
+myWorker.postMessage('Hi web worker!');
 ```
 
 ## Linting Javascript
