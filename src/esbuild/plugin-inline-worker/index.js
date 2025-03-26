@@ -88,7 +88,7 @@ async function buildWorker(workerPath, extraConfig) {
         entryPoints: [workerPath],
         minify: false,
         outfile: bundlePath,
-        format: 'cjs',
+        format: 'esm',
         ...extraConfig,
     });
 
