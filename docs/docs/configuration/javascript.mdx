@@ -420,7 +420,25 @@ eslint: {
 }
 ```
 
-The ignore path should start in the `javascript.src` directory.
+(See [eslint Ignore Files](https://eslint.org/docs/latest/use/configure/ignore)) for more information.)
+
+The ignore path should start in the `javascript.src` directory. Assuming that `javascript.src` equals `src/js` then the above example would ignore `src/js/fslightbox.js`.
+
+You can also ignore directories. For example, to ignore the `src/js/maps` directory you would do this:
+
+```js
+eslint: {
+    ignores: ['maps/']
+}
+```
+
+You can ignore both files and directories.
+
+```js
+eslint: {
+    ignores: ['fslightbox.js', 'maps/']
+}
+```
 
 If you're just ignoring files, you could also add a `.eslintignore` file in your project root. But, for consistency with keeping all build functionality in one place, we recommend that you put any eslint ignores in the configuration file as described above. (If you do use the `.eslintignore` file then be sure to include the `javascript.src` dirctory in the ignore path.)
 
