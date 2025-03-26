@@ -11,6 +11,10 @@ import { isObjectWithValues } from '../../lib/types.js';
 
 export { inlineWorkerPlugin as default };
 
+/**
+ *
+ * @param extraConfig
+ */
 function inlineWorkerPlugin(extraConfig) {
     return {
         name: 'esbuild-plugin-inline-worker',
@@ -23,7 +27,7 @@ function inlineWorkerPlugin(extraConfig) {
                     //   encoding: 'utf-8',
                     // });
 
-                    let workerCode = await buildWorker(workerPath, extraConfig);
+                    const workerCode = await buildWorker(workerPath, extraConfig);
                     return {
                         contents: `import inlineWorker from '__inline-worker'
 export default function Worker() {
@@ -47,29 +51,30 @@ export default function inlineWorker(scriptText) {
 }
 `;
 
-            build.onResolve({ filter: /^__inline-worker$/ }, ({ path }) => {
-                return { path, namespace: 'inline-worker' };
-            });
-            build.onLoad({ filter: /.*/, namespace: 'inline-worker' }, () => {
-                return { contents: inlineWorkerFunctionCode, loader: 'js' };
-            });
+            build.onResolve({ filter: /^__inline-worker$/ }, ({ path }) => ({ path, namespace: 'inline-worker' }));
+            build.onLoad({ filter: /.*/, namespace: 'inline-worker' }, () => ({ contents: inlineWorkerFunctionCode, loader: 'js' }));
         },
     };
 }
 
 
 
-let cacheDir = findCacheDir({
+const cacheDir = findCacheDir({
     name: 'esbuild-plugin-inline-worker',
     create: true,
 });
 
+/**
+ *
+ * @param workerPath
+ * @param extraConfig
+ */
 async function buildWorker(workerPath, extraConfig) {
-    let scriptNameParts = path.basename(workerPath).split('.');
+    const scriptNameParts = path.basename(workerPath).split('.');
     scriptNameParts.pop();
     scriptNameParts.push('js');
-    let scriptName = scriptNameParts.join('.');
-    let bundlePath = path.resolve(cacheDir, scriptName);
+    const scriptName = scriptNameParts.join('.');
+    const bundlePath = path.resolve(cacheDir, scriptName);
 
     if (extraConfig) {
         delete extraConfig.entryPoints;

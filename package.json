@@ -26,7 +26,7 @@
         "watch-eslint": "^1.1.0"
     },
     "dependencies": {
-        "@aptuitiv/eslint-config-aptuitiv": "^1.0.0",
+        "@aptuitiv/eslint-config-aptuitiv": "^1.1.0",
         "acorn": "^8.12.1",
         "acorn-walk": "^8.3.4",
         "autoprefixer": "^10.4.20",
@@ -39,7 +39,7 @@
         "deepmerge": "^4.3.1",
         "dotenv": "^16.4.5",
         "esbuild": "0.23.1",
-        "eslint": "^9.10.0",
+        "eslint": "^9.23.0",
         "fancy-log": "^2.0.0",
         "find-cache-dir": "^5.0.0",
         "fs-extra": "^11.2.0",
