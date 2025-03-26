@@ -9,11 +9,53 @@ import fs from 'fs';
 import path from 'path';
 import { isObjectWithValues } from '../../lib/types.js';
 
-export { inlineWorkerPlugin as default };
+
+const cacheDir = findCacheDir({
+    name: 'esbuild-plugin-inline-worker',
+    create: true,
+});
 
 /**
+ * Build the worker file using esbuild
  *
- * @param extraConfig
+ * @param {string} workerPath The path to the worker file
+ * @param {object} extraConfig Optional configuration to pass to esbuild when building the worker file.
+ * @returns {Promise<string>}
+ */
+async function buildWorker(workerPath, extraConfig) {
+    const scriptNameParts = path.basename(workerPath).split('.');
+    scriptNameParts.pop();
+    scriptNameParts.push('js');
+    const scriptName = scriptNameParts.join('.');
+    const bundlePath = path.resolve(cacheDir, scriptName);
+
+    // Remove configuration options that are not needed for the worker build
+    const config = { ...extraConfig };
+    if (config) {
+        delete config.entryPoints;
+        delete config.outfile;
+        delete config.outdir;
+        delete config.workerName;
+    }
+
+    await esbuild.build({
+        bundle: true,
+        entryPoints: [workerPath],
+        minify: false,
+        outfile: bundlePath,
+        format: 'esm',
+        ...config,
+    });
+
+    return fs.promises.readFile(bundlePath, { encoding: 'utf-8' });
+}
+
+
+/**
+ * InlineWorkerPlugin
+ *
+ * @param {object} [extraConfig] Optional configuration to pass to esbuild when building the worker file.
+ * @returns {object} The esbuild plugin object.
  */
 function inlineWorkerPlugin(extraConfig) {
     return {
@@ -51,7 +93,7 @@ export default function inlineWorker(scriptText) {
 }
 `;
 
-            build.onResolve({ filter: /^__inline-worker$/ }, ({ path }) => ({ path, namespace: 'inline-worker' }));
+            build.onResolve({ filter: /^__inline-worker$/ }, ({ resolvePath }) => ({ path: resolvePath, namespace: 'inline-worker' }));
             build.onLoad({ filter: /.*/, namespace: 'inline-worker' }, () => ({ contents: inlineWorkerFunctionCode, loader: 'js' }));
         },
     };
@@ -59,38 +101,8 @@ export default function inlineWorker(scriptText) {
 
 
 
-const cacheDir = findCacheDir({
-    name: 'esbuild-plugin-inline-worker',
-    create: true,
-});
 
-/**
- *
- * @param workerPath
- * @param extraConfig
- */
-async function buildWorker(workerPath, extraConfig) {
-    const scriptNameParts = path.basename(workerPath).split('.');
-    scriptNameParts.pop();
-    scriptNameParts.push('js');
-    const scriptName = scriptNameParts.join('.');
-    const bundlePath = path.resolve(cacheDir, scriptName);
 
-    if (extraConfig) {
-        delete extraConfig.entryPoints;
-        delete extraConfig.outfile;
-        delete extraConfig.outdir;
-        delete extraConfig.workerName;
-    }
 
-    await esbuild.build({
-        bundle: true,
-        entryPoints: [workerPath],
-        minify: false,
-        outfile: bundlePath,
-        format: 'esm',
-        ...extraConfig,
-    });
 
-    return fs.promises.readFile(bundlePath, { encoding: 'utf-8' });
-}
+export default inlineWorkerPlugin;
