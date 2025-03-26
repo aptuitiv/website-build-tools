@@ -15,7 +15,7 @@ There are three ways that Javascript files can be processed.
 2. As a single file that is minified and then output in the build folder. The only processing is to minimize the file. This is ideal for simple files.
 3. Build the Javascript files with [esbuild](https://esbuild.github.io/). This option is ideal for more complex Javascript. It supports importing during the build process. The output is a minimized file in the [IIFE](https://esbuild.github.io/api/#format-iife) format.
 
-### Javascript bundles
+## Javascript bundles
 
 You can concat Javascript files together and minify the output before saving to the build folder. The `javascript.bundles` configuration array holds that inforamation.
 
@@ -95,7 +95,7 @@ Here are some examples:
 }
 ```
 
-### Single Javascript files
+## Single Javascript files
 
 If you don't need to bundle a file with another set of files then you can use the `javascript.files` configuration array to specify files to minify and copy to the build directory.
 
@@ -114,13 +114,13 @@ The `javascript.files` array is an array of file paths where the file path start
 
 The files are minified and output in the build directory in the Javascript build directory (`javascript.build`) with the same file name and path.
 
-### Building Javascript files with esbuild
+## Building Javascript files with esbuild
 
 If your Javascript is more complex and you want to utilize importing files then this is the best option.
 
 You can also bundle the esbuild output with another Javascript file. This is useful if you have a library that you want to include on all pages but you don't want to do another network request from the browser to get it.
 
-#### Configure the entry point files
+### Configure the entry point files
 
 You configure an entry file for your Javascript and in that file you can import other files. The other files can also have their own imports if you want.
 
@@ -180,7 +180,7 @@ You can leave out the `out` value. If you do then the output file name will matc
 }
 ```
 
-#### Configuring esbuild
+### Configuring esbuild
 
 The default [esbuild](https://esbuild.github.io/) configuration that can be overridden is:
 
