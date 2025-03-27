@@ -93,7 +93,7 @@ export default function inlineWorker(scriptText) {
 }
 `;
 
-            build.onResolve({ filter: /^__inline-worker$/ }, ({ resolvePath }) => ({ path: resolvePath, namespace: 'inline-worker' }));
+            build.onResolve({ filter: /^__inline-worker$/ }, (resolveData) => ({ path: resolveData.path, namespace: 'inline-worker' }));
             build.onLoad({ filter: /.*/, namespace: 'inline-worker' }, () => ({ contents: inlineWorkerFunctionCode, loader: 'js' }));
         },
     };
