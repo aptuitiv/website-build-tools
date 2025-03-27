@@ -1,125 +1,204 @@
-# Change Log
+# Changelog
+<!-- markdownlint-disable MD024 -->
 
-## v1.20.0 - March 7, 2024
+All notable changes to this project will be documented in this file.
 
-- Added additional scripts to the package.json file.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v1.19.0 - March 7, 2024
+## [1.20.0] - 2024-03-07
 
-- Include cjs and mjs files when linting Javascript.
+### Added
 
-## v1.18.0 - February 14, 2024
+- Additional scripts to the `package.json` file.
 
-- Added support for processing multiple SVG icon folders. This involved updating the `icons` configuration to be an array of objects and adding support for `path` and `output` options to the `icons` CLI.
+## [1.19.0] - 2024-03-07
 
-## v1.17.0 - February 11, 2024
+### Added
 
-- Fixed issue where processing multiple bundles at the same time could end up with empty or incomplete files. The solution was to make sure that the temporary file had a unique name.
+- Include `cjs` and `mjs` files when linting JavaScript.
 
-## v1.16.0 - January 13, 2024
+## [1.18.0] - 2024-02-14
 
-- Added support for bundling an esbuild output with other files.
-- Improved Javascript console logging.
-- Improved Javascript error handling.
+### Added
 
-## v1.15.0 - December 16, 2024
+- Support for processing multiple SVG icon folders.
+- Updated the `icons` configuration to be an array of objects.
+- Added `path` and `output` options to the `icons` CLI.
 
-- Added the `env` action to build a missing `.env` file for FTP.
+## [1.17.0] - 2024-02-11
 
-## v1.14.0 - September 23, 2024
+### Fixed
 
-- Expanded the Javascript watch to include cjs and mjs files.
-- Added support for processing Javascript with esbuild.
-- Updated packages.
-- Updated eslint to version 9.
+- Issue where processing multiple bundles at the same time could result in empty or incomplete files by ensuring temporary files have unique names.
 
-## v1.13.2 - September 4, 2024
+## [1.16.0] - 2024-01-13
 
-- Don't remove the temp file when building code. This was sometimes causing an `ENOENT: no such file or directory` error when building files.
+### Added
 
-## v1.13.1 - August 14, 2024
+- Support for bundling an esbuild output with other files.
 
-- Fixed build path.
+### Improved
 
-## v1.13 - August 14, 2024
+- JavaScript console logging.
+- JavaScript error handling.
 
-- Added support for gracefully handling Javascript processing errors.
+## [1.15.0] - 2024-12-16
 
-## v1.12 - July 23, 2024
+### Added
 
-- Added support for matching a javascript file in multiple bundles.
+- The `env` action to build a missing `.env` file for FTP.
 
-## v1.11 - July 11, 2024
+## [1.14.0] - 2024-09-23
 
-- Updated aptuitiv eslint config library.
-- Updated other packages.
+### Added
 
-## v1.10 - May 14, 2024
+- Expanded JavaScript watch to include `cjs` and `mjs` files.
+- Support for processing JavaScript with esbuild.
 
-- Added support for [postcss extend plugin](https://github.com/travco/postcss-extend) that allows a developer to use `@extend` syntax.
+### Updated
 
-## v1.9 - April 10, 2024
+- Packages.
+- ESLint to version 9.
 
-- Added additional packages to remove when replacing gulp.
+## [1.13.2] - 2024-09-04
 
-## v1.8 - March 14, 2024
+### Fixed
 
-- Improved messaging for different actions.
-- Added support for skipping certain files when copying folders.
+- Prevent removal of the temp file when building code to avoid `ENOENT: no such file or directory` errors.
 
-## v1.7 - March 13, 2024
+## [1.13.1] - 2024-08-14
 
-- Update to the gulp convert process.
-- Improvements to setting up the package.json scripts section.
-- Improvements to exporting a site.
-- Added support for running npm install during the initialization task.
+### Fixed
 
-## v1.6 - March 12, 2024
+- Build path.
 
-- Added support for converting older legacy gulp build processes to using this build tool.
+## [1.13.0] - 2024-08-14
 
-## v1.5.1 - March 11, 2024
+### Added
 
-- Fixed issue when copying an array of files.
+- Graceful handling of JavaScript processing errors.
 
-## v1.5 - March 11, 2024
+## [1.12.0] - 2024-07-23
 
-- Added support for converting a legacy gulp build process to use these build tools.
-- Added `package-json` actions to format the package.json file.
+### Added
 
-## v1.4.1 - March 8, 2024
+- Support for matching a JavaScript file in multiple bundles.
 
-- Removed console.log.
+## [1.11.0] - 2024-07-11
 
-## v1.4 - March 8, 2024
+### Updated
 
-- Added `init` action to help set up the config file and the `.env` file.
+- Aptuitiv ESLint config library.
+- Other packages.
 
-## v1.3.2 - March 6, 2024
+## [1.10.0] - 2024-05-14
 
-- Fixed the stylelint `fix` option.
+### Added
 
-## v1.3.1 - March 6, 2024
+- Support for [postcss extend plugin](https://github.com/travco/postcss-extend) to allow the use of `@extend` syntax.
 
-- Fixed issue where the closing icon SVG tag was missing.
-  
-## v1.3 - March 6, 2024
+## [1.9.0] - 2024-04-10
 
-- Fixed issue where node_modules code wasn’t included in the script bundle.
-- Separate the Javascript bundle files from files to lint.
+### Added
+
+- Additional packages to remove when replacing Gulp.
+
+## [1.8.0] - 2024-03-14
+
+### Improved
+
+- Messaging for different actions.
+
+### Added
+
+- Support for skipping certain files when copying folders.
+
+## [1.7.0] - 2024-03-13
+
+### Updated
+
+- Gulp convert process.
+
+### Improved
+
+- Setting up the `package.json` scripts section.
+- Exporting a site.
+
+### Added
+
+- Support for running `npm install` during the initialization task.
+
+## [1.6.0] - 2024-03-12
+
+### Added
+
+- Support for converting older legacy Gulp build processes to use this build tool.
+
+## [1.5.1] - 2024-03-11
+
+### Fixed
+
+- Issue when copying an array of files.
+
+## [1.5.0] - 2024-03-11
+
+### Added
+
+- Support for converting a legacy Gulp build process to use these build tools.
+- `package-json` actions to format the `package.json` file.
+
+## [1.4.1] - 2024-03-08
+
+### Removed
+
+- `console.log`.
+
+## [1.4.0] - 2024-03-08
+
+### Added
+
+- `init` action to help set up the config file and the `.env` file.
+
+## [1.3.2] - 2024-03-06
+
+### Fixed
+
+- Stylelint `fix` option.
+
+## [1.3.1] - 2024-03-06
+
+### Fixed
+
+- Missing closing icon SVG tag.
+
+## [1.3.0] - 2024-03-06
+
+### Fixed
+
+- Issue where `node_modules` code wasn’t included in the script bundle.
+
+### Changed
+
+- Separated JavaScript bundle files from files to lint.
 - Only output lint results if there are any.
 
-## v1.2.0 - March 4, 2024
+## [1.2.0] - 2024-03-04
 
-- Fixed issue where the copy path didn’t include the file path in the source folder.
+### Fixed
 
-## v1.1.0 - March 4, 2024
+- Copy path to include the file path in the source folder.
+
+## [1.1.0] - 2024-03-04
+
+### Added
 
 - Documentation updates.
-- Added FTP growl notifier.
-- Added `build` command.
-- Added `start` command.
+- FTP growl notifier.
+- `build` command.
+- `start` command.
 
-## v1.0.0 - March 4, 2024
+## [1.0.0] - 2024-03-04
 
-Initial release.
+### Added
+
+- Initial release.
