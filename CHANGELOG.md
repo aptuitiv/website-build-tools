@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.21.0] - 2024-03-27
+
+### Added
+
+- Added support for eslint inline web worker plugin to support inlining the code for web workers instead of having to import files.
+- Added documentation with Docusaurus. Viewable at <https://aptuitiv.github.io/website-build-tools>.
+
+### Changed
+
+- Updated eslint and eslint configuration.
+- Updated other packages.
+
 ## [1.20.0] - 2024-03-07
 
 ### Added
