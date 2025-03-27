@@ -120,6 +120,87 @@ If your Javascript is more complex and you want to utilize importing files then 
 
 You can also bundle the esbuild output with another Javascript file. This is useful if you have a library that you want to include on all pages but you don't want to do another network request from the browser to get it.
 
+There are two ways to build Javascript files with esbuild.
+
+1. Use ES modules
+2. Use CommonJS
+
+The determination for which method is used depeds on the file extension, how you import files, and how you export objects from a file.
+
+### ES Modules build method
+
+This is our recommended option because it's similar to how modern development is done and it allows you to use [web workers](#web-workers-with-esbuild).
+
+The ES Modules build method requires the following:
+
+* Your files must have the `.js` file extension.
+* You must use `import` to import files.
+* You must use `export` to export objects from a file.
+
+If the entry file exports a variable or an object then that value can be accessed using the `globalName` value in the esbuild configuration and the name of the variable/object. For example, if the `globalName` is set to `products` and your entry file exports an object called `productsController` and that object has a method called `init`,
+then you can access that method in your inline Javascript depending on the way that you export.
+
+```js
+// Entry file
+// Using export default
+const productsController = {
+    init() {
+        console.log('init');
+    }
+}
+export default productsController;
+
+// Using the exported function in some other file
+<script>
+    products.default.init();
+</script>
+```
+
+
+
+```js
+// Entry file
+// Using export
+const productsController = {
+    init() {
+        console.log('init');
+    }
+}
+export {productsController};
+
+// Using the exported function in some other file
+<script>
+    products.productsController.init();
+</script>
+```
+
+The ES Modules is the only way to use web workers in your project.
+
+### CommonJS build method
+
+The CommonJS method requires the following:
+
+* Your files must have the `.cjs` file extension.
+* You must use `require()` to import files.
+* You must use `module.exports` to export objects from a file.
+
+If the entry file exports a variable or object then that value can be accessed using the `globalName` value in the esbuild configuration. For example, if the `globalName` is set to `products` and your entry file exports an object called `productsController` and that object has a method called `init`,
+then you can access that method in your inline Javascript like this:
+
+```js
+<script>
+    products.init();
+</script>
+```
+
+If you don't set the `globalName` value then the exported object will not be available in the global scope.
+
+There are some cons to using the CommonJS method.
+
+1. The file name extension is `.cjs`, which may confuse some of your team.
+2. You can't use [web workers](#web-workers-with-esbuild) with the CommonJS method. The web worker file name must end in `.worker.js` and be imported with `import`. Since `import` doesn't work with CommonJS, web workers can't be used.
+
+
 ### Configure the entry point files
 
 You configure an entry file for your Javascript and in that file you can import other files. The other files can also have their own imports if you want.
@@ -239,30 +320,72 @@ You can use any of the configuration parameters for [esbuild](https://esbuild.gi
 
 The IIFE format wraps the code in a self executing function, thus isolating any variables. If you need to expose a variable to other Javascript (like perhaps some inline Javascript on a page) then you need to set the [globalName](https://esbuild.github.io/api/#global-name) parameter.
 
-In order to properly export the global variable the entry point file that does the export needs to be a Common JS file and have `.csj` as the extension.
+How you use that variable to access your code depends on if you're using the [ES Modules](#es-modules-build-method) method or the [CommonJS method](#commonjs-build-method).
 
-There are two ways to export.
+#### ES Modules global variable
+Use `export` to export.
 
-First, use `module.exports`.
+```js
+const thingToExport = {};
+export default thingToExport;
+```
+If you want to export multiple variables you can do it like this:
+
+```js
+const variable1 = {};
+const variable2 = {};
+
+export default {
+    variable1,
+    variable2
+}
+```
+
+If the entry file exports a variable or an object then that value can be accessed using the `globalName` value in the esbuild configuration and the name of the variable/object. For example, if the `globalName` is set to `products` and your entry file exports an object called `productsController` and that object has a method called `init`,
+then you can access that method in your inline Javascript depending on the way that you export.
+
+```js
+// Entry file
+// Using export default
+const productsController = {
+    init() {
+        console.log('init');
+    }
+}
+export default productsController;
+
+// Using the exported function in some other file
+<script>
+    products.default.init();
+</script>
+```
+
+
+
+```js
+// Entry file
+// Using export
+const productsController = {
+    init() {
+        console.log('init');
+    }
+}
+export {productsController};
+
+// Using the exported function in some other file
+<script>
+    products.productsController.init();
+</script>
+```
+
+#### CommonJS global variable
+
+Use `module.exports` to export.
 
 ```js
 const thingToExport = {};
 
 module.exports = thingToExport;
-```
-
-Secondly, use `exports.default`.
-
-```js
-const thingToExport = {};
-
-exports.default = thingToExport;
-```
-
-If you use `exports` and you only export one thing then you need to use `.default` to access the value. For example:
-
-```js
-thingsToExport.default;
 ```
 
 If you want to export multiple variables you can do it like this:
@@ -274,26 +397,35 @@ module.exports = {
 }
 ```
 
-or
+If the entry file exports a variable or object then that value can be accessed using the `globalName` value in the esbuild configuration. For example, if the `globalName` is set to `products` and your entry file exports an object called `productsController` and that object has a method called `init`,
+then you can access that method in your inline Javascript like this:
 
 ```js
-exports.variable1 = 'something';
-exports.variable2 = 'something';
-```
-
-or
-
-```js
-const variable1 = 'something';
-const variable2 = 'something';
-
-exports.variable1 = variable1;
-exports.variable2 = variable2;
+<script>
+    products.init();
+</script>
 ```
 
 ### Importing other files
 
-You can import other files in your code. It's recommended that if you export something in a file that the file is a Common JS file with `.cjs` as the file extension. You would use `module.exports` to export your variable.
+You can import other files in your code.
+
+#### ES Modules importing
+
+You can import files with the `import` statement. The file name should end in `.js` and the file should be an ES module.
+
+```js
+import { myFunction } from './my-file.js';
+```
+You can also import a default export.
+
+```js
+import myFunction from './my-file.js';
+```
+
+#### CommonJS importing
+
+It's recommended that if you export something in a file that the file is a Common JS file with `.cjs` as the file extension. You would use `module.exports` to export your variable.
 
 If you keep your file as a `.js` file and use `exports.default` then you have to use `.default` when accessing the imported variable. That's why it's better to use the CommonJS `module.exports`.
 
@@ -318,7 +450,7 @@ For example:
     javascript: {
         entryPoints: [
             {
-                in: 'somefile.cjs',
+                in: 'somefile.js',
                 out: 'out-file-name',
                 config: { globalName: 'globalVar' },
                 bundle: {
@@ -343,7 +475,7 @@ Here is another example that includes a node_modules file and a few local Javasc
     javascript: {
         entryPoints: [
             {
-                in: 'main.cjs',
+                in: 'main.js',
                 out: 'main',
                 config: { globalName: 'main' },
                 bundle: {
