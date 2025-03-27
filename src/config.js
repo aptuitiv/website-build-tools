@@ -14,7 +14,7 @@ import { fileURLToPath } from 'url';
 import { isObjectWithValues } from './lib/types.js';
 
 // Get the directory name of the current module
-// eslint-disable-next-line no-underscore-dangle -- The dangle is used to match the __dirname variable in Node.js
+ 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Set up the default configuration

@@ -64,9 +64,12 @@ const runStylelint = async (fileGlob) => {
             defaultSeverity: 'warning', // So that stylelint won't stop on errors and the CSS will still build
             extends: ['stylelint-config-standard'],
             plugins: ['stylelint-order', 'stylelint-selector-bem-pattern'],
-            reportDescriptionlessDisables: true, // https://github.com/stylelint/stylelint/blob/main/docs/user-guide/options.md#reportdescriptionlessdisables
-            reportInvalidScopeDisables: true, // https://github.com/stylelint/stylelint/blob/main/docs/user-guide/options.md#reportinvalidscopedisables
-            reportNeedlessDisables: true, // https://github.com/stylelint/stylelint/blob/main/docs/user-guide/options.md#reportneedlessdisables
+            // https://github.com/stylelint/stylelint/blob/main/docs/user-guide/options.md#reportdescriptionlessdisables
+            reportDescriptionlessDisables: true,
+            // https://github.com/stylelint/stylelint/blob/main/docs/user-guide/options.md#reportinvalidscopedisables
+            reportInvalidScopeDisables: true,
+            // https://github.com/stylelint/stylelint/blob/main/docs/user-guide/options.md#reportneedlessdisables
+            reportNeedlessDisables: true,
             rules: {
                 'at-rule-no-unknown': [true, {
                     // Done to support the @extend, @define-placeholder, @define-extend, and @extend-define rule from https://github.com/travco/postcss-extend

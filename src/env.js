@@ -13,7 +13,9 @@ import * as readline from 'node:readline/promises';
  */
 export const createEnvFile = async () => {
     fancyLog(chalk.magenta('Creating the .env file'));
-    fancyLog(chalk.blue('Setting up the FTP credentials. You can get the username and password from the Settings -> Domain / FTP / DNS  section in the website administration.'));
+    fancyLog(chalk.blue(`Setting up the FTP credentials. You can get the username and password from the 
+        Settings -> Domain / FTP / DNS  section in the website administration.`
+    ));
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,

@@ -1,0 +1,96 @@
+---
+title: Overview
+slug: /
+---
+
+# Aptuitiv website build tools
+
+Build tools to help with building and deploying websites at [Aptuitiv](https://www.aptuitiv.com/).
+
+## Install
+
+We recommend installing the library globally so that you can use `aptuitiv-build` on the command line to run some commands.
+
+```bash
+npm i -g @aptuitiv/website-build-tools
+```
+
+You can also install the library for a single project:
+
+```bash
+npm i - D @aptuitiv/website-build-tools
+```
+
+## Usage
+
+There are two ways to call the build tools.
+
+The first, and recommended way is to call this from the `scripts` section of your `package.json` file.
+
+```json
+"scripts": {
+    "start": "npm run watch",
+    "pull-templates": "aptuitiv-build pull-templates",
+    "push-templates": "aptuitiv-build push-templates",
+    "watch": "aptuitiv-build watch"
+}
+```
+
+See the [Package.json](/configuration/package-json-scripts) page for a full list of recommended scripts.
+
+The other way is using the [command line](/command-line/).
+
+```bash
+aptuitiv-build pull-template
+```
+
+## Expected project structure
+
+These build tools expect the following project structure:
+
+- **build** - The folder that the CSS, Javscript, templates and other assets are built to. The contents of this folder are uploaded to the website via FTP.
+- **src** - The source folder for the CSS, Javascript, template, and other assets.
+  - **config** The folder holding the theme configuration files
+  - **css** The CSS files for the project.
+  - **fonts** Any self-hosted fonts needed for the project.
+  - **icons** Any SVG icons to complile into a sprite.
+  - **js** Any Javascript files for the project.
+  - **templates** The Twig template files.
+- **.aptuitiv-buildrc.js** - The [configuration file](/configuration/) for the build tools.
+- **.env** - The environment file that holds the FTP credentials.
+
+You can configure different paths for your assets in the [configuration file](/configuration/), but we recommend keeping this structure for consistency between projects.
+
+While not required for the build tools, is recommended that you also have the following configuration files in the root of your project.
+
+- **.editorconfig**
+- **.gitignore**
+- **.prettierignore**
+- **.prettierrc.cjs**
+
+## More information
+
+- [Command line usage and actions](/command-line/)
+  - [Build](/command-line/build)
+  - [Convert legacy gulp build process](/command-line/convert-gulp)
+  - [Copy files](/command-line/copy-files)
+  - [CSS](/command-line/css)
+  - [Environment file](/command-line/environment)
+  - [Export](/command-line/export)
+  - [Fonts](/command-line/fonts)
+  - [FTP](/command-line/ftp)
+  - [Icons](/command-line/icons)
+  - [Images](/command-line/images)
+  - [Initialize](/command-line/initialize)
+  - [Javascript](/command-line/javascript)
+  - [Package.json](/command-line/package-json)
+  - [Start](/command-line/start)
+  - [Templates](/command-line/templates)
+  - [Theme configuration](/command-line/theme)
+  - [Watch](/command-line/watch)
+- [Configuration](/configuration/)
+  - [Configuring CSS](/configuration/css).
+  - [Configuring Icons](/configuration/icons)
+  - [Configuring Images](/configuration/images)
+  - [Configuring Javascript](/configuration/javascript)
+  - [Recommended package.json scripts](/configuration/package-json-scripts)

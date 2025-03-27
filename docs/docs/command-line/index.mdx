@@ -1,0 +1,68 @@
+---
+title: Command Line Usage
+---
+
+# Command line usage
+
+The way that you interact with the build tools is through the command line. Even if you've set up `scripts` in your `package.json` file those script commands call the build tool actions through a command line call.
+
+The pattern for a command line call is:
+
+```bash
+aptuitiv-build <action> [parameters]
+```
+
+## Getting help
+
+You can get help by using `--help` or calling `help`.
+
+```bash
+aptuitiv-build --help
+```
+
+or
+
+```bash
+aptuitiv-build help
+```
+
+You can also use `--help` with any of the actions to get help with them.
+
+```bash
+aptuitiv-build css --help
+```
+
+## Changing the root directory
+
+If you're not calling the script from the base directory of your project then you must pass the `--root` argument so that the correct folders paths are used.
+
+```bash
+aptuitiv-build pull-template --root path/to/my/project/root
+```
+
+Or you can do a relative path to the root from the current directory.
+
+```bash
+aptuitiv-build pull-template --root ../../
+```
+
+## Actions
+
+- [Build](/command-line/build)
+- [Convert legacy gulp build process](/command-line/convert-gulp)
+- [Copy files](/command-line/copy-files)
+- [CSS](/command-line/css)
+- [Environment file](/command-line/environment)
+- [Export](/command-line/export)
+- [Fonts](/command-line/fonts)
+- [FTP](/command-line/ftp)
+- [Icons](/command-line/icons)
+- [Images](/command-line/images)
+- [Initialize](/command-line/initialize)
+- [Javascript](/command-line/javascript)
+- [Package.json](/command-line/package-json)
+- [Start](/command-line/start)
+- [Templates](/command-line/templates)
+- [Theme configuration](/command-line/theme)
+- [Watch](/command-line/watch)
+

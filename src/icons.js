@@ -34,7 +34,12 @@ export const createIconSprite = async (srcFolderPath, outputPath) => {
     if (!buildPath.endsWith('.twig')) {
         buildPath = `${buildPath}.twig`;
     }
-    fancyLog(chalk.magenta('Creating icon sprite from folder'), chalk.cyan(removeRootSrcPrefix(iconPath)), chalk.magenta('to file'), chalk.cyan(removeRootSrcPrefix(buildPath)));
+    fancyLog(
+        chalk.magenta('Creating icon sprite from folder'),
+        chalk.cyan(removeRootSrcPrefix(iconPath)),
+        chalk.magenta('to file'),
+        chalk.cyan(removeRootSrcPrefix(buildPath))
+    );
 
     // Get all the svg files in the icons folder
     const files = globSync(`${iconPath}/**/*.svg`);

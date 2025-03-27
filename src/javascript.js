@@ -11,6 +11,7 @@ import logSymbols from 'log-symbols';
 import { dirname, parse } from 'path';
 import { minify } from 'terser';
 import aptuitivEslint from '@aptuitiv/eslint-config-aptuitiv';
+import inlineWorkerPlugin from './esbuild/plugin-inline-worker/index.js';
 
 // Build scripts
 import config from './config.js';
@@ -362,7 +363,7 @@ const processBundle = async (bundle, additionalFileContents = '', log = true) =>
 
     // Process each file in the bundle
     // Cannot use forEach as it doesn't work with async/await. https://stackoverflow.com/a/37576787
-    // eslint-disable-next-line no-restricted-syntax -- We need to use a for loop to use await
+
     for (const file of bundle.src) {
         const contents = fs.readFileSync(file, 'utf-8');
         if (config.data.javascript.minify === false || minifyOptions.compress === false) {
@@ -459,6 +460,7 @@ const processEsbuild = async (entry) => {
         outdir: buildPath,
         platform: 'browser',
         write: false,
+        plugins: [inlineWorkerPlugin()]
     };
 
     // Get the esbuild context

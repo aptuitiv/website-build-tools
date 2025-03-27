@@ -31,7 +31,7 @@ import { themeHandler } from './src/theme.js';
 import watchHandler from './src/watch.js';
 
 // Get the directory name of the current module
-// eslint-disable-next-line no-underscore-dangle -- The dangle is used to match the __dirname variable in Node.js
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Get the current package.json information
@@ -245,7 +245,8 @@ program
     .addOption(configFileOption)
     .addOption(rootOption)
     .option('-p, --path <folderPath>', 'Path to the icon folder. For example, "icons".')
-    .option('-o, --output <filePath>', 'The path, including the file name, for the output Twig file within the "templates" folder. For example, "snippets/svg-icons.twig".')
+    .option('-o, --output <filePath>', `The path, including the file name, 
+        for the output Twig file within the "templates" folder. For example, "snippets/svg-icons.twig".`)
     .action(async (args) => {
         await config.init(args);
         iconHandler(args);

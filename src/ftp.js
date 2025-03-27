@@ -65,7 +65,11 @@ const connect = async (client) => {
         let user = process.env.FTP_USERNAME;
         let pass = process.env.FTP_PASSWORD;
         if (env === 'dev') {
-            if (typeof process.env.FTP_DEV_SERVER === 'string' && typeof process.env.FTP_DEV_USERNAME === 'string' && typeof process.env.FTP_DEV_PASSWORD === 'string') {
+            if (
+                typeof process.env.FTP_DEV_SERVER === 'string'
+                && typeof process.env.FTP_DEV_USERNAME === 'string'
+                && typeof process.env.FTP_DEV_PASSWORD === 'string'
+            ) {
                 server = process.env.FTP_DEV_SERVER;
                 user = process.env.FTP_DEV_USERNAME;
                 pass = process.env.FTP_DEV_PASSWORD;
