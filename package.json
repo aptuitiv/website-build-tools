@@ -60,7 +60,7 @@
         "resolve-from": "^5.0.0",
         "sharp": "^0.33.5",
         "stylelint": "^16.17.0",
-        "stylelint-config-standard": "^36.0.1",
+        "stylelint-config-standard": "^37.0.0",
         "stylelint-order": "^6.0.4",
         "stylelint-selector-bem-pattern": "^4.0.1",
         "svg-sprite": "^2.0.4",
