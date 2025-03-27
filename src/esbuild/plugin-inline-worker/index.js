@@ -3,6 +3,7 @@ This is a plugin for esbuild which allows you to import .worker.js files to get 
 Based on https://github.com/mitschabaude/esbuild-plugin-inline-worker
 =========================================================================== */
 
+/* eslint-env node */
 import esbuild from 'esbuild';
 import findCacheDir from 'find-cache-dir';
 import fs from 'fs';
@@ -16,11 +17,11 @@ const cacheDir = findCacheDir({
 });
 
 /**
- * Build the worker file using esbuild
+ * Build the worker code withi esbuild
  *
  * @param {string} workerPath The path to the worker file
- * @param {object} extraConfig Optional configuration to pass to esbuild when building the worker file.
- * @returns {Promise<string>}
+ * @param {object} extraConfig Any extra configuration for the esbuild build
+ * @returns {string} The worker code
  */
 async function buildWorker(workerPath, extraConfig) {
     const scriptNameParts = path.basename(workerPath).split('.');
@@ -29,7 +30,6 @@ async function buildWorker(workerPath, extraConfig) {
     const scriptName = scriptNameParts.join('.');
     const bundlePath = path.resolve(cacheDir, scriptName);
 
-    // Remove configuration options that are not needed for the worker build
     const config = { ...extraConfig };
     if (config) {
         delete config.entryPoints;
@@ -41,7 +41,7 @@ async function buildWorker(workerPath, extraConfig) {
     await esbuild.build({
         bundle: true,
         entryPoints: [workerPath],
-        minify: false,
+        minify: true,
         outfile: bundlePath,
         format: 'esm',
         ...config,
@@ -50,12 +50,11 @@ async function buildWorker(workerPath, extraConfig) {
     return fs.promises.readFile(bundlePath, { encoding: 'utf-8' });
 }
 
-
 /**
- * InlineWorkerPlugin
+ * Set up the plugin
  *
- * @param {object} [extraConfig] Optional configuration to pass to esbuild when building the worker file.
- * @returns {object} The esbuild plugin object.
+ * @param {object} extraConfig Any extra configuration for the esbuild build
+ * @returns {object}
  */
 function inlineWorkerPlugin(extraConfig) {
     return {
@@ -63,7 +62,7 @@ function inlineWorkerPlugin(extraConfig) {
 
         setup(build) {
             build.onLoad(
-                { filter: /\.worker\.(js|cjs|jsx|ts|tsx)$/ },
+                { filter: /\.worker\.(js|jsx|ts|tsx)$/ },
                 async ({ path: workerPath }) => {
                     // let workerCode = await fs.promises.readFile(workerPath, {
                     //   encoding: 'utf-8',
@@ -98,11 +97,6 @@ export default function inlineWorker(scriptText) {
         },
     };
 }
-
-
-
-
-
 
 
 export default inlineWorkerPlugin;
