@@ -33,7 +33,7 @@
         "basic-ftp": "^5.0.5",
         "chalk": "^5.4.1",
         "chokidar": "^4.0.3",
-        "commander": "^12.1.0",
+        "commander": "^13.1.0",
         "cosmiconfig": "^9.0.0",
         "cssnano": "^7.0.6",
         "deepmerge": "^4.3.1",
