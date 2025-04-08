@@ -17,33 +17,6 @@ import { getObjectKeysRecursive, setupRoot, sortObjectByKeys } from './helpers.j
 import { isObjectWithValues } from './lib/types.js';
 
 /**
- * Checks to see if the .env and configuration files exist
- *
- * @param {string} configFile The configuration file to check for
- * @param {boolean} [outputLog] Whether to output the log
- * @returns {object} An object containing the status of the files
- */
-const checkForFiles = (configFile, outputLog = true) => {
-    const returnValue = {
-        env: false,
-        config: false,
-    };
-    if (fs.existsSync('.env')) {
-        returnValue.env = true;
-        if (outputLog) {
-            fancyLog(logSymbols.success, chalk.green('Found the .env file'));
-        }
-    }
-    if (fs.existsSync(configFile)) {
-        returnValue.config = true;
-        if (outputLog) {
-            fancyLog(logSymbols.success, chalk.green('Found the configuration file'), chalk.cyan(configFile));
-        }
-    }
-    return returnValue;
-};
-
-/**
  * Convert the JSON content to a Javascript string
  *
  * @param {string} content The JSON content
@@ -196,6 +169,37 @@ node_modules/
 };
 
 /**
+ * Checks to see if the .env file exists and creates it if it doesn't
+ *
+ * @param {boolean} [outputLog] Whether to output the log
+ */
+const setupEnvFile = async (outputLog = true) => {
+    if (fs.existsSync('.env')) {
+        if (outputLog) {
+            fancyLog(logSymbols.success, chalk.green('Found the .env file'));
+        }
+    } else {
+        await createEnvFile();
+    }
+}
+
+/**
+ * Checks to see if the .env file exists and creates it if it doesn't
+ *
+ * @param {string} configFile The configuration file to check for
+ * @param {boolean} [outputLog] Whether to output the log
+ */
+const setupConfigFile = (configFile, outputLog = true) => {
+    if (fs.existsSync(configFile)) {
+        if (outputLog) {
+            fancyLog(logSymbols.success, chalk.green('Found the configuration file'), chalk.cyan(configFile));
+        }
+    } else {
+        createConfigFile(configFile);
+    }
+}
+
+/**
  * Install NPM packages
  */
 const installNpm = () => {
@@ -211,14 +215,8 @@ const installNpm = () => {
  */
 export const initialize = async (args, outputLog = true) => {
     setupGitIgnore();
-    const configFile = args.config || '.aptuitiv-buildrc.js';
-    const files = checkForFiles(configFile, outputLog);
-    if (!files.env) {
-        await createEnvFile();
-    }
-    if (!files.config) {
-        createConfigFile(configFile);
-    }
+    await setupEnvFile(outputLog);
+    setupConfigFile(args.config || '.aptuitiv-buildrc.js', outputLog);
     installNpm();
     if (outputLog) {
         fancyLog(logSymbols.success, chalk.green('The build environment is set up now.'));
