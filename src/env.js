@@ -6,25 +6,30 @@ import chalk from 'chalk';
 import fancyLog from 'fancy-log';
 import fs from 'fs-extra';
 import logSymbols from 'log-symbols';
-import * as readline from 'node:readline/promises';
+import { input } from '@inquirer/prompts';
+
+import { isStringWithValue } from './lib/types.js';
 
 /**
  * Create the .env file
+ *
+ * @param {string} [name] The name of the website/project
  */
-export const createEnvFile = async () => {
+export const createEnvFile = async (name) => {
     fancyLog(chalk.magenta('Creating the .env file'));
     fancyLog(chalk.blue(`Setting up the FTP credentials. You can get the username and password from the 
         Settings -> Domain / FTP / DNS  section in the website administration.`
     ));
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
-    const name = await rl.question('What is the name of this website? ');
-    const username = await rl.question('What is the FTP username? ');
-    const password = await rl.question('What is the FTP password? ');
-    rl.close();
-    const contents = `# ${name} FTP
+    let envName = '';
+    if (isStringWithValue(name)) {
+        envName = name;
+    } else {
+        envName = await input({ message: 'What is the name of this website? ' });
+    }
+    const username = await input({ message: 'What is the FTP username? ' });
+    const password = await input({ message: 'What is the FTP password? ' });
+
+    const contents = `# ${envName} FTP
 FTP_ENVIRONMENT = live
 FTP_SERVER = ftp1.branchcms.com
 FTP_USERNAME = ${username}

@@ -9,12 +9,15 @@ import fs from 'fs-extra';
 import logSymbols from 'log-symbols';
 import { parse } from 'path';
 import yaml from 'json-to-pretty-yaml';
+import { input } from '@inquirer/prompts';
 
 import { createEnvFile } from './env.js';
 
 // Build scripts
 import { getObjectKeysRecursive, setupRoot, sortObjectByKeys } from './helpers.js';
-import { isObjectWithValues } from './lib/types.js';
+import { isObject, isObjectWithValues, isStringWithValue } from './lib/types.js';
+import { formatPackageJson, setupLicense } from './package-json.js';
+import { kebabToCapitalized } from './lib/string.js';
 
 /**
  * Convert the JSON content to a Javascript string
@@ -171,15 +174,16 @@ node_modules/
 /**
  * Checks to see if the .env file exists and creates it if it doesn't
  *
+ * @param {string} [name] The project name
  * @param {boolean} [outputLog] Whether to output the log
  */
-const setupEnvFile = async (outputLog = true) => {
+const setupEnvFile = async (name, outputLog = true) => {
     if (fs.existsSync('.env')) {
         if (outputLog) {
             fancyLog(logSymbols.success, chalk.green('Found the .env file'));
         }
     } else {
-        await createEnvFile();
+        await createEnvFile(name);
     }
 }
 
@@ -200,6 +204,77 @@ const setupConfigFile = (configFile, outputLog = true) => {
 }
 
 /**
+ * Set up the package.json file
+ * 
+ * @param {object} args The command line arguments
+ * @param {string} [name] The project name to be used for the package name
+ * @param {boolean} [outputLog] Whether to output the log
+ */
+const setupPackageJson = async (args, name, outputLog = true) => {
+    if (fs.existsSync('package.json')) {
+        if (outputLog) {
+            fancyLog(logSymbols.success, chalk.green('Found the package.json file'));
+        }
+        await formatPackageJson(args);
+        if (outputLog) {
+            fancyLog(logSymbols.success, chalk.green('Package.json file has been formatted'));
+        }
+    } else {
+        // Get answers to build the package.json file
+        if (outputLog) {
+            fancyLog(chalk.magenta('Creating the package.json file'));
+        }
+        const packageArgs = isObject(args) ? args : {};
+        if (isStringWithValue(name)) {
+            packageArgs.packageName = name;
+        } else {
+            packageArgs.packageName = await input({ message: 'What is the project name?', default: process.cwd().split('/').pop().toLowerCase() });
+        }
+        packageArgs.packageAuthor = await input({ message: 'Who is the package author?', default: 'Aptuitiv, Inc <hello@aptuitiv.com>' });
+        packageArgs.packageCopyright = await input({ message: 'What is the copyright?', default: 'Aptuitiv, Inc' });
+
+        // Create the blank package.json file
+        fs.writeFileSync('package.json', `{}`);
+
+        // Format the file and fill in the content
+        await formatPackageJson(packageArgs);
+        if (outputLog) {
+            fancyLog(logSymbols.success, chalk.green('Package.json file created'));
+        }
+    }
+}
+
+/**
+ * Remove legacy files
+ * 
+ * @param {boolean} [outputLog] Whether to output the log
+ */
+const removeFiles = (outputLog) => {
+    const files = [
+        '.eslintignore',
+        '.eslintrc.js',
+        '.eslintrc.cjs',
+        '.stylelintrc',
+        '.stylelintrc.cjs'
+    ];
+    let removed = 0;
+    files.forEach((file) => {
+        if (fs.existsSync(file)) {
+            fs.removeSync(file);
+            removed += 1;
+            if (outputLog) {
+                fancyLog(logSymbols.success, chalk.green('Removed legacy file'), chalk.cyan(file));
+            }
+        }
+    });
+    if (removed === 0) {
+        if (outputLog) {
+            fancyLog(logSymbols.info, chalk.yellow('No legacy files to remove'));
+        }
+    }
+};
+
+/**
  * Install NPM packages
  */
 const installNpm = () => {
@@ -214,9 +289,19 @@ const installNpm = () => {
  * @param {boolean} [outputLog] Whether to output the log
  */
 export const initialize = async (args, outputLog = true) => {
+    // If the .env or the package.json file is missing get the project name.
+    // We do it here so that we don't potentially ask for the project name twice.
+    let name = null;
+    if (!fs.existsSync('.env') || !fs.existsSync('package.json')) {
+        name = await input({ message: 'What is the project name?', default: kebabToCapitalized(process.cwd().split('/').pop()) });
+    }
+
+    setupLicense(args);
+    await setupPackageJson(args, name, outputLog);
     setupGitIgnore();
-    await setupEnvFile(outputLog);
+    await setupEnvFile(name, outputLog);
     setupConfigFile(args.config || '.aptuitiv-buildrc.js', outputLog);
+    removeFiles(outputLog);
     installNpm();
     if (outputLog) {
         fancyLog(logSymbols.success, chalk.green('The build environment is set up now.'));

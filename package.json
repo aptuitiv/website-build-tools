@@ -27,6 +27,7 @@
     },
     "dependencies": {
         "@aptuitiv/eslint-config-aptuitiv": "^1.1.0",
+        "@inquirer/prompts": "^7.4.1",
         "acorn": "^8.14.1",
         "acorn-walk": "^8.3.4",
         "autoprefixer": "^10.4.21",
