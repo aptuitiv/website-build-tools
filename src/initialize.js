@@ -15,6 +15,7 @@ import { createEnvFile } from './env.js';
 
 // Build scripts
 import { getObjectKeysRecursive, setupRoot, sortObjectByKeys } from './helpers.js';
+import { logConditionalMessage, logConditionalSuccess, logConditionalWarning } from './lib/log.js';
 import { isObject, isObjectWithValues, isStringWithValue } from './lib/types.js';
 import { formatPackageJson, setupLicense } from './package-json.js';
 import { kebabToCapitalized } from './lib/string.js';
@@ -179,9 +180,7 @@ node_modules/
  */
 const setupEnvFile = async (name, outputLog = true) => {
     if (fs.existsSync('.env')) {
-        if (outputLog) {
-            fancyLog(logSymbols.success, chalk.green('Found the .env file'));
-        }
+        logConditionalSuccess(outputLog, 'Found the .env file');
     } else {
         await createEnvFile(name);
     }
@@ -195,9 +194,7 @@ const setupEnvFile = async (name, outputLog = true) => {
  */
 const setupConfigFile = (configFile, outputLog = true) => {
     if (fs.existsSync(configFile)) {
-        if (outputLog) {
-            fancyLog(logSymbols.success, chalk.green('Found the configuration file'), chalk.cyan(configFile));
-        }
+        logConditionalSuccess(outputLog, 'Found the configuration file', configFile);
     } else {
         createConfigFile(configFile);
     }
@@ -212,18 +209,11 @@ const setupConfigFile = (configFile, outputLog = true) => {
  */
 const setupPackageJson = async (args, name, outputLog = true) => {
     if (fs.existsSync('package.json')) {
-        if (outputLog) {
-            fancyLog(logSymbols.success, chalk.green('Found the package.json file'));
-        }
         await formatPackageJson(args);
-        if (outputLog) {
-            fancyLog(logSymbols.success, chalk.green('Package.json file has been formatted'));
-        }
+        logConditionalSuccess(outputLog, 'Found and formatted the package.json file');
     } else {
         // Get answers to build the package.json file
-        if (outputLog) {
-            fancyLog(chalk.magenta('Creating the package.json file'));
-        }
+        logConditionalMessage(outputLog, 'Creating the package.json file');
         const packageArgs = isObject(args) ? args : {};
         if (isStringWithValue(name)) {
             packageArgs.packageName = name;
@@ -238,9 +228,7 @@ const setupPackageJson = async (args, name, outputLog = true) => {
 
         // Format the file and fill in the content
         await formatPackageJson(packageArgs);
-        if (outputLog) {
-            fancyLog(logSymbols.success, chalk.green('Package.json file created'));
-        }
+        logConditionalSuccess(outputLog, 'package.json file created');
     }
 }
 
@@ -249,7 +237,7 @@ const setupPackageJson = async (args, name, outputLog = true) => {
  * 
  * @param {boolean} [outputLog] Whether to output the log
  */
-const removeFiles = (outputLog) => {
+const removeFiles = (outputLog = true) => {
     const files = [
         '.eslintignore',
         '.eslintrc.js',
@@ -262,15 +250,11 @@ const removeFiles = (outputLog) => {
         if (fs.existsSync(file)) {
             fs.removeSync(file);
             removed += 1;
-            if (outputLog) {
-                fancyLog(logSymbols.success, chalk.green('Removed legacy file'), chalk.cyan(file));
-            }
+            logConditionalSuccess(outputLog, 'Removed legacy file', file);
         }
     });
     if (removed === 0) {
-        if (outputLog) {
-            fancyLog(logSymbols.info, chalk.yellow('No legacy files to remove'));
-        }
+        logConditionalWarning(outputLog, 'No legacy files to remove');
     }
 };
 
