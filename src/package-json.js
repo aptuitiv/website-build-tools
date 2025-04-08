@@ -13,7 +13,7 @@ import { fileURLToPath } from 'url';
 import { setupRoot, sortObjectByKeys } from './helpers.js';
 
 // Get the directory name of the current module
- 
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Default license
@@ -169,7 +169,7 @@ const getScripts = (currentScripts) => {
 /**
  * Set up the scripts in the package.json file
  */
-const setupPackageJsonScripts = async () => {
+export const setupPackageJsonScripts = async () => {
     // Get the package.json file
     const packageJson = await fs.readJson('package.json');
 
@@ -182,6 +182,30 @@ const setupPackageJsonScripts = async () => {
 };
 
 /**
+ * Format a value for the package.json "name" field
+ *
+ * Ensures the name adheres to npm naming conventions, is <= 214 characters,
+ * and does not end with a hyphen.
+ *
+ * @param {string} value The input value to format
+ * @returns {string} The formatted name
+ */
+const formatPackageName = (value) => {
+    let formattedName = value
+        .toLowerCase() // Convert to lowercase
+        .replace(/\s+/g, '-') // Replace spaces with hyphens
+        .replace(/[^a-z0-9-]/g, '') // Remove invalid characters
+        .replace(/^-+|-+$/g, ''); // Trim leading or trailing hyphens
+
+    // Ensure the name is <= 214 characters
+    if (formattedName.length > 214) {
+        formattedName = formattedName.slice(0, 214).replace(/-+$/g, ''); // Trim trailing hyphens after slicing
+    }
+
+    return formattedName;
+};
+
+/**
  * Format the package.json file
  *
  * This orders the package.json file contents, sets the correct license, updates the scripts, and
@@ -190,10 +214,11 @@ const setupPackageJsonScripts = async () => {
  * @param {object} args The arguments from the command line
  */
 export const formatPackageJson = async (args) => {
-    const license = args.license || defaultLicense;
+    const license = args?.license || defaultLicense;
     // Get the package.json file
     const packageJson = await fs.readJson('package.json');
     // Format the package.json file
+    // Sections are in the order that they should show in the package.json file
     const sections = [
         'name',
         'version',
@@ -213,7 +238,7 @@ export const formatPackageJson = async (args) => {
 
     const newPackageJson = {};
     sections.forEach((section) => {
-        if (section === 'browserlist') {
+        if (section === 'browserslist') {
             newPackageJson.browserslist = [
                 '> 0.5%',
                 'last 2 years',
@@ -232,25 +257,47 @@ export const formatPackageJson = async (args) => {
             // Some sections make use of the existing data instead of overwriting them
             switch (section) {
                 case 'dependencies':
+                    // Remove the dependencies that are not needed
                     newPackageJson[section] = getDependencies(packageJson[section]);
                     break;
                 case 'devDependencies':
+                    // Remove the dependencies that are not needed
                     newPackageJson[section] = getDevDependencies(packageJson[section]);
                     break;
                 case 'scripts':
+                    // Setup the scripts
                     newPackageJson[section] = getScripts(packageJson[section]);
                     break;
                 default:
                     newPackageJson[section] = packageJson[section];
             }
-        } else if (['dependencies', 'devDependencies', 'scripts'].includes(section)) {
-            // One or more of these sections don't exist in the package.json file. Add them.
-            if (section === 'dependencies') {
-                newPackageJson.dependencies = getDependencies({});
-            } else if (section === 'devDependencies') {
-                newPackageJson.devDependencies = getDevDependencies({});
-            } else if (section === 'scripts') {
-                newPackageJson.scripts = getScripts({});
+        } else if (typeof packageJson[section] === 'undefined') {
+            if (['dependencies', 'devDependencies', 'scripts'].includes(section)) {
+                // One or more of these sections don't exist in the package.json file. Add them.
+                if (section === 'dependencies') {
+                    newPackageJson.dependencies = getDependencies({});
+                } else if (section === 'devDependencies') {
+                    newPackageJson.devDependencies = getDevDependencies({});
+                } else if (section === 'scripts') {
+                    newPackageJson.scripts = getScripts({});
+                }
+            } else if (section === 'author') {
+                newPackageJson[section] = args?.packageAuthor || 'Aptuitiv, Inc <hello@aptuitiv.com>';
+            } else if (section === 'bugs') {
+                newPackageJson[section] = {
+                    email: args?.packageBugs || 'support@aptuitiv.com'
+                };
+            } else if (section === 'copyright') {
+                newPackageJson[section] = args?.packageCopyright || 'Aptuitiv, Inc';
+            } else if (section === 'description') {
+                newPackageJson[section] = '';
+            } else if (section === 'name') {
+                // Set the name based off of the directory name
+                newPackageJson[section] = formatPackageName(args?.packageName || process.cwd().split('/').pop());
+            } else if (section === 'private') {
+                newPackageJson[section] = true;
+            } else if (section === 'version') {
+                newPackageJson[section] = '1.0.0';
             }
         }
     });
@@ -266,7 +313,7 @@ export const formatPackageJson = async (args) => {
  *  - license: The license to use
  */
 export const setupLicense = (args) => {
-    const license = args.license || defaultLicense;
+    const license = args?.license || defaultLicense;
     if (license === 'Apache-2.0') {
         // Copy the LICENSE file
         const licenseContent = fs.readFileSync(`${__dirname}/lib/apache-license.txt`);
