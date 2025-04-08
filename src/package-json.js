@@ -13,7 +13,6 @@ import { fileURLToPath } from 'url';
 import { setupRoot, sortObjectByKeys } from './helpers.js';
 
 // Get the directory name of the current module
-
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Default license
@@ -316,7 +315,7 @@ export const setupLicense = (args) => {
     const license = args?.license || defaultLicense;
     if (license === 'Apache-2.0') {
         // Copy the LICENSE file
-        const licenseContent = fs.readFileSync(`${__dirname}/lib/apache-license.txt`);
+        const licenseContent = fs.readFileSync(`${__dirname}/source-files/apache-license.txt`);
         fs.writeFileSync('LICENSE', licenseContent);
     }
 };
