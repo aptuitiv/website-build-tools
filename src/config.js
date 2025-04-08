@@ -9,12 +9,15 @@ import {
 import deepmerge from 'deepmerge';
 import { cosmiconfig } from 'cosmiconfig';
 import dotenv from 'dotenv';
+import fancyLog from 'fancy-log';
 import { fileURLToPath } from 'url';
+import logSymbols from 'log-symbols';
 
+import chalk from 'chalk';
 import { isObjectWithValues } from './lib/types.js';
 
 // Get the directory name of the current module
- 
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Set up the default configuration
@@ -215,29 +218,35 @@ class Config {
             cwd = root;
             overrideRoot = true;
         }
+
         // Load the configuration file if it exists
-        if (typeof configFile === 'string') {
-            const configPath = resolveFrom.silent(cwd, configFile) || join(cwd, configFile);
-            await configExplorer
-                .load(configPath)
-                .then((result) => {
-                    // The specified configuration file exists
+        try {
+            if (typeof configFile === 'string') {
+                const configPath = resolveFrom.silent(cwd, configFile) || join(cwd, configFile);
+                await configExplorer
+                    .load(configPath)
+                    .then((result) => {
+                        // The specified configuration file exists
+                        config = result;
+                    })
+                    .catch(async () => {
+                        // The specified configuration file doesn't exist so search for for the configuration file based 'aptuitiv-build' in the root folder
+                        await configExplorer
+                            .search()
+                            .then((result) => {
+                                config = result;
+                            })
+                            .catch(() => false);
+                    });
+            } else {
+                // NO configuration file was specified so search for for the configuration file based 'aptuitiv-build' in the root folder
+                await configExplorer.search().then((result) => {
                     config = result;
-                })
-                .catch(async () => {
-                    // The specified configuration file doesn't exist so search for for the configuration file based 'aptuitiv-build' in the root folder
-                    await configExplorer
-                        .search()
-                        .then((result) => {
-                            config = result;
-                        })
-                        .catch(() => false);
                 });
-        } else {
-            // NO configuration file was specified so search for for the configuration file based 'aptuitiv-build' in the root folder
-            await configExplorer.search().then((result) => {
-                config = result;
-            });
+            }
+        } catch (error) {
+            fancyLog(logSymbols.error, chalk.red('Error loading configuration file'), error);
+            fancyLog(logSymbols.warning, chalk.yellow('Continuing with the default configuration'));
         }
 
         // Override the root folder if it was passed in as an argument
