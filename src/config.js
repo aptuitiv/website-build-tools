@@ -152,8 +152,19 @@ class Config {
      */
     async init(args) {
         if (Object.keys(this.data).length === 0) {
-            await this.getConfigFromProject(args.config, args.root);
+            await this.getConfigFromProject(args?.config, args?.root);
         }
+    }
+
+    /**
+     * Reload the configuration object.
+     *
+     * This is useful if the configuration file didn't exist before when init() was run.
+     *
+     * @param {object} args An object containing the command line arguments
+     */
+    async reload(args) {
+        await this.getConfigFromProject(args?.config, args?.root);
     }
 
     /**
