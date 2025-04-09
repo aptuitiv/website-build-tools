@@ -10,7 +10,7 @@ import logSymbols from 'log-symbols';
 
 /**
  * Log an info message
- * 
+ *
  * @param {string} message The message to output
  * @param {string} [additionalMessage] An additional message to output in cyan
  */
@@ -24,7 +24,7 @@ export const logInfo = (message, additionalMessage) => {
 
 /**
  * Conditionally log an info message
- * 
+ *
  * @param {boolean} [outputLog] Whether to output the log
  * @param {string} message The message to output
  * @param {string} [additionalMessage] An additional message to output in cyan
@@ -37,28 +37,30 @@ export const logConditionalInfo = (outputLog, message, additionalMessage) => {
 
 /**
  * Log a message
- * 
+ *
  * @param {string} message The message to output
+ * @param {string} [additionalMessage] An additional message to output in cyan
  */
-export const logMessage = (message) => {
-    fancyLog(chalk.cyan(message));
+export const logMessage = (message, additionalMessage) => {
+    fancyLog(chalk.cyan(message), additionalMessage ?? '');
 }
 
 /**
  * Conditionally log a message
- * 
+ *
  * @param {boolean} [outputLog] Whether to output the log
  * @param {string} message The message to output
+ * @param {string} [additionalMessage] An additional message to output in cyan
  */
-export const logConditionalMessage = (outputLog, message) => {
+export const logConditionalMessage = (outputLog, message, additionalMessage) => {
     if (outputLog) {
-        logMessage(message);
+        logMessage(message, additionalMessage);
     }
 }
 
 /**
  * Log a success message
- * 
+ *
  * @param {string} message The message to output
  * @param {string} [additionalMessage] An additional message to output in cyan
  */
@@ -72,7 +74,7 @@ export const logSuccess = (message, additionalMessage) => {
 
 /**
  * Conditionally log a success message
- * 
+ *
  * @param {boolean} [outputLog] Whether to output the log
  * @param {string} message The message to output
  * @param {string} [additionalMessage] An additional message to output in cyan
@@ -85,7 +87,7 @@ export const logConditionalSuccess = (outputLog, message, additionalMessage) => 
 
 /**
  * Log a warning message
- * 
+ *
  * @param {string} message The message to output
  */
 export const logWarning = (message) => {
@@ -94,7 +96,7 @@ export const logWarning = (message) => {
 
 /**
  * Conditionally log a warning message
- * 
+ *
  * @param {boolean} [outputLog] Whether to output the log
  * @param {string} message The message to output
  */
