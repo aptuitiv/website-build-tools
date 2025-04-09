@@ -16,7 +16,7 @@ import zl from 'zip-lib';
 // Build scripts
 import { createEnvFile } from './env.js';
 import { getObjectKeysRecursive, setupRoot, sortObjectByKeys } from './helpers.js';
-import { logConditionalMessage, logConditionalSuccess, logConditionalWarning, logMessage, logSuccess, logWarning } from './lib/log.js';
+import { logConditionalMessage, logConditionalSuccess, logConditionalWarning, logMessage, logWarning } from './lib/log.js';
 import { kebabToCapitalized } from './lib/string.js';
 import { isObject, isObjectWithValues, isStringWithValue } from './lib/types.js';
 import { addDependency, formatPackageJson, setupLicense } from './package-json.js';
@@ -325,6 +325,7 @@ const setupNewWebsite = async (outputLog) => {
  * @param {object} args The command line arguments along with other arguments for the package.json file.
  * @param {string} theme The name of the theme to download
  * @param {boolean} [outputLog] Whether to output the log
+ * @returns {Promise<void>}
  */
 const downloadTheme = async (args, theme, outputLog = true) => new Promise((resolve, reject) => {
     (async () => {
