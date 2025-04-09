@@ -53,14 +53,17 @@ const rootOption = new Option(
 
 /**
  * Run the build process
+ *
+ * @param {object} args The command line arguments
  */
-const runBuild = async () => {
-    await copyHandler();
-    await cssHandler('css', {});
+const runBuild = async (args) => {
+    const argsObj = args || {};
+    await copyHandler(argsObj);
+    await cssHandler('css', argsObj);
     await fontHandler('push');
-    await iconHandler();
+    await iconHandler(argsObj);
     await imageHandler();
-    await jsHandler('process', {});
+    await jsHandler('process', argsObj);
     await templateHandler('push');
     await themeHandler('push');
 };
@@ -281,9 +284,7 @@ program
         if (args.build) {
             if (hasFiles('src')) {
                 logMessage('The project has been initialized. Running the build process.');
-                // The aptuitiv-buildrc.js file could have changed so setup the configuration again for the build process
-                await config.init(args);
-                await runBuild();
+                await runBuild(args);
                 logSuccess('The build process has completed.');
                 logInfo('You can now run "npm run watch" to start the watch process. Or run "npm run deploy" to upload files to the server.');
             } else {
