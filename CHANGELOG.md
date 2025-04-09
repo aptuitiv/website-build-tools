@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.21.0] - 2024-03-27
+## [1.21.0] - 2025-03-27
 
 ### Added
 
@@ -17,19 +17,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated eslint and eslint configuration.
 - Updated other packages.
 
-## [1.20.0] - 2024-03-07
+## [1.20.0] - 2025-03-07
 
 ### Added
 
 - Additional scripts to the `package.json` file.
 
-## [1.19.0] - 2024-03-07
+## [1.19.0] - 2025-03-07
 
 ### Added
 
 - Include `cjs` and `mjs` files when linting JavaScript.
 
-## [1.18.0] - 2024-02-14
+## [1.18.0] - 2025-02-14
 
 ### Added
 
@@ -37,13 +37,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated the `icons` configuration to be an array of objects.
 - Added `path` and `output` options to the `icons` CLI.
 
-## [1.17.0] - 2024-02-11
+## [1.17.0] - 2025-02-11
 
 ### Fixed
 
 - Issue where processing multiple bundles at the same time could result in empty or incomplete files by ensuring temporary files have unique names.
 
-## [1.16.0] - 2024-01-13
+## [1.16.0] - 2025-01-13
 
 ### Added
 
