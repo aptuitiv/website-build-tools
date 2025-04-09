@@ -118,10 +118,13 @@ export const createIconSprite = async (srcFolderPath, outputPath) => {
  */
 const processIcons = async (args) => new Promise((resolve) => {
     const promises = [];
-    if (isObjectWithValues(args)) {
+    let processAllIcons = true;
+    if (isObjectWithValues(args) && (isStringWithValue(args.path) || isStringWithValue(args.output))) {
         if (isStringWithValue(args.path) && isStringWithValue(args.output)) {
             promises.push(createIconSprite(args.path, args.output));
+            processAllIcons = false;
         } else if (isStringWithValue(args.path)) {
+            processAllIcons = false;
             config.data.icons.forEach((iconConfig) => {
                 if (isStringWithValue(iconConfig.src) && iconConfig.src === args.path) {
                     promises.push(createIconSprite(iconConfig.src, iconConfig.build));
@@ -133,13 +136,9 @@ const processIcons = async (args) => new Promise((resolve) => {
                     chalk.red(`The path "${args.path}" was not found in the icons configuration`),
                 );
             }
-        } else {
-            fancyLog(
-                logSymbols.error,
-                chalk.red(`The "path" and "output" arguments are required. You passed: ${Object.keys(args).join(', ')}`),
-            );
         }
-    } else if (Array.isArray(config.data.icons)) {
+    }
+    if (Array.isArray(config.data.icons) && processAllIcons) {
         config.data.icons.forEach((iconConfig) => {
             if (isStringWithValue(iconConfig.src) && isStringWithValue(iconConfig.build)) {
                 promises.push(createIconSprite(iconConfig.src, iconConfig.build));
