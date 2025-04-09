@@ -1,0 +1,86 @@
+/* =========================================================================== *\
+    Small Screen Menu Button
+\* =========================================================================== */
+
+/* @define SmScBtn */
+.SmScBtn {
+    background: var(--SmScBtn-background, transparent);
+    border: none;
+    color: var(--SmScBtn-color);
+    font-size: 16px;
+    line-height: 45px;
+    padding: 3px 5px 0 18px;
+    text-align: center;
+    text-decoration: none;
+}
+
+.SmScBtn:active,
+.SmScBtn:focus,
+.SmScBtn:hover {
+    color: var(--SmScBtn-color);
+    text-decoration: none;
+}
+
+.SmScBtn-icon {
+    bottom: 5px;
+    display: inline-block;
+    left: -7px;
+    position: relative;
+}
+
+.SmScBtn-icon,
+.SmScBtn-icon::before,
+.SmScBtn-icon::after {
+    background-color: var(--SmScBtn-color);
+    border-radius: 2px;
+    height: 4px;
+    transition-duration: 0.1s;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+    width: 30px;
+}
+
+.SmScBtn-icon::before,
+.SmScBtn-icon::after {
+    content: '';
+    display: block;
+    position: absolute;
+}
+
+.SmScBtn-icon::before {
+    top: -8px;
+    transform: none;
+}
+
+.SmScBtn-icon::after {
+    bottom: -8px;
+    transform: none;
+}
+
+.SmScBtn.is-active .SmScBtn-icon {
+    transform: rotate(45deg);
+    transition-delay: 0.14s;
+    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.SmScBtn.is-active .SmScBtn-icon::before {
+    opacity: 0;
+    top: 0;
+    transition:
+        top 0.1s ease,
+        opacity 0.1s 0.14s ease;
+}
+
+.SmScBtn.is-active .SmScBtn-icon::after {
+    bottom: 0;
+    transform: rotate(-90deg);
+    transition:
+        bottom 0.1s ease,
+        transform 0.1s 0.14s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+@media (--m-lg) {
+    .SmScBtn {
+        display: none;
+    }
+}

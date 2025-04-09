@@ -620,6 +620,10 @@ export const processJsFile = async (filePath, lint = true) => {
  * @returns {Promise}
  */
 export const jsHandler = async (action, args) => {
+    // Make sure that the config is the most current version.
+    // If the `init` command was run it's possible that the config could be out of date.
+    await config.reload(args);
+
     if (action === 'process') {
         if (isString(args.file)) {
             await processJsFile(args.file, args.lint);

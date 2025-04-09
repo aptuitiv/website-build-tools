@@ -4,11 +4,8 @@
  * npx aptuitiv-build template --pulld
  */
 
-import chalk from 'chalk';
 import { Command, Option } from 'commander';
-import fancyLog from 'fancy-log';
 import fs from 'fs-extra';
-import logSymbols from 'log-symbols';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -29,6 +26,8 @@ import { packageJsonHandler } from './src/package-json.js';
 import { templateHandler } from './src/template.js';
 import { themeHandler } from './src/theme.js';
 import watchHandler from './src/watch.js';
+import { hasFiles } from './src/lib/files.js';
+import { logInfo, logMessage, logSuccess } from './src/lib/log.js';
 
 // Get the directory name of the current module
 
@@ -54,16 +53,19 @@ const rootOption = new Option(
 
 /**
  * Run the build process
+ *
+ * @param {object} args The command line arguments
  */
-const runBuild = async () => {
-    await copyHandler();
-    await cssHandler('css', {});
+const runBuild = async (args) => {
+    const argsObj = args || {};
+    await copyHandler(argsObj);
+    await cssHandler('css', argsObj);
     await fontHandler('push');
-    await iconHandler();
+    await iconHandler(argsObj);
     await imageHandler();
-    await jsHandler('process', {});
+    await jsHandler('process', argsObj);
     await templateHandler('push');
-    themeHandler('push');
+    await themeHandler('push');
 };
 
 /**
@@ -273,16 +275,26 @@ program
     .alias('init')
     .description('Initialize the project')
     .option('--no-build', 'Do not run the build process after initializing the project')
+    .option('-n, --name <name>', 'The name of the project')
+    .option('-t, --type <name>', 'The type of project')
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        await initiaizeHandler(args);
-        if (args.build) {
-            fancyLog(chalk.magenta('The project has been initialized. Running the build process.'));
-            await runBuild();
-            fancyLog(logSymbols.success, chalk.green('The build process has completed.'));
-            fancyLog(chalk.blue('You can now run "npm run watch" to start the watch process.'));
+        const success = await initiaizeHandler(args);
+        if (success) {
+            if (args.build) {
+                if (hasFiles('src')) {
+                    logMessage('The project has been initialized. Running the build process.');
+                    await runBuild(args);
+                    logSuccess('The build process has completed.');
+                    logInfo('You can now run "npm run watch" to start the watch process. Or run "npm run deploy" to upload files to the server.');
+                } else {
+                    logMessage('The project has been initialized. You can add your source files to the "src" folder.');
+                }
+            } else {
+                logMessage('The project has been initialized. You can now run "npm run build" to build the project.');
+            }
         }
     });
 

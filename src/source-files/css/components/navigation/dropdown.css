@@ -1,0 +1,155 @@
+/* ==========================================================================
+   Dropdown
+   ========================================================================== */
+
+/** @define Dropdown */
+
+/**
+ * Drop-down navigation menu.
+ */
+
+.Dropdown {
+    position: relative;
+}
+
+/* ------------------------------------ *\
+    Menu
+\* ------------------------------------ */
+
+.Dropdown-menu {
+    background: var(--Dropdown-background, #fff);
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.Dropdown-menu .Dropdown-menu {
+    margin: 0;
+    padding-top: 0;
+}
+
+/* postcss-bem-linter: ignore */
+.MainNav-item.is-first .Dropdown-menu {
+    left: 0;
+}
+
+.Dropdown-item {
+    position: relative;
+}
+
+.Dropdown-link {
+    background: var(--Dropdown-link-background-sm);
+    color: var(--Dropdown-link-color-sm) !important;
+    display: block;
+    font-size: var(--Dropdown-link-font-size);
+    font-weight: var(--Dropdown-link-font-weight);
+    letter-spacing: var(--Dropdown-link-letter-spacing);
+    line-height: var(--Dropdown-link-line-height);
+    padding: var(--Dropdown-link-padding, 6px 10px);
+    text-align: var(--Dropdown-link-text-align);
+    text-decoration: var(--Dropdown-link-text-decoration, none);
+    text-transform: var(--Dropdown-link-text-transform);
+}
+
+.Dropdown-link:hover,
+.Dropdown-link.is-current,
+.Dropdown-link.is-currentParent {
+    background-color: var(--Dropdown-link-background-hover);
+    color: var(--Dropdown-link-color-hover) !important;
+}
+
+.Dropdown-link:hover {
+    text-decoration: none;
+}
+
+/* ------------------------------------ *\
+    #PARENT ITEMS
+\* ------------------------------------ */
+
+.Dropdown-link--parent {
+    position: relative;
+}
+
+/* ------------------------------------ *\
+    Responsive
+\* ------------------------------------ */
+
+@media (--m-lg-below) {
+    /* show sub-menus under active items */
+    .Dropdown.is-active > .Dropdown-menu {
+        display: block;
+    }
+}
+
+@media (--m-lg) {
+    .Dropdown-menu {
+        left: var(--Dropdown-left);
+        margin-top: 0;
+        max-width: var(--Dropdown-max-width);
+        min-width: var(--Dropdown-min-width);
+        padding: var(--Dropdown-padding, 0);
+        position: absolute;
+        top: 100%;
+        transform: var(--Dropdown-transform);
+        width: max-content;
+        z-index: 999;
+    }
+
+    .Dropdown-item--smallScreen {
+        display: none;
+    }
+
+    .Dropdown-link {
+        background: var(--Dropdown-link-background);
+        color: var(--Dropdown-link-color) !important;
+    }
+
+    .Dropdown:hover > .Dropdown-menu,
+    .Dropdown-item:hover > .Dropdown-menu {
+        display: block;
+    }
+
+    .Dropdown-item:hover > .Dropdown-menu {
+        display: block;
+        left: 100%;
+        top: 0;
+        transform: none;
+    }
+
+    /* display sub-menus under the last item to the right */
+    .Dropdown.is-last:hover > .Dropdown-menu {
+        left: auto;
+        right: 0;
+    }
+
+    /* fly-out to the left if root parent is last item */
+    .Dropdown.is-last .Dropdown-item:hover > .Dropdown-menu,
+    .Dropdown.is-last .Dropdown-item.is-active > .Dropdown-menu {
+        display: block;
+        left: auto;
+        right: 100%;
+    }
+
+    .Dropdown-link--parent::before,
+    .Dropdown-link--parent::after {
+        background: var(--Dropdown-link-color);
+        content: '';
+        display: inline-block;
+        height: 1px;
+        margin-top: -1px;
+        position: absolute;
+        right: var(--Dropdown-arrow-offset, 10px);
+        top: 50%;
+        transform-origin: 7px 50%;
+        width: 7px;
+    }
+
+    .Dropdown-link--parent::after {
+        transform: rotate(-45deg);
+    }
+
+    .Dropdown-link--parent::before {
+        transform: rotate(45deg);
+    }
+}

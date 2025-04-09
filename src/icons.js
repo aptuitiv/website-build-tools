@@ -16,6 +16,7 @@ import config from './config.js';
 import {
     prefixPath, prefixRootSrcPath, removePrefix, removeRootSrcPrefix,
 } from './helpers.js';
+import { hasFilesByExtension } from './lib/files.js';
 import { isObjectWithValues, isStringWithValue } from './lib/types.js';
 
 /**
@@ -26,84 +27,86 @@ import { isObjectWithValues, isStringWithValue } from './lib/types.js';
  * @returns {Promise}
  */
 export const createIconSprite = async (srcFolderPath, outputPath) => {
-    // Get the absolute path to the icons folder
     const iconPath = prefixRootSrcPath(srcFolderPath);
-    let buildPath = prefixRootSrcPath(
-        prefixPath(outputPath, config.data.templates.src),
-    );
-    if (!buildPath.endsWith('.twig')) {
-        buildPath = `${buildPath}.twig`;
-    }
-    fancyLog(
-        chalk.magenta('Creating icon sprite from folder'),
-        chalk.cyan(removeRootSrcPrefix(iconPath)),
-        chalk.magenta('to file'),
-        chalk.cyan(removeRootSrcPrefix(buildPath))
-    );
-
-    // Get all the svg files in the icons folder
-    const files = globSync(`${iconPath}/**/*.svg`);
-
-    // Set up the sprite generator
-    const spriteObj = new Sprite({
-        mode: {
-            symbol: {
-                inline: true,
-            },
-        },
-        shape: {
-            id: {
-                // SVG shape ID related options
-                separator: '-', // Separator for directory name traversal
-                generator: 'icon-%s',
-            },
-            transform: [
-                {
-                    svgo: {
-                        // https://svgo.dev/docs/plugins/
-                        plugins: ['preset-default', 'removeXMLNS'],
-                    },
-                },
-            ],
-        },
-    });
-
-    // Add each file to the sprite generator
-    files.forEach((file) => {
-        const stat = fs.statSync(file);
-        if (stat.isFile()) {
-            // Get the base path to the file within the icons folder.
-            // This handles situations where the file may be in a nested subfolder.
-            // In that case, the id will include the folder path.
-            const filePath = removePrefix(file, `${iconPath}/`);
-            const contents = fs.readFileSync(file, 'utf-8');
-            if (isSvg(contents)) {
-                spriteObj.add(file, filePath, contents);
-            }
-        }
-    });
-    try {
-        // Generate the sprite
-        const { data } = await spriteObj.compileAsync();
-
-        // Make sure that the build folder folder exists
-        fs.ensureDirSync(dirname(buildPath));
-
-        // The result sprite contains some code that we don't want so we use
-        // the data object to get the svg code for each icon and build the sprite.
-        const stream = fs.createWriteStream(buildPath, { flags: 'w' });
-        stream.write(
-            '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',
+    if (hasFilesByExtension(iconPath, 'svg')) {
+        // Get the absolute path to the icons folder
+        let buildPath = prefixRootSrcPath(
+            prefixPath(outputPath, config.data.templates.src),
         );
-        data.symbol.shapes.forEach((shape) => {
-            stream.write(shape.svg);
+        if (!buildPath.endsWith('.twig')) {
+            buildPath = `${buildPath}.twig`;
+        }
+        fancyLog(
+            chalk.magenta('Creating icon sprite from folder'),
+            chalk.cyan(removeRootSrcPrefix(iconPath)),
+            chalk.magenta('to file'),
+            chalk.cyan(removeRootSrcPrefix(buildPath))
+        );
+
+        // Get all the svg files in the icons folder
+        const files = globSync(`${iconPath}/**/*.svg`);
+
+        // Set up the sprite generator
+        const spriteObj = new Sprite({
+            mode: {
+                symbol: {
+                    inline: true,
+                },
+            },
+            shape: {
+                id: {
+                    // SVG shape ID related options
+                    separator: '-', // Separator for directory name traversal
+                    generator: 'icon-%s',
+                },
+                transform: [
+                    {
+                        svgo: {
+                            // https://svgo.dev/docs/plugins/
+                            plugins: ['preset-default', 'removeXMLNS'],
+                        },
+                    },
+                ],
+            },
         });
-        stream.write('</svg>');
-        stream.end();
-        fancyLog(logSymbols.success, chalk.green('Done creating icon sprite'));
-    } catch (error) {
-        // eslint-disable-next-line no-console -- Need to output the error
-        console.error(error);
+
+        // Add each file to the sprite generator
+        files.forEach((file) => {
+            const stat = fs.statSync(file);
+            if (stat.isFile()) {
+                // Get the base path to the file within the icons folder.
+                // This handles situations where the file may be in a nested subfolder.
+                // In that case, the id will include the folder path.
+                const filePath = removePrefix(file, `${iconPath}/`);
+                const contents = fs.readFileSync(file, 'utf-8');
+                if (isSvg(contents)) {
+                    spriteObj.add(file, filePath, contents);
+                }
+            }
+        });
+        try {
+            // Generate the sprite
+            const { data } = await spriteObj.compileAsync();
+
+            // Make sure that the build folder folder exists
+            fs.ensureDirSync(dirname(buildPath));
+
+            // The result sprite contains some code that we don't want so we use
+            // the data object to get the svg code for each icon and build the sprite.
+            const stream = fs.createWriteStream(buildPath, { flags: 'w' });
+            stream.write(
+                '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',
+            );
+            data.symbol.shapes.forEach((shape) => {
+                stream.write(shape.svg);
+            });
+            stream.write('</svg>');
+            stream.end();
+            fancyLog(logSymbols.success, chalk.green('Done creating icon sprite'));
+        } catch (error) {
+            // eslint-disable-next-line no-console -- Need to output the error
+            console.error(error);
+        }
     }
 };
 
@@ -115,10 +118,13 @@ export const createIconSprite = async (srcFolderPath, outputPath) => {
  */
 const processIcons = async (args) => new Promise((resolve) => {
     const promises = [];
-    if (isObjectWithValues(args)) {
+    let processAllIcons = true;
+    if (isObjectWithValues(args) && (isStringWithValue(args.path) || isStringWithValue(args.output))) {
         if (isStringWithValue(args.path) && isStringWithValue(args.output)) {
             promises.push(createIconSprite(args.path, args.output));
+            processAllIcons = false;
         } else if (isStringWithValue(args.path)) {
+            processAllIcons = false;
             config.data.icons.forEach((iconConfig) => {
                 if (isStringWithValue(iconConfig.src) && iconConfig.src === args.path) {
                     promises.push(createIconSprite(iconConfig.src, iconConfig.build));
@@ -130,13 +136,9 @@ const processIcons = async (args) => new Promise((resolve) => {
                     chalk.red(`The path "${args.path}" was not found in the icons configuration`),
                 );
             }
-        } else {
-            fancyLog(
-                logSymbols.error,
-                chalk.red(`The "path" and "output" arguments are required. You passed: ${Object.keys(args).join(', ')}`),
-            );
         }
-    } else if (Array.isArray(config.data.icons)) {
+    }
+    if (Array.isArray(config.data.icons) && processAllIcons) {
         config.data.icons.forEach((iconConfig) => {
             if (isStringWithValue(iconConfig.src) && isStringWithValue(iconConfig.build)) {
                 promises.push(createIconSprite(iconConfig.src, iconConfig.build));

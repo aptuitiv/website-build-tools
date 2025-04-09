@@ -11,7 +11,11 @@ This will do a few things things:
 1. Check to make sure that the `.env` and the configuration file are in place.
 2. Create the `.env` file with the FTP credentials if the file doesn't exist.
 3. Create the configuration file if it doesn't exist.
-4. Run the [build](./build) process to build the site.
+4. Optionally install an Aptuitiv theme.
+5. Optionally set up a new basic website.
+6. Run the [build](./build) process to build the site.
+
+If the `.env` file needs to be created then follow the prompts.
 
 The following are equivalent:
 
@@ -19,6 +23,71 @@ The following are equivalent:
 aptuitiv-build init
 aptuitiv-build initialize
 ```
+
+## Options
+
+The following options are available:
+
+- `--config` or `-c`: Specify a different name for the configuration file.
+- `--name` or `n`: Specify the name of the project.
+- `--no-build`: Don't build the files after the initialization.
+- `--type` or `-t`: Specify the type of project to create. See the [Type of project](#type-of-project) section below.
+
+## Prompts
+
+### Project name
+
+You will be prompted for the project name if one of the following conditions is met:
+
+- The folder you're running this in is blank.
+- The `.env` file doesn't exist.
+- The `package.json` file doesn't exist.
+- You didn't pass the project name as an argument with `--name` or `-n`.
+
+The prompt will default to using the current folder name converted to title case. (For example, converting "my-project" to "My Project".)
+
+This value will be used for the `name` value in the `project.json` file if necessary and for the `.env` file.
+
+### Type of project
+
+You'll be prompted to choose what type of project you're initializing.
+
+- **Existing website with project files**: Use this when you're starting to work on an existing website, the folder has all the project files, and you just need to set up the `.env` file and do the initial build.
+- **New basic website**: Use this if you're starting a brand new project that isn't using one of the Aptuitiv themes and the folder is empty.
+- **Carmine theme**: Use this if you're starting a new project using the Aptuitiv Carmine theme.
+- **Harvest theme**: Use this if you're starting a new project using the Aptuitiv Harvest theme.
+- **Mallard theme**: Use this if you're starting a new project using the Aptuitiv Mallard theme.
+- **Rivera theme**: Use this if you're starting a new project using the Aptuitiv Rivera theme.
+- **Skeleton theme**: Use this if you're starting a new project using the Aptuitiv Skeleton theme.
+
+If you want to pass the type of project as an argument you can use the `--type` or `-t` option. Below are the values you can use:
+
+| Type of project | Value |
+|-----------------|-------|
+| Existing website with project files | existing |
+| New website | basic |
+| Carmine theme | theme-carmine |
+| Harvest theme | theme-harvest |
+| Mallard theme | theme-mallard |
+| Rivera theme | theme-rivera |
+| Skeleton theme | theme-skeleton |
+
+For example, to set up a site with the Carmine theme you can run:
+
+```bash
+aptuitiv-build init --type theme-carmine
+```
+
+### Package.json data
+
+If the `package.json` file doesn't exist and you're not setting up a theme website then you'll get the following prompts:
+
+- Who is the package author name? (defaults to "Aptuitiv, Inc")
+- What is the package author email? (defaults to "hello@aptuitiv.com")
+
+You can typically stick with the defaults.
+
+## Configuration file
 
 By default the configuration file built will be `.aptuitiv-buildrc.js`. You can specify a different name if you prefer. See the [Configuration](/configuration/) page for valid file names.
 
@@ -29,7 +98,7 @@ aptuitiv-build init --config .aptuitiv-buildrc.cjs
 aptuitiv-build init -c .aptuitiv-buildrc.cjs
 ```
 
-If the `.env` file needs to be created then follow the prompts.
+## Don't build the files
 
 You can disable building the files with the `--no-build` options.
 
