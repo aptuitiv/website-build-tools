@@ -121,7 +121,7 @@ const getDevDependencies = (currentDevDependencies) => {
 
 /**
  * Add a dev dependency to the package.json file
- * 
+ *
  * @param {string} name The dev dependency name
  * @param {string} version The package version
  */
@@ -278,6 +278,8 @@ export const formatPackageJson = async (args) => {
                 case 'name':
                     if (args?.packageName) {
                         newPackageJson[section] = formatPackageName(args?.packageName);
+                    } else {
+                        newPackageJson[section] = packageJson[section];
                     }
                     break;
                 case 'scripts':
