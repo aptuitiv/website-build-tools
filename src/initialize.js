@@ -273,22 +273,34 @@ const installNpm = () => {
  * @param {boolean} [outputLog] Whether to output the log
  */
 export const initialize = async (args, outputLog = true) => {
-    // If the .env or the package.json file is missing get the project name.
-    // We do it here so that we don't potentially ask for the project name twice.
-    let name = null;
-    if (!fs.existsSync('.env') || !fs.existsSync('package.json')) {
-        name = await input({ message: 'What is the project name?', default: kebabToCapitalized(process.cwd().split('/').pop()) });
-    }
+    try {
+        // If the .env or the package.json file is missing get the project name.
+        // We do it here so that we don't potentially ask for the project name twice.
+        let name = null;
+        if (!fs.existsSync('.env') || !fs.existsSync('package.json')) {
+            name = await input({ message: 'What is the project name?', default: kebabToCapitalized(process.cwd().split('/').pop()) });
+        }
 
-    setupLicense(args);
-    await setupPackageJson(args, name, outputLog);
-    setupGitIgnore();
-    await setupEnvFile(name, outputLog);
-    setupConfigFile(args.config || '.aptuitiv-buildrc.js', outputLog);
-    removeFiles(outputLog);
-    installNpm();
-    if (outputLog) {
-        fancyLog(logSymbols.success, chalk.green('The build environment is set up now.'));
+        setupLicense(args);
+        await setupPackageJson(args, name, outputLog);
+        setupGitIgnore();
+        await setupEnvFile(name, outputLog);
+        setupConfigFile(args.config || '.aptuitiv-buildrc.js', outputLog);
+        removeFiles(outputLog);
+        await createBuildFiles(outputLog)
+        installNpm();
+        if (outputLog) {
+            fancyLog(logSymbols.success, chalk.green('The build environment is set up now.'));
+        }
+    } catch (error) {
+        if (error instanceof Error && error.name === 'ExitPromptError') {
+            // This is an "error" likely from pressing CTRL+C
+            // We want to exit gracefully
+            // https://www.npmjs.com/package/@inquirer/prompts#handling-ctrlc-gracefully
+            fancyLog(chalk.red('Exiting...'));
+        } else {
+            throw error;
+        }
     }
 };
 
