@@ -1,0 +1,49 @@
+{# Macro to build an accessible icon with a title #}
+{% macro iconImg(icon, title, class) %}
+    {% apply spaceless %}
+        {% set class = (class ~ ' Icon')|trim %}
+        {% set id = 'iconTitle-' ~ random_string(6) %}
+        <svg class="{{ class }}" role="img" alt="{{ title }}" aria-labelledby="{{ id }}" focusable="false"><title id="{{ id }}">{{ title }}</title><use xlink:href="#icon-{{ icon }}" /></svg>
+    {% endapply %}
+{% endmacro %}
+
+{# Macro to build an icon that should be hidden from screen readers #}
+{% macro iconAriaHidden(icon, class) %}
+    {% apply spaceless %}
+        {% set class = (class ~ ' Icon')|trim %}
+        <svg class="{{ class }}" aria-hidden="true" focusable="false"><use xlink:href="#icon-{{ icon }}" /></svg>
+    {% endapply %}
+{% endmacro %}
+
+{# Macro to load Splide #}
+{% macro loadSplide() %}
+    {% do _page.addCss('splide/splide.min.css'|theme_url, {'preload': true}) %}
+    {% do _page.addCss('splide/splide-extension-video.min.css'|theme_url, {'preload': true}) %}
+    {% if _page.hasJs('splide/splide.min.js'|theme_url) == false %}
+        {% inlinejs %}
+            loadjs.ready('main', {
+                success: function() {
+                    loadjs(['{{ 'splide/splide.min.js'|theme_url }}'], 'splide');
+                }
+            });
+            loadjs.ready('splide', {
+                success: function() {
+                    loadjs(['{{ 'splide/splide-extension-video.min.js'|theme_url }}'], 'splidevideo');
+                }
+            });
+        {% endinlinejs %}
+        {% do _page.registerJs('splide/splide.min.js'|theme_url) %}
+    {% endif %}
+{% endmacro %}
+
+{# Macro to load fslightbox #}
+{% macro loadLightbox() %}
+    {% inlinejs %}
+        loadjs.ready('main', {
+            success: function() {
+                loadjs(['{{ '/js/lightbox.js'|theme_url }}'], 'lightbox');
+            }
+        });
+    {% endinlinejs %}
+    {% do _page.registerJs('/js/lightbox.js'|theme_url) %}
+{% endmacro %}

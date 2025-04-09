@@ -120,6 +120,18 @@ const getDevDependencies = (currentDevDependencies) => {
 };
 
 /**
+ * Add a dev dependency to the package.json file
+ * 
+ * @param {string} name The dev dependency name
+ * @param {string} version The package version
+ */
+export const addDependency = (name, version) => {
+    const packageJson = fs.readJsonSync('package.json');
+    packageJson.dependencies[name] = version;
+    fs.writeJSONSync('package.json', packageJson, { spaces: 4 });
+}
+
+/**
  * Get the scripts for the package.json file
  *
  * @param {object} currentScripts The current scripts from the package.json file
@@ -281,7 +293,14 @@ export const formatPackageJson = async (args) => {
                     newPackageJson.scripts = getScripts({});
                 }
             } else if (section === 'author') {
-                newPackageJson[section] = args?.packageAuthor || 'Aptuitiv, Inc <hello@aptuitiv.com>';
+                let author = 'Aptuitiv, Inc <hello@aptuitiv.com>';
+                if (args?.packageAuthor) {
+                    author = args?.packageAuthor;
+                    if (args?.packageAuthorEmail) {
+                        author = `${author} <${args?.packageAuthorEmail}>`;
+                    }
+                }
+                newPackageJson[section] = author;
             } else if (section === 'bugs') {
                 newPackageJson[section] = {
                     email: args?.packageBugs || 'support@aptuitiv.com'

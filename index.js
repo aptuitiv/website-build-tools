@@ -4,11 +4,8 @@
  * npx aptuitiv-build template --pulld
  */
 
-import chalk from 'chalk';
 import { Command, Option } from 'commander';
-import fancyLog from 'fancy-log';
 import fs from 'fs-extra';
-import logSymbols from 'log-symbols';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -29,6 +26,8 @@ import { packageJsonHandler } from './src/package-json.js';
 import { templateHandler } from './src/template.js';
 import { themeHandler } from './src/theme.js';
 import watchHandler from './src/watch.js';
+import { hasFiles } from './src/lib/files.js';
+import { logInfo, logMessage, logSuccess } from './src/lib/log.js';
 
 // Get the directory name of the current module
 
@@ -63,7 +62,7 @@ const runBuild = async () => {
     await imageHandler();
     await jsHandler('process', {});
     await templateHandler('push');
-    themeHandler('push');
+    await themeHandler('push');
 };
 
 /**
@@ -279,10 +278,16 @@ program
         await config.init(args);
         await initiaizeHandler(args);
         if (args.build) {
-            fancyLog(chalk.magenta('The project has been initialized. Running the build process.'));
-            await runBuild();
-            fancyLog(logSymbols.success, chalk.green('The build process has completed.'));
-            fancyLog(chalk.blue('You can now run "npm run watch" to start the watch process.'));
+            if (hasFiles('src')) {
+                logMessage('The project has been initialized. Running the build process.');
+                // The aptuitiv-buildrc.js file could have changed so setup the configuration again for the build process
+                await config.init(args);
+                await runBuild();
+                logSuccess('The build process has completed.');
+                logInfo('You can now run "npm run watch" to start the watch process. Or run "npm run deploy" to upload files to the server.');
+            } else {
+                logMessage('The project has been initialized. You can add your source files to the "src" folder.');
+            }
         }
     });
 

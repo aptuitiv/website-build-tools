@@ -1,0 +1,17 @@
+{# One-column template. The content is as wide as the default container. #}
+{% include 'snippets/header' %}
+
+{% block banner %}
+    {{ _page.content('banner') }}
+{% endblock %}
+
+<div class="Container Container--pad ContentBg">
+    <div class="Content clearfix">
+        {% if _core.theme.settings.showBreadcrumb == "yes" and _page.isHome == false %}
+            {{ _page.breadcrumb() }}
+        {% endif %}
+        <main id="main">{% block main _page.content() %}</main>
+    </div>
+</div>
+
+{% include 'snippets/footer' %}

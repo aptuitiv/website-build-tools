@@ -3,22 +3,26 @@
 =========================================================================== */
 
 import chalk from 'chalk';
-import * as childProcess from 'child_process';
+import { execa } from 'execa';
 import fancyLog from 'fancy-log';
 import fs from 'fs-extra';
 import logSymbols from 'log-symbols';
-import { parse } from 'path';
+import { dirname, parse } from 'path';
 import yaml from 'json-to-pretty-yaml';
-import { input } from '@inquirer/prompts';
-
-import { createEnvFile } from './env.js';
+import { input, select } from '@inquirer/prompts';
+import { fileURLToPath } from 'url';
 
 // Build scripts
+import { createEnvFile } from './env.js';
 import { getObjectKeysRecursive, setupRoot, sortObjectByKeys } from './helpers.js';
-import { logConditionalMessage, logConditionalSuccess, logConditionalWarning } from './lib/log.js';
-import { isObject, isObjectWithValues, isStringWithValue } from './lib/types.js';
-import { formatPackageJson, setupLicense } from './package-json.js';
+import { logConditionalMessage, logConditionalSuccess, logConditionalWarning, logMessage } from './lib/log.js';
 import { kebabToCapitalized } from './lib/string.js';
+import { isObject, isObjectWithValues, isStringWithValue } from './lib/types.js';
+import { addDependency, formatPackageJson, setupLicense } from './package-json.js';
+import { hasFilesByExtension } from './lib/files.js';
+
+// Get the directory name of the current module
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /**
  * Convert the JSON content to a Javascript string
@@ -220,8 +224,9 @@ const setupPackageJson = async (args, name, outputLog = true) => {
         } else {
             packageArgs.packageName = await input({ message: 'What is the project name?', default: process.cwd().split('/').pop().toLowerCase() });
         }
-        packageArgs.packageAuthor = await input({ message: 'Who is the package author?', default: 'Aptuitiv, Inc <hello@aptuitiv.com>' });
-        packageArgs.packageCopyright = await input({ message: 'What is the copyright?', default: 'Aptuitiv, Inc' });
+        packageArgs.packageAuthor = await input({ message: 'Who is the package author name?', default: 'Aptuitiv, Inc' });
+        packageArgs.packageAuthorEmail = await input({ message: 'What is the package author email?', default: 'hello@aptuitiv.com' });
+        packageArgs.packageCopyright = packageArgs.packageAuthor;
 
         // Create the blank package.json file
         fs.writeFileSync('package.json', `{}`);
@@ -259,11 +264,64 @@ const removeFiles = (outputLog = true) => {
 };
 
 /**
+ * Set up a new website with basic project files
+ * 
+ * @param {boolean} [outputLog] Whether to output the log
+ */
+const setupNewWebsite = async (outputLog) => {
+    fs.ensureDirSync('src/config');
+    fs.ensureDirSync('src/css');
+    fs.ensureDirSync('src/fonts');
+    fs.ensureDirSync('src/icons');
+    fs.ensureDirSync('src/js');
+    fs.ensureDirSync('src/templates');
+
+    // Aptuitiv build configuration
+    fs.copyFileSync(`${__dirname}/source-files/.aptuitiv-buildrc.js`, '.aptuitiv-buildrc.js');
+
+    // Theme config files
+    if (!hasFilesByExtension('src/config', 'json')) {
+        fs.copySync(`${__dirname}/source-files/config`, 'src/config');
+    }
+
+    // CSS files
+    const cssFiles = fs.readdirSync('src/css');
+    if (cssFiles.length === 0) {
+        const { stdout: cacaoVersion } = await execa`npm view cacao-css version`;
+        addDependency('cacao-css', cacaoVersion);
+        fs.copySync(`${__dirname}/source-files/css`, 'src/css');
+    }
+
+    // Font files
+    if (!fs.existsSync('src/fonts/README.md')) {
+        fs.copyFileSync(`${__dirname}/source-files/fonts/README.md`, 'src/fonts/README.md');
+    }
+
+    // Icon files
+    if (!hasFilesByExtension('src/icons', 'svg')) {
+        fs.copySync(`${__dirname}/source-files/icons`, 'src/icons');
+    }
+
+    // JS files
+    const jsFiles = fs.readdirSync('src/js');
+    if (jsFiles.length === 0) {
+        fs.copySync(`${__dirname}/source-files/js`, 'src/js');
+    }
+
+    // Template files
+    if (!hasFilesByExtension('src/templates', 'twig')) {
+        fs.copySync(`${__dirname}/source-files/templates`, `src/templates`);
+    }
+
+    logConditionalSuccess(outputLog, 'Basic website set up.');
+}
+
+/**
  * Install NPM packages
  */
-const installNpm = () => {
-    fancyLog(chalk.magenta('Installing packages...'));
-    childProcess.execSync('npm install', { stdio: 'inherit' });
+const installNpm = async () => {
+    logMessage('Installing NPM packages');
+    await execa`npm install`;
 };
 
 /**
@@ -281,14 +339,24 @@ export const initialize = async (args, outputLog = true) => {
             name = await input({ message: 'What is the project name?', default: kebabToCapitalized(process.cwd().split('/').pop()) });
         }
 
+        const projectType = await select({
+            message: 'What type of project is this?',
+            choices: [
+                { name: 'Existing website with project files', value: 'existing' },
+                { name: 'New website', value: 'new' },
+            ],
+        });
+
         setupLicense(args);
         await setupPackageJson(args, name, outputLog);
         setupGitIgnore();
         await setupEnvFile(name, outputLog);
         setupConfigFile(args.config || '.aptuitiv-buildrc.js', outputLog);
         removeFiles(outputLog);
-        await createBuildFiles(outputLog)
-        installNpm();
+        if (projectType === 'new') {
+            await setupNewWebsite(outputLog);
+        }
+        await installNpm();
         if (outputLog) {
             fancyLog(logSymbols.success, chalk.green('The build environment is set up now.'));
         }

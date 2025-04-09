@@ -1,0 +1,142 @@
+/* ==========================================================================
+   Main Navigation
+   ========================================================================== */
+
+/** @define MainNav */
+
+/**
+ * Base menu
+ */
+
+.MainNav {
+    align-items: center;
+    background: var(--MainNav-background-sm);
+    display: none;
+    flex-flow: column wrap;
+    font-family: var(--MainNav-font-family);
+    gap: var(--MainNav-item-gap);
+    grid-column: 1 / span 2;
+    justify-content: var(--MainNav-horizontal-alignment);
+    line-height: var(--MainNav-lineHeight);
+    list-style: none;
+    margin: var(--MainNav-margin-sm);
+    padding: var(--MainNav-padding-sm);
+    width: 100%;
+}
+
+/**
+ * Items
+ */
+
+.MainNav-item {
+    font-size: var(--MainNav-font-size);
+    letter-spacing: var(--MainNav-letter-spacing);
+    line-height: var(--MainNav-line-height);
+    text-transform: var(--MainNav-text-transform);
+    width: 100%;
+}
+
+/**
+ * Links
+ */
+
+.MainNav-link {
+    background: var(--MainNav-link-background-sm, --MainNav-link-background);
+    color: var(--MainNav-color-sm, --MainNav-color);
+    display: block;
+    font-weight: var(--MainNav-font-weight);
+    padding: var(--MainNav-item-padding-sm);
+    position: relative;
+    text-align: center;
+    text-decoration: var(--MainNav-link-text-decoration, none);
+}
+
+.MainNav-item.is-current > .MainNav-link,
+.MainNav-item.is-currentParent > .MainNav-link,
+.MainNav-item:hover > .MainNav-link {
+    background: var(--MainNav-link-background-hover-sm, --MainNav-link-background-hover);
+    color: var(--MainNav-color-hover-sm, --MainNav-color-hover);
+    text-decoration: var(--MainNav-link-text-decoration-hover, none);
+}
+
+/* ------------------------------------ *\
+    Responsive
+\* ------------------------------------ */
+
+@media (--m-small-screen-nav) {
+    .MainNav[data-open='yes'] {
+        display: flex;
+    }
+
+    .MainNav-link {
+        text-align: left;
+    }
+
+    .MainNav-link.is-dropdown::after {
+        border: 5px solid transparent;
+        border-left-color: currentcolor;
+        content: '';
+        display: block;
+        opacity: 0.7;
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .MainNav-link.is-dropdown.is-active::after {
+        right: 13px;
+        top: 60%;
+        transform: translateY(-50%) rotate(90deg);
+    }
+}
+
+@media (--m-large-screen-nav) {
+    .MainNav {
+        background: none;
+        display: flex;
+        flex-direction: row;
+        grid-column: 1 / span 1;
+        margin: 0;
+        padding: 0;
+    }
+
+    .MainNav-item {
+        width: unset;
+    }
+
+    .MainNav-link {
+        background: var(--MainNav-link-background, transparent);
+        color: var(--MainNav-color);
+        padding: var(--MainNav-item-padding);
+    }
+
+    .MainNav-item--smallScreen {
+        display: none;
+    }
+
+    .MainNav-item.is-current > .MainNav-link,
+    .MainNav-item.is-currentParent > .MainNav-link,
+    .MainNav-item:hover > .MainNav-link {
+        background: var(--MainNav-link-background-hover, transprent);
+        color: var(--MainNav-color-hover);
+        text-decoration: none;
+    }
+
+    .MainNav-item.is-current > .MainNav-link::after,
+    .MainNav-item.is-currentParent > .MainNav-link::after,
+    .MainNav-item:hover > .MainNav-link::after {
+        border-top: 1px solid var(--MainNav-color-hover);
+        bottom: -1px;
+        content: '';
+        left: 50%;
+        position: absolute;
+        transform: translateX(-50%);
+        width: 45px;
+    }
+
+    /* postcss-bem-linter: ignore */
+    .MainNav-item.Dropdown:hover > .MainNav-link::after {
+        display: none;
+    }
+}

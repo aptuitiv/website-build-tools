@@ -1,0 +1,81 @@
+{
+    "groups": [
+        {
+            "name": "Breadcrumb",
+            "fields": [
+                {
+                    "name": "showBreadcrumb",
+                    "label": "Show Breadcrumb Text",
+                    "type": "switch",
+                    "defaultValue": "yes"
+                }
+            ]
+        },
+        {
+            "name": "Header",
+            "description": "Content for the header that is used on all pages",
+            "fields": [
+                {
+                    "name": "headerLogo",
+                    "label": "Logo",
+                    "type": "image",
+                    "path": "images",
+                    "preview": {
+                        "type": "replace",
+                        "contentSelector": ".Header-logo",
+                        "template": "<img src=\"{{ url }}\" height=\"{{ imageHeight }}\" width=\"{{ imageWidth }}\" alt=\"{{ alt }}\" class=\"Header-logo\">"
+                    }
+                },
+                {
+                    "name": "headerLogoWidth",
+                    "label": "Logo width",
+                    "type": "stepper",
+                    "after": "px",
+                    "default": "425",
+                    "preview": {
+                        "type": "css-head",
+                        "cssVariable": "--Header-logo-width",
+                        "template": "{{ value }}px"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Social Icons",
+            "description": "Set the links and icons to use for your social networks in the footer of each page.",
+            "fields": [
+                {
+                    "name": "social",
+                    "label": "Social Networks",
+                    "type": "repeatingGrid",
+                    "itemName": "Social Network",
+                    "children": [
+                        {
+                            "name": "icon",
+                            "label": "Icon",
+                            "type": "select",
+                            "options": {
+                                "facebook": "Facebook",
+                                "google": "Google",
+                                "instagram": "Instagram",
+                                "linkedin": "LinkedIn",
+                                "pinterest": "Pinterest",
+                                "tiktok": "TikTok",
+                                "whatsapp": "WhatsApp",
+                                "x": "X (Twitter)",
+                                "youtube": "YouTube"
+                            },
+                            "columnWidth": "1fr"
+                        },
+                        {
+                            "name": "url",
+                            "label": "URL to your page on this social network",
+                            "type": "text",
+                            "columnWidth": "2fr"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -41,6 +41,7 @@
         "dotenv": "^16.4.7",
         "esbuild": "0.25.1",
         "eslint": "^9.23.0",
+        "execa": "^9.5.2",
         "fancy-log": "^2.0.0",
         "find-cache-dir": "^5.0.0",
         "fs-extra": "^11.3.0",

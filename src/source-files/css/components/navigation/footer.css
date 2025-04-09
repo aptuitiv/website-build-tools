@@ -1,0 +1,14 @@
+/* =========================================================================== *\
+    Footer Nav
+\* =========================================================================== */
+
+/* :root {
+    --FooterNav-textTransform: uppercase;
+} */
+
+/* @define FooterNav */
+.FooterNav {
+    list-style: none;
+    padding-left: 0;
+    text-transform: var(--FooterNav-textTransform);
+}

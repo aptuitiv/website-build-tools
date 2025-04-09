@@ -1,0 +1,26 @@
+        <footer class="Footer">
+            Footer content here
+        </footer>
+
+        {# Do this before you output any inline Javascript in the footer #}
+        {% if _core.service.recaptchaV3.isUsable %}
+            {% if _page.hasJs('recaptchaV3') == false %}
+                {% do _page.registerJs('recaptchaV3') %}
+                {% inlinejs %}
+                    loadjs.ready('main', {
+                        success: function() {
+                            new ScriptLoader(["{{ _core.service.recaptchaV3.js.src }}"]);
+                        }
+                    });
+                {% endinlinejs %}
+                {{ _core.service.recaptchaV3.script.tag }}
+            {% endif %}
+            {% inlinecss %}
+                .grecaptcha-badge { visibility: hidden; }
+            {% endinlinecss %}
+        {% endif %}
+        
+        {{ _page.js() }}
+        {{ _page.bodyEndCode() }}
+    </body>
+</html>

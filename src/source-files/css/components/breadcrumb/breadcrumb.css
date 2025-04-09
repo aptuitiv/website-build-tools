@@ -1,0 +1,31 @@
+/* =========================================================================== *\
+    BREADCRUMB
+\* =========================================================================== */
+
+/** @define Breadcrumb **/
+.Breadcrumb {
+    color: var(--Breadcrumbs-color);
+    font-size: var(--Breadcrumbs-fontSize, 1.2rem);
+    padding: var(--Breadcrumbs-padding-sm);
+}
+
+.Breadcrumb-link {
+    color: var(--Breadcrumbs-link-color);
+    text-decoration: none;
+}
+
+.Breadcrumb-link:focus-visible {
+    color: var(--Breadcrumbs-link-colorHover);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .Breadcrumb-link:hover {
+        color: var(--Breadcrumbs-link-colorHover);
+    }
+}
+
+@media (--m-sm) {
+    .Breadcrumb {
+        padding: var(--Breadcrumbs-padding);
+    }
+}
