@@ -79,6 +79,17 @@ const runStylelint = async (fileGlob) => {
                 'color-named': 'never',
                 // Override the stylelint-config-standard rule to allow custom properties in formats that aren't kebab-case
                 'custom-property-pattern': null,
+                // Don't allow duplicate properties that are identical
+                'declaration-block-no-duplicate-properties': [
+                    true,
+                    {
+                        ignore: [
+                            'consecutive-duplicates-with-different-values',
+                            'consecutive-duplicates-with-different-syntaxes',
+                            'consecutive-duplicates-with-same-prefixless-values'
+                        ],
+                    },
+                ],
                 'import-notation': 'string',
                 'order/properties-alphabetical-order': true,
                 // Set the BEM pattern rule
