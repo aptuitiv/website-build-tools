@@ -281,15 +281,19 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        await initiaizeHandler(args);
-        if (args.build) {
-            if (hasFiles('src')) {
-                logMessage('The project has been initialized. Running the build process.');
-                await runBuild(args);
-                logSuccess('The build process has completed.');
-                logInfo('You can now run "npm run watch" to start the watch process. Or run "npm run deploy" to upload files to the server.');
+        const success = await initiaizeHandler(args);
+        if (success) {
+            if (args.build) {
+                if (hasFiles('src')) {
+                    logMessage('The project has been initialized. Running the build process.');
+                    await runBuild(args);
+                    logSuccess('The build process has completed.');
+                    logInfo('You can now run "npm run watch" to start the watch process. Or run "npm run deploy" to upload files to the server.');
+                } else {
+                    logMessage('The project has been initialized. You can add your source files to the "src" folder.');
+                }
             } else {
-                logMessage('The project has been initialized. You can add your source files to the "src" folder.');
+                logMessage('The project has been initialized. You can now run "npm run build" to build the project.');
             }
         }
     });

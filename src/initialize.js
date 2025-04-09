@@ -364,69 +364,81 @@ const installNpm = async () => {
  * @param {boolean} [outputLog] Whether to output the log
  */
 export const initialize = async (args, outputLog = true) => {
+    // If the .env or the package.json file is missing get the project name.
+    // We do it here so that we don't potentially ask for the project name twice.
+    let name = null;
+    if (args.name) {
+        name = args.name;
+    }
+    if (name === null && (!fs.existsSync('.env') || !fs.existsSync('package.json'))) {
+        name = await input({ message: 'What is the project name?', default: kebabToCapitalized(process.cwd().split('/').pop()) });
+    }
+
+    let projectType = args.type ?? null;
+    const allowedTypes = [
+        'existing',
+        'basic',
+        'theme-arlo',
+        'theme-carmine',
+        'theme-caro',
+        'theme-harvest',
+        'theme-mallard',
+        'theme-rivera',
+        'theme-skeleton'
+    ];
+    if (projectType === null || !allowedTypes.includes(projectType)) {
+        projectType = await select({
+            message: 'What type of project is this?',
+            choices: [
+                { name: 'Existing website with project files', value: 'existing' },
+                { name: 'New basic website', value: 'basic' },
+                // { name: 'Arlo theme', value: 'theme-arlo' },
+                { name: 'Carmine theme', value: 'theme-carmine' },
+                // { name: 'Caro theme', value: 'theme-caro' },
+                { name: 'Harvest theme', value: 'theme-harvest' },
+                { name: 'Mallard theme', value: 'theme-mallard' },
+                { name: 'Rivera theme', value: 'theme-rivera' },
+                { name: 'Skeleton theme', value: 'theme-skeleton' },
+            ],
+        });
+    }
+    projectType = projectType.toLowerCase();
+
+    if (projectType.substring(0, 6) === 'theme-') {
+        const themeArgs = isObject(args) ? args : {};
+        if (name) {
+            themeArgs.packageName = name;
+        }
+        await downloadTheme(themeArgs, projectType, outputLog);
+    } else {
+        // Not a theme site. Could be an existing site or a new website
+        setupLicense(args);
+        await setupPackageJson(args, name, outputLog);
+        setupGitIgnore();
+        await setupEnvFile(name, outputLog);
+        setupConfigFile(args.config || '.aptuitiv-buildrc.js', outputLog);
+        removeFiles(outputLog);
+        if (projectType === 'basic') {
+            await setupBasicWebsite(outputLog);
+        }
+    }
+    await installNpm();
+    if (outputLog) {
+        fancyLog(logSymbols.success, chalk.green('The build environment is set up now.'));
+    }
+};
+
+/**
+ * Process the initialize request
+ *
+ * @param {object} args The command line arguments
+ */
+export const initiaizeHandler = async (args) => {
+    let returnValue = false;
     try {
-        // If the .env or the package.json file is missing get the project name.
-        // We do it here so that we don't potentially ask for the project name twice.
-        let name = null;
-        if (args.name) {
-            name = args.name;
-        }
-        if (name === null && (!fs.existsSync('.env') || !fs.existsSync('package.json'))) {
-            name = await input({ message: 'What is the project name?', default: kebabToCapitalized(process.cwd().split('/').pop()) });
-        }
-
-        let projectType = args.type ?? null;
-        const allowedTypes = [
-            'existing',
-            'basic',
-            'theme-arlo',
-            'theme-carmine',
-            'theme-caro',
-            'theme-harvest',
-            'theme-mallard',
-            'theme-rivera',
-            'theme-skeleton'
-        ];
-        if (projectType === null || !allowedTypes.includes(projectType)) {
-            projectType = await select({
-                message: 'What type of project is this?',
-                choices: [
-                    { name: 'Existing website with project files', value: 'existing' },
-                    { name: 'New basic website', value: 'basic' },
-                    // { name: 'Arlo theme', value: 'theme-arlo' },
-                    { name: 'Carmine theme', value: 'theme-carmine' },
-                    // { name: 'Caro theme', value: 'theme-caro' },
-                    { name: 'Harvest theme', value: 'theme-harvest' },
-                    { name: 'Mallard theme', value: 'theme-mallard' },
-                    { name: 'Rivera theme', value: 'theme-rivera' },
-                    { name: 'Skeleton theme', value: 'theme-skeleton' },
-                ],
-            });
-        }
-        projectType = projectType.toLowerCase();
-
-        if (projectType.substring(0, 6) === 'theme-') {
-            const themeArgs = isObject(args) ? args : {};
-            if (name) {
-                themeArgs.packageName = name;
-            }
-            await downloadTheme(themeArgs, projectType, outputLog);
-        } else {
-            // Not a theme site. Could be an existing site or a new website
-            setupLicense(args);
-            await setupPackageJson(args, name, outputLog);
-            setupGitIgnore();
-            await setupEnvFile(name, outputLog);
-            setupConfigFile(args.config || '.aptuitiv-buildrc.js', outputLog);
-            removeFiles(outputLog);
-            if (projectType === 'basic') {
-                await setupBasicWebsite(outputLog);
-            }
-        }
-        await installNpm();
-        if (outputLog) {
-            fancyLog(logSymbols.success, chalk.green('The build environment is set up now.'));
-        }
+        setupRoot(args.root);
+        await initialize(args);
+        returnValue = true;
     } catch (error) {
         if (error instanceof Error && error.name === 'ExitPromptError') {
             // This is an "error" likely from pressing CTRL+C
@@ -437,14 +449,5 @@ export const initialize = async (args, outputLog = true) => {
             throw error;
         }
     }
-};
-
-/**
- * Process the initialize request
- *
- * @param {object} args The command line arguments
- */
-export const initiaizeHandler = async (args) => {
-    setupRoot(args.root);
-    await initialize(args);
+    return returnValue;
 };
