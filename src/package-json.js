@@ -275,6 +275,11 @@ export const formatPackageJson = async (args) => {
                     // Remove the dependencies that are not needed
                     newPackageJson[section] = getDevDependencies(packageJson[section]);
                     break;
+                case 'name':
+                    if (args?.packageName) {
+                        newPackageJson[section] = formatPackageName(args?.packageName);
+                    }
+                    break;
                 case 'scripts':
                     // Setup the scripts
                     newPackageJson[section] = getScripts(packageJson[section]);
@@ -331,11 +336,13 @@ export const formatPackageJson = async (args) => {
  *  - license: The license to use
  */
 export const setupLicense = (args) => {
-    const license = args?.license || defaultLicense;
-    if (license === 'Apache-2.0') {
-        // Copy the LICENSE file
-        const licenseContent = fs.readFileSync(`${__dirname}/source-files/apache-license.txt`);
-        fs.writeFileSync('LICENSE', licenseContent);
+    if (!fs.existsSync('LICENSE')) {
+        const license = args?.license || defaultLicense;
+        if (license === 'Apache-2.0') {
+            // Copy the LICENSE file
+            const licenseContent = fs.readFileSync(`${__dirname}/source-files/apache-license.txt`);
+            fs.writeFileSync('LICENSE', licenseContent);
+        }
     }
 };
 
