@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Added support for eslint inline web worker plugin to support inlining the code for web workers instead of having to import files.
-- Added documentation with Docusaurus. Viewable at <https://aptuitiv.github.io/website-build-tools>.
+- Added documentation with Docusaurus. Viewable at [https://aptuitiv.github.io/website-build-tools](https://aptuitiv.github.io/website-build-tools).
 
 ### Changed
 
