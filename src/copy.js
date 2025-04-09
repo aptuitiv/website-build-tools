@@ -107,7 +107,13 @@ const copyFiles = async () => {
 
 /**
  * Process the copy request
+ *
+ * @param {object} args The command line arguments
  */
-export const copyHandler = async () => {
+export const copyHandler = async (args) => {
+    // Make sure that the config is the most current version.
+    // If the `init` command was run it's possible that the config could be out of date.
+    await config.reload(args);
+
     await copyFiles();
 };
