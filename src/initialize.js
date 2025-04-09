@@ -271,7 +271,7 @@ const removeFiles = (outputLog = true) => {
  *
  * @param {boolean} [outputLog] Whether to output the log
  */
-const setupNewWebsite = async (outputLog) => {
+const setupBasicWebsite = async (outputLog) => {
     fs.ensureDirSync('src/config');
     fs.ensureDirSync('src/css');
     fs.ensureDirSync('src/fonts');
@@ -375,20 +375,35 @@ export const initialize = async (args, outputLog = true) => {
             name = await input({ message: 'What is the project name?', default: kebabToCapitalized(process.cwd().split('/').pop()) });
         }
 
-        const projectType = await select({
-            message: 'What type of project is this?',
-            choices: [
-                { name: 'Existing website with project files', value: 'existing' },
-                { name: 'New website', value: 'new' },
-                // { name: 'Arlo theme', value: 'theme-arlo' },
-                { name: 'Carmine theme', value: 'theme-carmine' },
-                // { name: 'Caro theme', value: 'theme-caro' },
-                { name: 'Harvest theme', value: 'theme-harvest' },
-                { name: 'Mallard theme', value: 'theme-mallard' },
-                { name: 'Rivera theme', value: 'theme-rivera' },
-                { name: 'Skeleton theme', value: 'theme-skeleton' },
-            ],
-        });
+        let projectType = args.type ?? null;
+        const allowedTypes = [
+            'existing',
+            'basic',
+            'theme-arlo',
+            'theme-carmine',
+            'theme-caro',
+            'theme-harvest',
+            'theme-mallard',
+            'theme-rivera',
+            'theme-skeleton'
+        ];
+        if (projectType === null || !allowedTypes.includes(projectType)) {
+            projectType = await select({
+                message: 'What type of project is this?',
+                choices: [
+                    { name: 'Existing website with project files', value: 'existing' },
+                    { name: 'New basic website', value: 'basic' },
+                    // { name: 'Arlo theme', value: 'theme-arlo' },
+                    { name: 'Carmine theme', value: 'theme-carmine' },
+                    // { name: 'Caro theme', value: 'theme-caro' },
+                    { name: 'Harvest theme', value: 'theme-harvest' },
+                    { name: 'Mallard theme', value: 'theme-mallard' },
+                    { name: 'Rivera theme', value: 'theme-rivera' },
+                    { name: 'Skeleton theme', value: 'theme-skeleton' },
+                ],
+            });
+        }
+        projectType = projectType.toLowerCase();
 
         if (projectType.substring(0, 6) === 'theme-') {
             const themeArgs = isObject(args) ? args : {};
@@ -404,8 +419,8 @@ export const initialize = async (args, outputLog = true) => {
             await setupEnvFile(name, outputLog);
             setupConfigFile(args.config || '.aptuitiv-buildrc.js', outputLog);
             removeFiles(outputLog);
-            if (projectType === 'new') {
-                await setupNewWebsite(outputLog);
+            if (projectType === 'basic') {
+                await setupBasicWebsite(outputLog);
             }
         }
         await installNpm();

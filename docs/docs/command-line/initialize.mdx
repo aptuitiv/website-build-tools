@@ -31,6 +31,7 @@ The following options are available:
 - `--config` or `-c`: Specify a different name for the configuration file.
 - `--name` or `n`: Specify the name of the project.
 - `--no-build`: Don't build the files after the initialization.
+- `--type` or `-t`: Specify the type of project to create. See the [Type of project](#type-of-project) section below.
 
 ## Prompts
 
@@ -52,12 +53,30 @@ This value will be used for the `name` value in the `project.json` file if neces
 You'll be prompted to choose what type of project you're initializing.
 
 - **Existing website with project files**: Use this when you're starting to work on an existing website, the folder has all the project files, and you just need to set up the `.env` file and do the initial build.
-- **New website**: Use this if you're starting a brand new project that isn't using one of the Aptuitiv themes and the folder is empty.
+- **New basic website**: Use this if you're starting a brand new project that isn't using one of the Aptuitiv themes and the folder is empty.
 - **Carmine theme**: Use this if you're starting a new project using the Aptuitiv Carmine theme.
 - **Harvest theme**: Use this if you're starting a new project using the Aptuitiv Harvest theme.
 - **Mallard theme**: Use this if you're starting a new project using the Aptuitiv Mallard theme.
 - **Rivera theme**: Use this if you're starting a new project using the Aptuitiv Rivera theme.
 - **Skeleton theme**: Use this if you're starting a new project using the Aptuitiv Skeleton theme.
+
+If you want to pass the type of project as an argument you can use the `--type` or `-t` option. Below are the values you can use:
+
+| Type of project | Value |
+|-----------------|-------|
+| Existing website with project files | existing |
+| New website | basic |
+| Carmine theme | theme-carmine |
+| Harvest theme | theme-harvest |
+| Mallard theme | theme-mallard |
+| Rivera theme | theme-rivera |
+| Skeleton theme | theme-skeleton |
+
+For example, to set up a site with the Carmine theme you can run:
+
+```bash
+aptuitiv-build init --type theme-carmine
+```
 
 ### Package.json data
 
