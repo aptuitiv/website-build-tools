@@ -272,6 +272,7 @@ program
     .alias('init')
     .description('Initialize the project')
     .option('--no-build', 'Do not run the build process after initializing the project')
+    .option('-n, --name <name>', 'The name of the project')
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {

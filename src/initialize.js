@@ -11,11 +11,12 @@ import { dirname, parse } from 'path';
 import yaml from 'json-to-pretty-yaml';
 import { input, select } from '@inquirer/prompts';
 import { fileURLToPath } from 'url';
+import zl from 'zip-lib';
 
 // Build scripts
 import { createEnvFile } from './env.js';
 import { getObjectKeysRecursive, setupRoot, sortObjectByKeys } from './helpers.js';
-import { logConditionalMessage, logConditionalSuccess, logConditionalWarning, logMessage } from './lib/log.js';
+import { logConditionalMessage, logConditionalSuccess, logConditionalWarning, logMessage, logSuccess, logWarning } from './lib/log.js';
 import { kebabToCapitalized } from './lib/string.js';
 import { isObject, isObjectWithValues, isStringWithValue } from './lib/types.js';
 import { addDependency, formatPackageJson, setupLicense } from './package-json.js';
@@ -152,7 +153,8 @@ export const createConfigFile = (configFile, content) => {
  * Make sure that it has all of the necessary patterns
  */
 const setupGitIgnore = () => {
-    const content = `# This includes files that will be ignored by git
+    if (!fs.existsSync('.gitignore')) {
+        const content = `# This includes files that will be ignored by git
 # We want to include the package-lock.json file in git so that everyone is working with the same package files.
 # The package-lock.json should not be included in this file.
 # Web projects are not dependencies in other projects so this is ok. Reference for that decision:
@@ -172,8 +174,9 @@ node_modules/
 .DS_Store
 .env
 .stylelintcache`;
-    fs.writeFileSync('.gitignore', content);
-    fancyLog(logSymbols.success, chalk.green('Updated .gitignore file'));
+        fs.writeFileSync('.gitignore', content);
+        fancyLog(logSymbols.success, chalk.green('Updated .gitignore file'));
+    }
 };
 
 /**
@@ -206,7 +209,7 @@ const setupConfigFile = (configFile, outputLog = true) => {
 
 /**
  * Set up the package.json file
- * 
+ *
  * @param {object} args The command line arguments
  * @param {string} [name] The project name to be used for the package name
  * @param {boolean} [outputLog] Whether to output the log
@@ -239,7 +242,7 @@ const setupPackageJson = async (args, name, outputLog = true) => {
 
 /**
  * Remove legacy files
- * 
+ *
  * @param {boolean} [outputLog] Whether to output the log
  */
 const removeFiles = (outputLog = true) => {
@@ -265,7 +268,7 @@ const removeFiles = (outputLog = true) => {
 
 /**
  * Set up a new website with basic project files
- * 
+ *
  * @param {boolean} [outputLog] Whether to output the log
  */
 const setupNewWebsite = async (outputLog) => {
@@ -317,6 +320,35 @@ const setupNewWebsite = async (outputLog) => {
 }
 
 /**
+ * Download an Aptuitiv theme from Github
+ *
+ * @param {object} args The command line arguments along with other arguments for the package.json file.
+ * @param {string} theme The name of the theme to download
+ * @param {boolean} [outputLog] Whether to output the log
+ */
+const downloadTheme = async (args, theme, outputLog = true) => new Promise((resolve, reject) => {
+    (async () => {
+        logConditionalMessage(outputLog, 'Downloading the theme', theme);
+        await execa`curl -L -O https://github.com/aptuitiv/${theme}/archive/main.zip`;
+        zl.extract('./main.zip', './').then(() => {
+            fs.removeSync('./main.zip');
+            // The theme is downloaded to "theme-name-main" folder. Need to move all contents of
+            // that folder to the current directory.
+            fs.copySync(`./${theme}-main`, './');
+            fs.removeSync(`./${theme}-main`);
+            // Format the package json file
+            formatPackageJson(args).then(() => {
+                logConditionalSuccess(outputLog, 'Theme downloaded and extracted');
+                resolve();
+            });
+        }, (err) => {
+            logWarning('Error extracting the theme zip file', err);
+            reject(err);
+        })
+    })();
+})
+
+/**
  * Install NPM packages
  */
 const installNpm = async () => {
@@ -335,7 +367,10 @@ export const initialize = async (args, outputLog = true) => {
         // If the .env or the package.json file is missing get the project name.
         // We do it here so that we don't potentially ask for the project name twice.
         let name = null;
-        if (!fs.existsSync('.env') || !fs.existsSync('package.json')) {
+        if (args.name) {
+            name = args.name;
+        }
+        if (name === null && (!fs.existsSync('.env') || !fs.existsSync('package.json'))) {
             name = await input({ message: 'What is the project name?', default: kebabToCapitalized(process.cwd().split('/').pop()) });
         }
 
@@ -344,17 +379,33 @@ export const initialize = async (args, outputLog = true) => {
             choices: [
                 { name: 'Existing website with project files', value: 'existing' },
                 { name: 'New website', value: 'new' },
+                // { name: 'Arlo theme', value: 'theme-arlo' },
+                { name: 'Carmine theme', value: 'theme-carmine' },
+                // { name: 'Caro theme', value: 'theme-caro' },
+                { name: 'Harvest theme', value: 'theme-harvest' },
+                { name: 'Mallard theme', value: 'theme-mallard' },
+                { name: 'Rivera theme', value: 'theme-rivera' },
+                { name: 'Skeleton theme', value: 'theme-skeleton' },
             ],
         });
 
-        setupLicense(args);
-        await setupPackageJson(args, name, outputLog);
-        setupGitIgnore();
-        await setupEnvFile(name, outputLog);
-        setupConfigFile(args.config || '.aptuitiv-buildrc.js', outputLog);
-        removeFiles(outputLog);
-        if (projectType === 'new') {
-            await setupNewWebsite(outputLog);
+        if (projectType.substring(0, 6) === 'theme-') {
+            const themeArgs = isObject(args) ? args : {};
+            if (name) {
+                themeArgs.packageName = name;
+            }
+            await downloadTheme(themeArgs, projectType, outputLog);
+        } else {
+            // Not a theme site. Could be an existing site or a new website
+            setupLicense(args);
+            await setupPackageJson(args, name, outputLog);
+            setupGitIgnore();
+            await setupEnvFile(name, outputLog);
+            setupConfigFile(args.config || '.aptuitiv-buildrc.js', outputLog);
+            removeFiles(outputLog);
+            if (projectType === 'new') {
+                await setupNewWebsite(outputLog);
+            }
         }
         await installNpm();
         if (outputLog) {
