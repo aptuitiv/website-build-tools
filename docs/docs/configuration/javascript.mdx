@@ -378,6 +378,27 @@ export {productsController};
 </script>
 ```
 
+**Recommended approach**
+
+We recommend exporting the object as setting it to the `helper` name. It seems cleaner and avoids possible duplication of the global/object name.
+
+```js
+// Entry file
+// Using export
+const productsController = {
+    init() {
+        console.log('init');
+    }
+}
+//// eslint-disable-next-line import/prefer-default-export -- See http://aptuitiv.github.io/website-build-tools/configuration/javascript#es-modules-build-method for exporting recommendations.
+export {productsController as helper};
+
+// Using the exported function in some other file
+<script>
+    products.helper.init();
+</script>
+```
+
 #### CommonJS global variable
 
 Use `module.exports` to export.
