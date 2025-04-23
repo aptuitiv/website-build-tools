@@ -392,7 +392,7 @@ export const initialize = async (args, outputLog = true) => {
             choices: [
                 { name: 'Existing website with project files', value: 'existing' },
                 { name: 'New basic website', value: 'basic' },
-                // { name: 'Arlo theme', value: 'theme-arlo' },
+                { name: 'Arlo theme', value: 'theme-arlo' },
                 { name: 'Carmine theme', value: 'theme-carmine' },
                 // { name: 'Caro theme', value: 'theme-caro' },
                 { name: 'Harvest theme', value: 'theme-harvest' },
