@@ -432,6 +432,7 @@ export const initialize = async (args, outputLog = true) => {
  * Process the initialize request
  *
  * @param {object} args The command line arguments
+ * @returns {Promise<boolean>} Returns true if the initialization was successful, false otherwise
  */
 export const initiaizeHandler = async (args) => {
     let returnValue = false;

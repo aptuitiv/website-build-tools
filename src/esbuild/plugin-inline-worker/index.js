@@ -5,7 +5,7 @@ Based on https://github.com/mitschabaude/esbuild-plugin-inline-worker
 
 /* eslint-env node */
 import esbuild from 'esbuild';
-import findCacheDir from 'find-cache-dir';
+import findCacheDir from 'find-cache-directory';
 import fs from 'fs';
 import path from 'path';
 import { isObjectWithValues } from '../../lib/types.js';

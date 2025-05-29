@@ -16,7 +16,7 @@ export default defineConfig([
     {
         rules: {
             // Allow importing Javascript files
-            'import/extensions': 'off',
+            'import-x/extensions': ['off'],
         },
     },
 ]);
