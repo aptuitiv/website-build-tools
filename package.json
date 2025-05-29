@@ -1,6 +1,6 @@
 {
     "name": "@aptuitiv/website-build-tools",
-    "version": "1.24.0",
+    "version": "1.25.0",
     "description": "Build tools to help with building and deploying websites at Aptuitiv",
     "main": "index.js",
     "scripts": {
