@@ -159,6 +159,7 @@ const getScripts = (currentScripts) => {
         init: 'aptuitiv-build init',
         js: 'aptuitiv-build js',
         jslint: 'aptuitiv-build jslint',
+        ncu: 'ncu -i --format group',
         'packagejson-format': 'aptuitiv-build package-json format',
         'packagejson-scripts': 'aptuitiv-build package-json scripts',
         'pull-templates': 'aptuitiv-build pull-templates',

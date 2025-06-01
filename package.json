@@ -5,6 +5,7 @@
     "main": "index.js",
     "scripts": {
         "eslint": "eslint --fix --no-warn-ignored .",
+        "ncu": "ncu -i --format group",
         "prettier": "prettier --write .",
         "updateBrowsersList": "npx update-browserslist-db@latest",
         "watch": "watch-eslint  --fix --color ."
