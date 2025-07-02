@@ -154,7 +154,7 @@ const getScripts = (currentScripts) => {
         env: 'aptuitiv-build env',
         export: 'aptuitiv-build export',
         fonts: 'aptuitiv-build push-fonts',
-        formatThemeJson: 'aptuitiv-build format-theme-json',
+        "format-theme-json": 'aptuitiv-build format-theme-json',
         icons: 'aptuitiv-build icons',
         images: 'aptuitiv-build images',
         init: 'aptuitiv-build init',
