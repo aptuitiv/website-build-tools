@@ -24,7 +24,7 @@ import { initiaizeHandler } from './src/initialize.js';
 import { jsHandler } from './src/javascript.js';
 import { packageJsonHandler } from './src/package-json.js';
 import { templateHandler } from './src/template.js';
-import { themeHandler } from './src/theme.js';
+import { themeHandler, formatThemeJson } from './src/theme.js';
 import watchHandler from './src/watch.js';
 import { hasFiles } from './src/lib/files.js';
 import { logInfo, logMessage, logSuccess } from './src/lib/log.js';
@@ -247,7 +247,7 @@ program
     .addOption(configFileOption)
     .addOption(rootOption)
     .option('-p, --path <folderPath>', 'Path to the icon folder. For example, "icons".')
-    .option('-o, --output <filePath>', `The path, including the file name, 
+    .option('-o, --output <filePath>', `The path, including the file name,
         for the output Twig file within the "templates" folder. For example, "snippets/svg-icons.twig".`)
     .action(async (args) => {
         await config.init(args);
@@ -378,6 +378,16 @@ program
 /**
  * Theme related commands
  */
+program
+    .command('format-theme-json')
+    .description('Format the theme configuration JSON file')
+    .option('-f, --file <fileName>', 'The name of the theme configuration JSON file to format')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        await config.init(args);
+        formatThemeJson(args.file);
+    });
 program
     .command('pull-theme-config')
     .description('Pull the theme config files from the build directory to the source directory')

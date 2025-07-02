@@ -14,13 +14,20 @@ Below are the recommended scripts within the `package.json` file.
         "css": "aptuitiv-build css",
         "deploy": "aptuitiv-build upload -t",
         "download-theme": "aptuitiv-build download -t",
+        "env": "aptuitiv-build env",
         "export": "aptuitiv-build export",
         "fonts": "aptuitiv-build push-fonts",
+        "format-theme-json": "aptuitiv-build format-theme-json",
         "icons": "aptuitiv-build icons",
         "images": "aptuitiv-build images",
         "init": "aptuitiv-build init",
         "js": "aptuitiv-build js",
         "jslint": "aptuitiv-build jslint",
+        "ncu": "ncu -i --format group",
+        "packagejson-format": "aptuitiv-build package-json format",
+        "packagejson-scripts": "aptuitiv-build package-json scripts",
+        "pull-templates": "aptuitiv-build pull-templates",
+        "pull-theme-config": "aptuitiv-build pull-theme-config",
         "start": "aptuitiv-build start",
         "stylelint": "aptuitiv-build stylelint",
         "templates": "aptuitiv-build push-templates",
@@ -29,4 +36,13 @@ Below are the recommended scripts within the `package.json` file.
         "watch": "aptuitiv-build watch"
     }
 }
+```
+
+You can run any of the scripts by running `npm run <script-name>`. For example:
+
+```bash
+npm run build
+npm run css
+npm run format-theme-json
+npm run watch
 ```
