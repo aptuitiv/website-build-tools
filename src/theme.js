@@ -93,7 +93,7 @@ const reorderJsonByName = (json) => {
 };
 
 /**
- * Reorder the theme config groups
+ * Reorder the theme config top level groups
  *
  * @param {object} obj The object to reorder
  * @returns {object} The reordered object
@@ -102,10 +102,6 @@ const reorderThemeConfigGroups = (obj) => {
     let returnValue = obj;
     if (Array.isArray(returnValue)) {
         returnValue = returnValue.map(reorderThemeConfigGroups);
-    } if (isObject(returnValue)) {
-        if (objectHasValue(returnValue, 'groups')) {
-            returnValue.groups = reorderJsonByName(returnValue.groups);
-        }
     }
     return returnValue;
 };
