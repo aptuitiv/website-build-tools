@@ -93,16 +93,21 @@ const reorderJsonByName = (json) => {
 };
 
 /**
- * Reorder the theme config top level groups
+ * Reorder the theme config top level groups or sections
  *
  * @param {object} obj The object to reorder
  * @returns {object} The reordered object
  */
-const reorderThemeConfigGroups = (obj) => {
+const reorderThemeConfigGroupsOrSections = (obj) => {
     let returnValue = obj;
-    if (Array.isArray(returnValue)) {
-        returnValue = returnValue.map(reorderThemeConfigGroups);
+    if (isObject(returnValue)) {
+        if (objectHasValue(returnValue, 'groups') && Array.isArray(returnValue.groups)) {
+            returnValue.groups = reorderJsonByName(returnValue.groups);
+        } else if (objectHasValue(returnValue, 'sections') && Array.isArray(returnValue.sections)) {
+            returnValue.sections = reorderJsonByName(returnValue.sections);
+        }
     }
+
     return returnValue;
 };
 
@@ -145,7 +150,7 @@ const reorderThemeConfigProperties = (obj) => {
  */
 const reorderThemeConfig = (json) => {
     let returnValue = reorderThemeConfigProperties(json);
-    returnValue = reorderThemeConfigGroups(returnValue);
+    returnValue = reorderThemeConfigGroupsOrSections(returnValue);
     return returnValue;
 };
 
