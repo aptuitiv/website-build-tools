@@ -4,6 +4,30 @@ title: Theme Configuration
 
 # Theme configuration actions
 
+## Format the theme configuration files
+
+This affects the  `theme-settings.json` and `theme-styles.json` files. The following actions will be performed:
+- Validate the theme configuration files to ensure they are valid.
+- Reorder the top level groups in the theme configuration files to be in alphabetical order. Sub groups and sections will be in the order that they are defined in the file.
+- Reorder the properties for fields so that the properties show as:
+    - name
+    - label
+    - type
+    - description
+    - Any other properties in the order that they already are in the object.
+- Format the JSON to make them easier to read.
+
+```bash
+aptuitiv-build format-theme-json
+```
+
+If you want to format a single file, you can do so by passing the file name as an argument.
+
+```bash
+aptuitiv-build format-theme-json -f theme-settings.json
+aptuitiv-build format-theme-json --file theme-settings.json
+```
+
 ## Pull theme configuration files
 
 Copy the theme configuration files from the build folder to the source folder. This is typically done after downloading the theme configuration files via FTP.
