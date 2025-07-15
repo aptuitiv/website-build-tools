@@ -99,7 +99,7 @@ const reorderJsonByName = (json) => {
  * @returns {object} The reordered object
  */
 const reorderThemeConfigGroupsOrSections = (obj) => {
-    let returnValue = obj;
+    const returnValue = obj;
     if (isObject(returnValue)) {
         if (objectHasValue(returnValue, 'groups') && Array.isArray(returnValue.groups)) {
             returnValue.groups = reorderJsonByName(returnValue.groups);

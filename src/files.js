@@ -296,7 +296,7 @@ const removeFile = (path, msgPath, itemType, folderName) => {
  * @param {string} itemType The type of item to remove. Used in the messaging.
  */
 export const removeFileFromThemeBuild = (path, buildPath, itemType) => {
-    const filename = getFileName(path);
+    const filename = removeRootSrcPrefix(path, [buildPath]);
     const removePath = getRootThemeBuildPath(buildPath, filename);
     const msgPath = getThemeBuildPath(buildPath, filename);
     removeFile(removePath, msgPath, itemType, 'theme build');
