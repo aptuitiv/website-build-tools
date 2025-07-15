@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.28.0] - 2025-07-15
+
+### Fixed
+
+- Fixed issue where the correct delete path was not set for a file so the file in the `dist` folder was not removed.
+
 ## [1.27.1] - 2025-07-02
 
 ### Changed
