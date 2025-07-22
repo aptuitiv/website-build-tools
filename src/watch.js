@@ -176,7 +176,22 @@ const watchHandler = async () => {
         chalk.cyan(themeSrcFolder),
     );
     chokidar
-        .watch(themeFolder, { ignoreInitial: true })
+        .watch(themeFolder, {
+            ignoreInitial: true,
+            // We use this to allow the theme processor to validate and write a reconfigured file
+            // to the watched theme file.
+            // Without doing this the written changes will not be applied to the watched file.
+            // I lowered the stability threshold to 500ms from the default 2000ms to reduce the
+            // lag from editing the file to when it's processed.
+            // If the file is written to then it'll trigger another "change" event and the file will be
+            // uploaded to the server twice. I couldn't find a way to prevent this. It only happens if the
+            // json file has to be reformatted.
+            // https://github.com/paulmillr/chokidar
+            awaitWriteFinish: {
+                stabilityThreshold: 500,
+                pollInterval: 100
+            }
+        })
         .on('add', (path) => {
             copyThemeSrcToBuild(path);
         })
