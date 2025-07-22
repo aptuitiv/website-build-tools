@@ -162,6 +162,7 @@ const getScripts = (currentScripts, theme) => {
         'download-templates': `aptuitiv-build download -p theme/${theme ?? 'custom'}/templates`,
         'download-theme': 'aptuitiv-build download -t',
         'download-theme-config': `aptuitiv-build download -p theme/${theme ?? 'custom'}/config`,
+        'download-theme-images': `aptuitiv-build download -p theme/${theme ?? 'custom'}/images`,
         env: 'aptuitiv-build env',
         export: 'aptuitiv-build export',
         fonts: 'aptuitiv-build push-fonts',
