@@ -6,6 +6,7 @@ import chalk from 'chalk';
 import fancyLog from 'fancy-log';
 import fs from 'fs-extra';
 import logSymbols from 'log-symbols';
+import path from 'path';
 
 // Lib
 import { isObject, isStringWithValue } from './lib/types.js';
@@ -24,25 +25,12 @@ import {
 } from './helpers.js';
 
 /**
- * Copy the theme file to the build folder
- *
- * @param {string} path The file path
- */
-export const copyThemeSrcToBuild = (path) => {
-    copySrcFileToThemeBuild(
-        path,
-        config.data.themeConfig.src,
-        config.data.themeConfig.build,
-    );
-};
-
-/**
  * Removes a deleted theme config file from the build directory
  *
- * @param {string} path The file path
+ * @param {string} filePath The file path
  */
-export const removeThemeFileFromBuild = (path) => {
-    removeFileFromThemeBuild(path, config.data.themeConfig.build, 'theme file');
+export const removeThemeFileFromBuild = (filePath) => {
+    removeFileFromThemeBuild(filePath, config.data.themeConfig.build, 'theme file');
 };
 
 /**
@@ -303,4 +291,21 @@ export const formatThemeJson = async (fileName) => {
         console.log('');
         fancyLog(logSymbols.success, chalk.green('Done formatting the theme configuration JSON files'));
     }
+};
+
+/**
+ * Copy the theme file to the build folder
+ *
+ * @param {string} filePath The file path
+ */
+export const copyThemeSrcToBuild = async (filePath) => {
+    const fileName = path.basename(filePath);
+    if (fileName !== 'theme-config.json') {
+        await formatThemeJson(fileName);
+    }
+    copySrcFileToThemeBuild(
+        fileName,
+        config.data.themeConfig.src,
+        config.data.themeConfig.build,
+    );
 };
