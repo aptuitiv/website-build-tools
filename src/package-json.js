@@ -144,6 +144,9 @@ const getScripts = (currentScripts, theme) => {
     const remove = [
         'lint',
         'updateBrowsersList',
+        // Scripts that were renamed or removed
+        'packagejson-format',
+        'packagejson-scripts',
     ];
     // Scripts to make sure that they exists
     const add = {
@@ -173,8 +176,8 @@ const getScripts = (currentScripts, theme) => {
         js: 'aptuitiv-build js',
         jslint: 'aptuitiv-build jslint',
         ncu: 'ncu -i --format group',
-        'packagejson-format': 'aptuitiv-build package-json format',
-        'packagejson-scripts': 'aptuitiv-build package-json scripts',
+        'package-json-format': 'aptuitiv-build package-json format',
+        'package-json-scripts': 'aptuitiv-build package-json scripts',
         'pull-templates': 'aptuitiv-build pull-templates',
         'pull-theme-config': 'aptuitiv-build pull-theme-config',
         'pull-theme-images': 'aptuitiv-build pull-theme-images',
