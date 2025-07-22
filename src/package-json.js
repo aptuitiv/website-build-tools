@@ -147,19 +147,20 @@ const getScripts = (currentScripts, theme) => {
         // Scripts that were renamed or removed
         'packagejson-format',
         'packagejson-scripts',
+        'deploy',
+        'deploy-css',
+        'deploy-fonts',
+        'deploy-images',
+        'deploy-js',
+        'deploy-templates',
+        'deploy-theme-config',
     ];
     // Scripts to make sure that they exists
     const add = {
         build: 'aptuitiv-build build',
         copy: 'aptuitiv-build copy',
         css: 'aptuitiv-build css',
-        deploy: 'aptuitiv-build upload -t',
-        'deploy-css': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/css`,
-        'deploy-fonts': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/fonts`,
-        'deploy-images': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/images`,
-        'deploy-js': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/js`,
-        'deploy-templates': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/templates`,
-        'deploy-theme-config': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/config`,
+        'download': 'aptuitiv-build download -t',
         'download-content-docs': 'aptuitiv-build download -p docs',
         'download-content-images': 'aptuitiv-build download -p images',
         'download-templates': `aptuitiv-build download -p theme/${theme ?? 'custom'}/templates`,
@@ -185,7 +186,14 @@ const getScripts = (currentScripts, theme) => {
         stylelint: 'aptuitiv-build stylelint',
         templates: 'aptuitiv-build push-templates',
         'theme-config': 'aptuitiv-build push-theme-config',
+        upload: 'aptuitiv-build upload -t',
+        'upload-css': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/css`,
+        'upload-fonts': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/fonts`,
+        'upload-images': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/images`,
+        'upload-js': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/js`,
+        'upload-templates': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/templates`,
         'upload-theme': 'aptuitiv-build upload -t',
+        'upload-theme-config': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/config`,
         watch: 'aptuitiv-build watch',
     };
     remove.forEach((item) => {
