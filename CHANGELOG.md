@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.29.0] - 2025-07-22
+
+### Added
+
+- Added package.json scripts to download and upload specific theme folders.
+- Added `pull` and `pull-images` command line scripts.
+- Added package.json scripts to download and pull theme images.
+
+### Changed
+
+- Renamed the `deploy` package.json scripts to `upload`. This was done to make the usage more clear.
+- Renamed `packagejson-format` package.json script to `package-json-format`.
+- Renamed `packagejson-scripts` package.json script to `package-json-scripts`.
+
 ## [1.28.0] - 2025-07-15
 
 ### Fixed
