@@ -135,22 +135,38 @@ export const addDependency = (name, version) => {
  * Get the scripts for the package.json file
  *
  * @param {object} currentScripts The current scripts from the package.json file
+ * @param {string} theme The theme name
  * @returns {object}
  */
-const getScripts = (currentScripts) => {
+const getScripts = (currentScripts, theme) => {
     let scripts = currentScripts || {};
     // Scripts to remove
     const remove = [
         'lint',
         'updateBrowsersList',
+        // Scripts that were renamed or removed
+        'packagejson-format',
+        'packagejson-scripts',
+        'deploy',
+        'deploy-css',
+        'deploy-fonts',
+        'deploy-images',
+        'deploy-js',
+        'deploy-templates',
+        'deploy-theme-config',
     ];
     // Scripts to make sure that they exists
     const add = {
         build: 'aptuitiv-build build',
         copy: 'aptuitiv-build copy',
         css: 'aptuitiv-build css',
-        deploy: 'aptuitiv-build upload -t',
+        'download': 'aptuitiv-build download -t',
+        'download-content-docs': 'aptuitiv-build download -p docs',
+        'download-content-images': 'aptuitiv-build download -p images',
+        'download-templates': `aptuitiv-build download -p theme/${theme ?? 'custom'}/templates`,
         'download-theme': 'aptuitiv-build download -t',
+        'download-theme-config': `aptuitiv-build download -p theme/${theme ?? 'custom'}/config`,
+        'download-theme-images': `aptuitiv-build download -p theme/${theme ?? 'custom'}/images`,
         env: 'aptuitiv-build env',
         export: 'aptuitiv-build export',
         fonts: 'aptuitiv-build push-fonts',
@@ -161,15 +177,23 @@ const getScripts = (currentScripts) => {
         js: 'aptuitiv-build js',
         jslint: 'aptuitiv-build jslint',
         ncu: 'ncu -i --format group',
-        'packagejson-format': 'aptuitiv-build package-json format',
-        'packagejson-scripts': 'aptuitiv-build package-json scripts',
+        'package-json-format': 'aptuitiv-build package-json format',
+        'package-json-scripts': 'aptuitiv-build package-json scripts',
         'pull-templates': 'aptuitiv-build pull-templates',
         'pull-theme-config': 'aptuitiv-build pull-theme-config',
+        'pull-theme-images': 'aptuitiv-build pull-theme-images',
         start: 'aptuitiv-build start',
         stylelint: 'aptuitiv-build stylelint',
         templates: 'aptuitiv-build push-templates',
         'theme-config': 'aptuitiv-build push-theme-config',
+        upload: 'aptuitiv-build upload -t',
+        'upload-css': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/css`,
+        'upload-fonts': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/fonts`,
+        'upload-images': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/images`,
+        'upload-js': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/js`,
+        'upload-templates': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/templates`,
         'upload-theme': 'aptuitiv-build upload -t',
+        'upload-theme-config': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/config`,
         watch: 'aptuitiv-build watch',
     };
     remove.forEach((item) => {
@@ -181,13 +205,15 @@ const getScripts = (currentScripts) => {
 
 /**
  * Set up the scripts in the package.json file
+ *
+ * @param {object} args The arguments from the command line
  */
-export const setupPackageJsonScripts = async () => {
+export const setupPackageJsonScripts = async (args) => {
     // Get the package.json file
     const packageJson = await fs.readJson('package.json');
 
     // Get the correct scripts
-    packageJson.scripts = getScripts(packageJson.scripts);
+    packageJson.scripts = getScripts(packageJson.scripts, args?.theme ?? 'custom');
 
     // Write the updated package.json back to the file
     fs.writeJSONSync('package.json', packageJson, { spaces: 4 });
@@ -286,7 +312,7 @@ export const formatPackageJson = async (args) => {
                     break;
                 case 'scripts':
                     // Setup the scripts
-                    newPackageJson[section] = getScripts(packageJson[section]);
+                    newPackageJson[section] = getScripts(packageJson[section], args?.theme ?? 'custom');
                     break;
                 default:
                     newPackageJson[section] = packageJson[section];
@@ -299,7 +325,7 @@ export const formatPackageJson = async (args) => {
                 } else if (section === 'devDependencies') {
                     newPackageJson.devDependencies = getDevDependencies({});
                 } else if (section === 'scripts') {
-                    newPackageJson.scripts = getScripts({});
+                    newPackageJson.scripts = getScripts({}, args?.theme ?? 'custom');
                 }
             } else if (section === 'author') {
                 let author = 'Aptuitiv, Inc <hello@aptuitiv.com>';
@@ -362,6 +388,6 @@ export const packageJsonHandler = async (args, action) => {
         await formatPackageJson(args);
         setupLicense(args);
     } else if (action === 'scripts') {
-        await setupPackageJsonScripts();
+        await setupPackageJsonScripts(args);
     }
 };

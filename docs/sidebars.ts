@@ -29,7 +29,7 @@ const sidebars: SidebarsConfig = {
         {
             type: 'category',
             label: 'Command Line Usage',
-            link: {type: 'doc', id: 'command-line/index'},
+            link: { type: 'doc', id: 'command-line/index' },
             items: [
                 {
                     type: 'doc',
@@ -103,6 +103,11 @@ const sidebars: SidebarsConfig = {
                 },
                 {
                     type: 'doc',
+                    id: 'command-line/pull',
+                    label: 'Pull',
+                },
+                {
+                    type: 'doc',
                     id: 'command-line/start',
                     label: 'Start',
                 },
@@ -121,12 +126,12 @@ const sidebars: SidebarsConfig = {
                     id: 'command-line/watch',
                     label: 'Watch',
                 },
-            ]
+            ],
         },
         {
             type: 'category',
             label: 'Configuration',
-            link: {type: 'doc', id: 'configuration/index'},
+            link: { type: 'doc', id: 'configuration/index' },
             items: [
                 {
                     type: 'doc',
@@ -136,7 +141,7 @@ const sidebars: SidebarsConfig = {
                 {
                     type: 'category',
                     label: 'Configuration Examples',
-                    link: {type: 'generated-index',},
+                    link: { type: 'generated-index' },
                     items: [
                         {
                             type: 'doc',
@@ -158,7 +163,7 @@ const sidebars: SidebarsConfig = {
                             id: 'configuration/examples/yaml',
                             label: 'Yaml',
                         },
-                    ]
+                    ],
                 },
                 {
                     type: 'doc',
@@ -185,14 +190,13 @@ const sidebars: SidebarsConfig = {
                     id: 'configuration/package-json-scripts',
                     label: 'Package.json Scripts',
                 },
-
             ],
         },
 
         {
             type: 'category',
             label: 'Development',
-            link: {type: 'doc', id: 'development/index'},
+            link: { type: 'doc', id: 'development/index' },
             items: [
                 {
                     type: 'doc',

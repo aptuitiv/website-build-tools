@@ -6,14 +6,35 @@ title: Package JSON Scripts
 
 Below are the recommended scripts within the `package.json` file.
 
+These scripts can be set up automatically by running the [package-json scripts](/command-line/package-json) command.
+
+```bash
+aptuitiv-build package-json scripts
+aptuitiv-build package-json scripts -t <theme>
+aptuitiv-build package-json scripts --theme <theme>
+```
+
+The `<theme>` placeholder will be replaced with the theme name. By default it will use "custom".
+You can specify the theme name to use for the package.json scripts with the `-t` or `--theme` flag on the [package-json scripts](/command-line/package-json) command.
+
+```bash
+aptuitiv-build package-json scripts -t <theme>
+aptuitiv-build package-json scripts --theme <theme>
+```
+
 ```json
 {
     "scripts": {
         "build": "aptuitiv-build build",
         "copy": "aptuitiv-build copy",
         "css": "aptuitiv-build css",
-        "deploy": "aptuitiv-build upload -t",
+        "download": "aptuitiv-build download -t",
+        "download-content-docs": "aptuitiv-build download -p docs",
+        "download-content-images": "aptuitiv-build download -p images",
+        "download-templates": "aptuitiv-build download -p theme/<theme>/templates",
         "download-theme": "aptuitiv-build download -t",
+        "download-theme-config": "aptuitiv-build download -p theme/<theme>/config",
+        "download-theme-images": "aptuitiv-build download -p theme/<theme>/images",
         "env": "aptuitiv-build env",
         "export": "aptuitiv-build export",
         "fonts": "aptuitiv-build push-fonts",
@@ -24,15 +45,23 @@ Below are the recommended scripts within the `package.json` file.
         "js": "aptuitiv-build js",
         "jslint": "aptuitiv-build jslint",
         "ncu": "ncu -i --format group",
-        "packagejson-format": "aptuitiv-build package-json format",
-        "packagejson-scripts": "aptuitiv-build package-json scripts",
+        "package-json-format": "aptuitiv-build package-json format",
+        "package-json-scripts": "aptuitiv-build package-json scripts",
         "pull-templates": "aptuitiv-build pull-templates",
         "pull-theme-config": "aptuitiv-build pull-theme-config",
+        "pull-theme-images": "aptuitiv-build pull-theme-images",
         "start": "aptuitiv-build start",
         "stylelint": "aptuitiv-build stylelint",
         "templates": "aptuitiv-build push-templates",
         "theme-config": "aptuitiv-build push-theme-config",
+        "upload": "aptuitiv-build upload -t",
+        "upload-css": "aptuitiv-build upload -p theme/<theme>/css",
+        "upload-fonts": "aptuitiv-build upload -p theme/<theme>/fonts",
+        "upload-images": "aptuitiv-build upload -p theme/<theme>/images",
+        "upload-js": "aptuitiv-build upload -p theme/<theme>/js",
+        "upload-templates": "aptuitiv-build upload -p theme/<theme>/templates",
         "upload-theme": "aptuitiv-build upload -t",
+        "upload-theme-config": "aptuitiv-build upload -p theme/<theme>/config",
         "watch": "aptuitiv-build watch"
     }
 }

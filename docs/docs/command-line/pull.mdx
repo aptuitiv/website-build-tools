@@ -1,0 +1,50 @@
+---
+title: Pull Files
+---
+
+# Pull files actions
+
+These commands will copy files from the build directory to the source directory or the root project directory.
+
+Typically you run these commands after [downloading files via FTP](/command-line/ftp).
+
+## Pull a specific directory
+
+This will copy a specific folder from the build directory to the root project directory.
+
+An example scenario is if you download the "images" or "docs" directory and you wanted to add them to your git repository.
+
+```bash
+aptuitiv-build pull -p <path>
+aptuitiv-build pull --path <path>
+```
+
+This will set up the same folder in your root project directory. For example, if you pull the "images" directory, it will set up the same folder in your root project directory.
+
+```bash
+aptuitiv-build pull -p images
+```
+
+## Pull theme configuration files
+
+Copy the theme configuration files from the build folder to the source folder.
+
+```bash
+aptuitiv-build pull-theme-config
+```
+
+## Pull theme images
+
+Copy the theme images from the build theme directory to the source theme directory.
+
+```bash
+aptuitiv-build pull-images
+```
+
+## Pull theme template files
+
+Copy the theme template files from the build folder to the source folder.
+
+```bash
+aptuitiv-build pull-templates
+```

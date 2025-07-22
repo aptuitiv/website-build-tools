@@ -14,6 +14,15 @@ This can be used when setting up a new site or converting a gulp-build process t
 
 ```bash
 aptuitiv-build package-json format
+aptuitiv-build package-json format -t <theme>
+aptuitiv-build package-json format --theme <theme>
+```
+
+You can specify the theme name to use for the package.json scripts. By default it will use "custom". For example, to set the theme name to "my-theme", you can run the following command:
+
+```bash
+aptuitiv-build package-json format -t my-theme
+aptuitiv-build package-json format --theme my-theme
 ```
 
 ## Update the `scripts` in the `package.json` file
@@ -22,4 +31,13 @@ This will update the `scripts` section of the `package.json` file to use the [la
 
 ```bash
 aptuitiv-build package-json scripts
+aptuitiv-build package-json scripts -t <theme>
+aptuitiv-build package-json scripts --theme <theme>
+```
+
+You can specify the theme name to use for the package.json scripts. By default it will use "custom". For example, to set the theme name to "my-theme", you can run the following command:
+
+```bash
+aptuitiv-build package-json scripts -t my-theme
+aptuitiv-build package-json scripts --theme my-theme
 ```
