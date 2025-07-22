@@ -176,6 +176,7 @@ const getScripts = (currentScripts, theme) => {
         'packagejson-scripts': 'aptuitiv-build package-json scripts',
         'pull-templates': 'aptuitiv-build pull-templates',
         'pull-theme-config': 'aptuitiv-build pull-theme-config',
+        'pull-theme-images': 'aptuitiv-build pull-theme-images',
         start: 'aptuitiv-build start',
         stylelint: 'aptuitiv-build stylelint',
         templates: 'aptuitiv-build push-templates',
