@@ -253,7 +253,9 @@ const processThemeJsonFile = async (fileName) => {
             if (validateThemeJsonFile(json, fileName)) {
                 fancyLog(logSymbols.success, chalk.green(`${fileName} file is valid`));
                 const formattedJson = reorderThemeConfig(json);
-                fs.writeJSONSync(filePath, formattedJson, { spaces: 4 });
+                if (JSON.stringify(json) !== JSON.stringify(formattedJson)) {
+                    fs.writeJSONSync(filePath, formattedJson, { spaces: 4 });
+                }
                 fancyLog(logSymbols.success, chalk.green(`Formatted the ${fileName} file`));
             } else {
                 fancyLog(logSymbols.error, chalk.red(`The ${fileName} file is not valid. Please fix the file and try again.`));
