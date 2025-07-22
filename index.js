@@ -340,6 +340,7 @@ packageJsonCommand
     .description('Format the package.json file')
     .addOption(rootOption)
     .option('-l, --license <license>', 'The license for the project. https://docs.npmjs.com/cli/v10/configuring-npm/package-json#license')
+    .option('-t, --theme <themeName>', 'Set the theme name. This sets the path to download and upload theme files. Defaults to "custom".')
     .action(async (args) => {
         packageJsonHandler(args, 'format');
     });
@@ -348,6 +349,7 @@ packageJsonCommand
     .command('scripts')
     .description('Update the scripts in the package.json to the recommended ones')
     .addOption(rootOption)
+    .option('-t, --theme <themeName>', 'Set the theme name. This sets the path to download and upload theme files. Defaults to "custom".')
     .action(async (args) => {
         packageJsonHandler(args, 'scripts');
     });
