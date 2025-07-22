@@ -23,8 +23,9 @@ import { imageHandler } from './src/image.js';
 import { initiaizeHandler } from './src/initialize.js';
 import { jsHandler } from './src/javascript.js';
 import { packageJsonHandler } from './src/package-json.js';
-import { templateHandler } from './src/template.js';
-import { themeHandler, formatThemeJson } from './src/theme.js';
+import { pullHandler, pullImages, pullTemplates, pullThemeConfig } from './src/pull.js';
+import { pushTemplates } from './src/template.js';
+import { formatThemeJson, pushTheme } from './src/theme.js';
 import watchHandler from './src/watch.js';
 import { hasFiles } from './src/lib/files.js';
 import { logInfo, logMessage, logSuccess } from './src/lib/log.js';
@@ -64,8 +65,8 @@ const runBuild = async (args) => {
     await iconHandler(argsObj);
     await imageHandler();
     await jsHandler('process', argsObj);
-    await templateHandler('push');
-    await themeHandler('push');
+    await pushTemplates();
+    await pushTheme();
 };
 
 /**
@@ -358,23 +359,55 @@ packageJsonCommand
  * Template related commands
  */
 program
-    .command('pull-templates')
-    .description('Pull the theme twig templates from the build directory to the source directory')
-    .addOption(configFileOption)
-    .addOption(rootOption)
-    .action(async (args) => {
-        await config.init(args);
-        templateHandler('pull');
-    });
-
-program
     .command('push-templates')
     .description('Push the theme twig templates from the source directory to the build directory')
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        templateHandler('push');
+        pushTemplates();
+    });
+
+/**
+ * Pull commands to pull files from the build directory to the source directory
+ */
+program
+    .command('pull')
+    .description('Pull files from the build directory to the source directory')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .requiredOption('-p, --path <filePath>', 'The path to the files to pull. For example, "theme/custom/templates", "theme/custom/config", or "images".')
+    .action(async (args) => {
+        await config.init(args);
+        pullHandler(args);
+    });
+
+program
+    .command('pull-images')
+    .description('Pull the images from the build theme directory to the source theme directory')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        await config.init(args);
+        pullImages();
+    });
+program
+    .command('pull-templates')
+    .description('Pull the theme twig templates from the build directory to the source directory')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        await config.init(args);
+        pullTemplates();
+    });
+program
+    .command('pull-theme-config')
+    .description('Pull the theme config files from the build directory to the source directory')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        await config.init(args);
+        pullThemeConfig();
     });
 
 /**
@@ -390,15 +423,7 @@ program
         await config.init(args);
         formatThemeJson(args.file);
     });
-program
-    .command('pull-theme-config')
-    .description('Pull the theme config files from the build directory to the source directory')
-    .addOption(configFileOption)
-    .addOption(rootOption)
-    .action(async (args) => {
-        await config.init(args);
-        themeHandler('pull');
-    });
+
 program
     .command('push-theme-config')
     .description('Push the theme config files from the source directory to the build directory')
@@ -406,7 +431,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        themeHandler('push');
+        pushTheme();
     });
 
 /**

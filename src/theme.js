@@ -14,7 +14,6 @@ import { objectHasValue } from './lib/object.js';
 // Build files
 import config from './config.js';
 import {
-    copyBuildFolderToSrc,
     copySrcFileToThemeBuild,
     copySrcFolderToBuild,
     removeFileFromThemeBuild,
@@ -48,34 +47,20 @@ export const removeThemeFileFromBuild = (path) => {
 
 /**
  * Process the theme request
- *
- * @param {string} action The action to take
  */
-export const themeHandler = async (action) => {
-    if (action === 'pull') {
-        await copyBuildFolderToSrc(
-            prefixThemeBuildPath(config.data.themeConfig.build),
-            prefixSrcPath(config.data.themeConfig.src),
-            'theme config files',
-        );
-        copySrcFileToThemeBuild(
-            'theme.json',
-            config.data.src,
-            config.data.build.theme,
-        );
-    } else if (action === 'push') {
-        await copySrcFolderToBuild(
-            prefixSrcPath(config.data.themeConfig.src),
-            prefixThemeBuildPath(config.data.themeConfig.build),
-            'theme config files',
-            ['*.md'], // Skip any markdown files
-        );
-        copySrcFileToThemeBuild(
-            'theme.json',
-            config.data.src,
-            config.data.build.theme,
-        );
-    }
+export const pushTheme = async () => {
+
+    await copySrcFolderToBuild(
+        prefixSrcPath(config.data.themeConfig.src),
+        prefixThemeBuildPath(config.data.themeConfig.build),
+        'theme config files',
+        ['*.md'], // Skip any markdown files
+    );
+    copySrcFileToThemeBuild(
+        'theme.json',
+        config.data.src,
+        config.data.build.theme,
+    );
 };
 
 /**

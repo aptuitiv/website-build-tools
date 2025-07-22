@@ -7,7 +7,6 @@
 // Build scripts
 import config from './config.js';
 import {
-    copyBuildFolderToSrc,
     copySrcFileToThemeBuild,
     copySrcFolderToBuild,
     removeFileFromThemeBuild,
@@ -42,22 +41,12 @@ export const removeTemplateFileFromBuild = (path) => {
 
 /**
  * Processs the template request
- *
- * @param {string} action The action to take
  */
-export const templateHandler = async (action) => {
-    if (action === 'pull') {
-        await copyBuildFolderToSrc(
-            prefixThemeBuildPath(config.data.templates.build),
-            prefixSrcPath(config.data.templates.src),
-            'templates',
-        );
-    } else if (action === 'push') {
-        await copySrcFolderToBuild(
-            prefixSrcPath(config.data.templates.src),
-            prefixThemeBuildPath(config.data.templates.build),
-            'templates',
-            ['*.md'], // Skip any markdown files
-        );
-    }
+export const pushTemplates = async () => {
+    await copySrcFolderToBuild(
+        prefixSrcPath(config.data.templates.src),
+        prefixThemeBuildPath(config.data.templates.build),
+        'templates',
+        ['*.md'], // Skip any markdown files
+    );
 };
