@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.31.1] - 2025-07-22
+
+### Changed
+
+- Improved the error handling when validating theme config files. Errors are now caught and output to the console instead of stopping a task.
+- Added validation to the theme config push command.
+
 ## [1.30.1] - 2025-07-22
 
 ### Fixed
