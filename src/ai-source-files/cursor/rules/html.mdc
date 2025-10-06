@@ -1,0 +1,62 @@
+---
+description: Rules for HTML in Twig files
+globs: *.twig
+alwaysApply: false
+---
+
+## General
+
+- Refer to MDN Web Docs for HTML and CSS best practices and to the W3C guidelines for accessibility standards.
+
+## CSS
+
+- Framework is the Cacao CSS framework <https://github.com/aptuitiv/cacao>
+- Group related classes together in HTML
+- Use utility classes from Cacao CSS framework
+- Custom classes should be placed at the beginning of class lists
+- Order: Custom classes → Utility classes → Responsive classes
+
+## Documentation
+
+- Add Twig comments where the code may need explanation.
+
+## Forms
+
+- Use <form> for forms, with appropriate input types and labels.
+
+## Images
+
+- Use <img> with alt attribute for images.
+- Add `loading="lazy"` to images that may be below the fold. The Twig `.lazy()` function is preferred. `{% do image.lazy() %}`.
+
+## Links
+
+- Use <a> for links, ensuring href attribute is present.
+
+## Structure
+
+- Use 4 spaces for indentation (no tabs)
+- Maintain consistent indentation throughout
+- Place nested elements on new lines with proper indentation
+- Content between tags should be on its own line when multi-line
+- Short content can stay on the same line as the tag
+- Place each HTML attribute on the same line as the tag
+
+### Good HTML Structure
+
+```html
+<!-- Good: Multi-line content on separate lines -->
+<div class="Header">
+    <h1 class="Header-title">Welcome to All-American Pest Control</h1>
+    <p class="header__description">
+        Professional pest control services for your home and business.
+        More longer content.
+    </p>
+</div>
+
+<!-- Good: Short content on same line -->
+<span class="Badge">New</span>
+
+<!-- Good: Attributes on same line -->
+<img src="logo.png" alt="Company Logo" class="Header-logo" />
+```

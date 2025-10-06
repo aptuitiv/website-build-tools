@@ -1,0 +1,57 @@
+---
+description: Command Allowlist
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Command Allowlist and Security Rules
+
+<https://docs.cursor.com/en/context/rules>
+
+## Allowed Commands
+
+Only run commands that are explicitly listed below:
+
+### Linting and Formatting
+
+- `npm run jslint` - ESLint code linting
+- `npm run stylelint` - Stylelint CSS linting
+
+### Build Commands
+
+- `npm run css` - Build CSS
+- `npm run js` - Build Javascript
+
+### File System Commands (Read-only)
+
+- `cd`
+- `head`
+- `ls`
+- `ls -la`
+- `grep`
+
+### File System Commands (write)
+
+- `mkdir`
+
+### Directory Navigation
+
+- `cd`
+- `pwd`
+
+## Blocked Commands
+
+Never run these dangerous commands:
+
+- `rm -rf`, `sudo`, `chmod 777`, `chown`, `kill`, `pkill`
+- `curl`, `wget`, `ssh`, `scp`
+- `npm install`, `npm uninstall`, `npm update`, `yarn install`
+- `mysql`, `psql`, `sqlite3`
+- `ps aux`, `top`, `htop`
+
+## Execution Rules
+
+1. Only run commands from the allowed list above
+2. Always ask for confirmation before running file-modifying commands
+3. Prefer read-only commands when possible
+4. Never run commands with sudo or elevated privileges
