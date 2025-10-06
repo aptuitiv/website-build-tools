@@ -1,0 +1,21 @@
+# Markdow lint configuration for the VS Code Markdownlint extension
+# https://github.com/DavidAnson/markdownlint
+# https://github.com/DavidAnson/markdownlint/blob/main/schema/.markdownlint.yaml
+
+# MD013/line-length : Line length
+MD013:
+  # Number of characters
+  line_length: 150
+  # Number of characters for headings
+  heading_line_length: 150
+  # Number of characters for code blocks
+  code_block_line_length: 150
+
+# MD033/no-inline-html : Inline HTML
+MD033: false
+
+# MD041/first-line-heading/first-line-h1 : First line in a file should be a top-level heading
+MD041: false
+
+# MD045/no-alt-text : Images should have alternate text (alt text)
+MD045: false
