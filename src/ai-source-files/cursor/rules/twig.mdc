@@ -1,0 +1,245 @@
+---
+description: "Twig templating rules and best practices for Twig version 3"
+globs: *.twig
+alwaysApply: false
+---
+
+## General
+
+- Use Twig version 3.x
+- Use modern Twig syntax and features.
+- Follow Twig best practices and conventions.
+- Variables and macros follow camelCase format.
+
+## Code Quality
+
+- Use meaningful variable names
+- Add comments for complex logic
+- Follow consistent formatting
+- Maintain clean, readable template structure
+
+## Indentation
+
+- Use 4 spaces for indentation (no tabs)
+- Maintain consistent indentation throughout
+- Align Twig tags with HTML structure
+
+## Good code examples
+
+### Template Structure
+
+```twig
+{# Good: Proper Twig structure with indentation #}
+{% extends "base.twig" %}
+
+{% block content %}
+    <div class="page-header">
+        <h1 class="page-header__title">
+            {{ page.title }}
+        </h1>
+        {% if page.subtitle %}
+            <p class="page-header__subtitle">
+                {{ page.subtitle }}
+            </p>
+        {% endif %}
+    </div>
+{% endblock %}
+```
+
+### Variable Usage
+
+```twig
+{# Good: Safe variable access #}
+{{ page.title|default('Default Title') }}
+
+{# Good: Conditional content #}
+{% if page.description %}
+    <p class="content__description">
+        {{ page.description }}
+    </p>
+{% endif %}
+
+{# Good: Loops with proper structure #}
+{% for item in items %}
+    <div class="item">
+        <h3 class="item__title">
+            {{ item.title }}
+        </h3>
+        <p class="item__description">
+            {{ item.description }}
+        </p>
+    </div>
+{% endfor %}
+```
+
+### Template Inheritance
+
+```twig
+{# Good: Base template structure #}
+<!DOCTYPE html>
+<html lang="{{ site.language|default('en') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {{ page.title }}
+    </title>
+</head>
+<body>
+    {% block content %}{% endblock %}
+    {% block sidebar %}{% endblock %}
+</body>
+</html>
+```
+
+### Includes and Macros
+
+```twig
+{# Good: Include structure #}
+{% include 'components/header.twig' with {
+    'title': page.title,
+    'navigation': navigation
+} %}
+
+{# Good: Macro definition #}
+{% macro button(text, url, class) %}
+    {% set class = 'Button ' ~ class %}
+    <a href="{{ url }}" class="{{ class|trim }}">
+        {{ text }}
+    </a>
+{% endmacro %}
+
+{# Good: Macro usage #}
+{% import 'macros/buttons.twig' as buttons %}
+{{ buttons.button('Learn More', '/about', 'Button--primary') }}
+```
+
+### Filters and Functions
+
+```twig
+{# Good: Using filters #}
+{{ page.content|striptags|slice(0, 150) }}...
+
+{# Good: Date formatting #}
+{{ page.date|date('F j, Y') }}
+
+{# Good: URL generation #}
+<a href="{{ url('page', {'slug': page.slug}) }}">
+    {{ page.title }}
+</a>
+
+{# Good: Image handling #}
+{% do image.resie(800, 600) %}
+{% do image.lazy() %}
+{% do image.alt.default('Default alt') %}
+{{ image.tag }}
+```
+
+### Conditional Logic
+
+```twig
+{# Good: Complex conditionals #}
+{% if page.featured and page.category == 'news' %}
+    <div class="featured-news">
+        <h2 class="featured-news__title">
+            {{ page.title }}
+        </h2>
+    </div>
+{% elseif page.category == 'services' %}
+    <div class="service-content">
+        <h2 class="service-content__title">
+            {{ page.title }}
+        </h2>
+    </div>
+{% else %}
+    <div class="standard-content">
+        <h2 class="standard-content__title">
+            {{ page.title }}
+        </h2>
+    </div>
+{% endif %}
+```
+
+### Loops and Iteration
+
+```twig
+{# Good: Loop with index #}
+{% for service in services %}
+    <div class="Service{% if loop.last %} Service--last{% endif %}">
+        <h3 class="Service-title">
+            {{ service.title }}
+        </h3>
+        <p class="Service-description">
+            {{ service.description }}
+        </p>
+        {% if service.features %}
+            <ul class="Service-features">
+                {% for feature in service.features %}
+                    <li class="Service-feature">
+                        {{ feature }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endfor %}
+```
+
+### Comments and Documentation
+
+```twig
+{# Good: Template comments #}
+{#
+    Header component
+    Displays site navigation and branding
+    Variables: title, navigation, logo
+#}
+<header class="header">
+    <div class="header__brand">
+        <a href="{{ url('home') }}" class="header__logo">
+            {{ site.name }}
+        </a>
+    </div>
+
+    {# Navigation menu #}
+    <nav class="header__nav">
+        {% include 'components/navigation.twig' %}
+    </nav>
+</header>
+```
+
+### Security Best Practices
+
+```twig
+{# Good: Safe output #}
+{{ user_input|escape }}
+
+{# Good: Safe attributes #}
+<div class="content" data-id="{{ item.id|escape('html_attr') }}">
+    {{ item.content|raw }}
+</div>
+
+{# Good: URL safety #}
+<a href="{{ url|escape('url') }}">
+    {{ link_text }}
+</a>
+```
+
+### Performance Considerations
+
+```twig
+{# Good: Conditional loading #}
+{% if page.images %}
+    {% include 'components/image-gallery.twig' with {
+        'images': page.images
+    } %}
+{% endif %}
+
+{# Good: Caching considerations #}
+{# Cache this block for 1 hour #}
+{% cache 'page-content' ~ page.id, 3600 %}
+    <div class="page-content">
+        {{ page.content }}
+    </div>
+{% endcache %}
+```

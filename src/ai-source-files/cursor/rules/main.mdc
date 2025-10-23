@@ -1,0 +1,27 @@
+---
+description: "Main project rules and tech stack overview for this website"
+globs: ["**/*"]
+alwaysApply: true
+---
+
+## Project Overview
+
+This is a custom website built with Aptuitiv's custom build tools and Cacao CSS framework.
+
+## Tech Stack
+
+- **CSS Framework**: Cacao CSS (utility class library) - <https://github.com/aptuitiv/cacao>
+- **Build Tools**: Aptuitiv Build Tools - <https://github.com/aptuitiv/website-build-tools>
+- **Templating**: Twig v3
+- **JavaScript**: Modern vanilla JavaScript
+- **Browser Support**: Latest 2 versions of Safari, Chrome, Firefox, and Edge,
+
+## File Structure
+
+- `dist/` - Built/compiled files. Do not edit these.
+- `src/` - Source files
+- `src/css/` - CSS source files
+- `src/js/` - JavaScript source files
+- `src/images/` - Source image assets
+- `src/icons/` - Source SVG icons
+- `src/templates/` - Twig templates

@@ -1,0 +1,19 @@
+---
+description: WCAG compliance and accessibility best practices
+globs: *.html, *.twig
+alwaysApply: true
+---
+
+# Accessibility Standards
+
+Ensures WCAG compliance and accessibility best practices.
+
+- Use ARIA roles and attributes to enhance accessibility when applicable.
+- Use semantic elements (e.g., <header>, <main>, <nav>, <footer>, <article>, <section>) for screen readers.
+- Use <button> for clickable elements, not <div> or <span>.
+- Avoid using deprecated elements (e.g., <font>, <center>).
+- Set the lang attribute on the <html> element to indicate the primary language of the page.
+- Use descriptive text for links, avoiding generic phrases like "click here."
+- Provide 'skip to main content' links for keyboard users to bypass repetitive navigation.
+- Check color contrast ratios meet WCAG guidelines (4.5:1 for normal text, 7:1 for large text).
+- Use headings (h1 to h6) in a logical order to structure content.

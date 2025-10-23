@@ -12,6 +12,7 @@ import { fileURLToPath } from 'url';
 // Build scripts
 import config from './src/config.js';
 import { copyHandler } from './src/copy.js';
+import { aiHandler } from './src/ai.js';
 import { cssHandler } from './src/css.js';
 import { envHandler } from './src/env.js';
 import exportHandler from './src/export.js';
@@ -146,6 +147,19 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await envHandler(args);
+    });
+
+/**
+ * AI commands
+ */
+const aiCommand = program.command('ai').description('Commands to set up AI tools');
+aiCommand
+    .command('cursor')
+    .description('Copy cursor AI rules to the project')
+    .addOption(rootOption)
+    .action(async (args) => {
+        await config.init(args);
+        aiHandler(args, 'cursor');
     });
 
 /**

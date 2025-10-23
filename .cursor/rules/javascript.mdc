@@ -1,0 +1,247 @@
+---
+description: "JavaScript coding standards for modern vanilla JS with browser compatibility"
+globs: *.js
+alwaysApply: false
+---
+
+
+## General
+
+- Use modern JavaScript features
+- Do not use jQuery.
+- Use native browser APIs
+- Implement proper error handling
+- Use 4 spaces for indentation (no tabs)
+- Maintain consistent indentation throughout
+
+## Browser Support
+
+- Support latest 2 versions of Safari, Chrome, Firefox, and Edge
+- Use features supported by all target browsers
+
+### Code Quality
+
+- Use camelCase for variables and objects.
+- Use PascalCase for classes.
+- Class or ID electors in HTML should be prefixed with `js-`. For example: `js-someComponent`.
+- Use meaningful variable and function names
+- Add comments for complex logic
+- Follow consistent formatting
+- Implement proper error handling
+- Test across all supported browsers
+- Use modern JavaScript features with appropriate fallbacks
+
+## Examples of good code
+
+### Code Structure
+
+```javascript
+// Good: Modern JavaScript with proper structure
+class NavigationHandler {
+    constructor() {
+        this.menu = document.querySelector('.navigation');
+        this.toggle = document.querySelector('.navigation__toggle');
+        this.init();
+    }
+
+    init() {
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        this.toggle.addEventListener('click', this.toggleMenu.bind(this));
+    }
+
+    toggleMenu() {
+        this.menu.classList.toggle('navigation--open');
+    }
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    new NavigationHandler();
+});
+```
+
+### ES6+ Features (Browser Supported)
+
+```javascript
+// Arrow functions
+const handleClick = (event) => {
+    event.preventDefault();
+    // Handle click
+};
+
+// Template literals
+const message = `Welcome to ${companyName}`;
+
+// Destructuring
+const { name, email } = userData;
+
+// Async/await
+async function fetchData() {
+    try {
+        const response = await fetch('/api/data');
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+
+// Modules (if supported)
+export { NavigationHandler };
+import { NavigationHandler } from './navigation.js';
+```
+
+### Event Handling
+
+```javascript
+// Good: Modern event handling
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize components
+    initNavigation();
+    initForms();
+    initSliders();
+});
+
+// Good: Event delegation
+document.addEventListener('click', (event) => {
+    if (event.target.matches('.btn--close')) {
+        closeModal();
+    }
+});
+
+// Good: Form handling
+const form = document.querySelector('.contact-form');
+form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    try {
+        const formData = new FormData(form);
+        const response = await fetch('/contact', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            showSuccessMessage();
+        }
+    } catch (error) {
+        showErrorMessage();
+    }
+});
+```
+
+### Performance Best Practices
+
+```javascript
+// Good: Debounced functions
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Good: Throttled scroll handler
+const handleScroll = debounce(() => {
+    // Handle scroll
+}, 100);
+
+window.addEventListener('scroll', handleScroll);
+
+// Good: Intersection Observer for performance
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('animate');
+        }
+    });
+});
+
+document.querySelectorAll('.animate-on-scroll').forEach(el => {
+    observer.observe(el);
+});
+```
+
+### Error Handling
+
+```javascript
+// Good: Proper error handling
+async function loadData() {
+    try {
+        const response = await fetch('/api/data');
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error loading data:', error);
+        // Show user-friendly error message
+        showErrorMessage('Unable to load data. Please try again.');
+        return null;
+    }
+}
+```
+
+### Code Organization
+
+```javascript
+// Good: Modular approach
+const utils = {
+    debounce(func, wait) {
+        // Implementation
+    },
+
+    throttle(func, limit) {
+        // Implementation
+    },
+
+    formatPhone(phone) {
+        // Implementation
+    }
+};
+
+const utils = {
+    init() {
+        this.bindEvents();
+    },
+
+    bindEvents() {
+        // Event binding
+    }
+};
+
+// Initialize modules
+document.addEventListener('DOMContentLoaded', () => {
+    Navigation.init();
+});
+```
+
+### Browser Compatibility
+
+```javascript
+// Good: Feature detection
+if ('IntersectionObserver' in window) {
+    // Use Intersection Observer
+} else {
+    // Fallback for older browsers
+    // Use scroll event with throttling
+}
+
+// Good: Polyfill for older browsers
+if (!Array.prototype.includes) {
+    Array.prototype.includes = function(searchElement) {
+        return this.indexOf(searchElement) !== -1;
+    };
+}
+```

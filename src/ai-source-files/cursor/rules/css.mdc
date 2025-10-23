@@ -1,0 +1,70 @@
+---
+description: Rules for CSS development
+globs: *.css
+alwaysApply: false
+---
+
+## General
+
+- Framework is the Cacao CSS framework <https://github.com/aptuitiv/cacao>
+- Follow mobile-first development.
+- Use the Cacao CSS breakpoints for larger screens if necessary.
+- Use efficient selectors
+- Minimize specificity conflicts
+- Leverage utility classes for common patterns
+- Do not use `!important`. Instead, increase the selector specificity.
+- Use `/* postcss-bem-linter: ignore */` for invalid BEM selectors but try to avoid invalid BEM selectors.
+- Support latest 2 versions of Safari, Chrome, Firefox, and Edge.
+- Use meaningful class names.
+- Add comments for complex logic
+
+## Folder structure
+
+- Source files are in `src/css`.
+- Components are organized in folders in the `src/css/components` folder.
+- Each component has an `index.css` file that imports the styles for that component, even if there is only one file.
+- The component is imported in the `src/components/index.css` file.
+- Each CSS file should have a comment at the top briefly explaining the file usage.
+
+### Comment structure
+
+```css
+/* ===========================================================================
+    File Description Here
+=========================================================================== */
+```
+
+## BEM Methodology (Modified Suit CSS)
+
+- See <https://github.com/suitcss/suit/blob/master/doc/naming-conventions.md> for naming conventions
+
+- Use PascalCase for the component name.
+- Use camelCase for the element.
+- Use camelCase for the modifier
+
+```css
+/* Block */
+.Component {
+    /* styles */
+}
+
+/* Element */
+.Component-element {
+    /* styles */
+}
+
+/* Block modifier */
+.Component--modifier {
+    /* styles */
+}
+
+/* Element modifier */
+.Component-element--modifierName {
+    /* styles */
+}
+
+/* State */
+.Component.is-active {
+    /* styles */
+}
+```

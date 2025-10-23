@@ -157,6 +157,7 @@ const getScripts = (currentScripts, theme) => {
     ];
     // Scripts to make sure that they exists
     const add = {
+        "ai-cursor": 'aptuitiv-build ai cursor',
         build: 'aptuitiv-build build',
         copy: 'aptuitiv-build copy',
         css: 'aptuitiv-build css',
