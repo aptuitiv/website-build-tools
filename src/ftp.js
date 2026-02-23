@@ -12,14 +12,68 @@ import * as path from 'path';
 
 // Build scripts
 import config from './config.js';
-import {
-    processGlobPath,
-    prefixBuildPath,
-    prefixPath,
-    prefixRootPath,
-} from './helpers.js';
+import { processGlobPath, prefixPath, prefixRootPath } from './helpers.js';
 
 /* global Client */
+
+// ---- Retry configuration ----
+const MAX_RETRIES = 3;
+const BASE_DELAY_MS = 1000;
+
+// ---- Notification batching ----
+const NOTIFICATION_DELAY_MS = 2000;
+let pendingNotifications = [];
+let notificationTimer = null;
+
+/**
+ * Flush all pending notifications as a single summary notification
+ */
+const flushNotifications = () => {
+    if (pendingNotifications.length === 0) {
+        return;
+    }
+
+    const uploaded = pendingNotifications.filter(
+        (n) => n.action === 'uploaded',
+    );
+    const deleted = pendingNotifications.filter((n) => n.action === 'deleted');
+    const parts = [];
+
+    if (uploaded.length > 0) {
+        const label = uploaded.length === 1 ? 'file' : 'files';
+        parts.push(`${uploaded.length} ${label} uploaded`);
+    }
+    if (deleted.length > 0) {
+        const label = deleted.length === 1 ? 'file' : 'files';
+        parts.push(`${deleted.length} ${label} deleted`);
+    }
+
+    notifier.notify({
+        title: 'FTP Deploy',
+        message: parts.join(', '),
+        sound: true,
+    });
+
+    pendingNotifications = [];
+    notificationTimer = null;
+};
+
+/**
+ * Queue a notification to be batched and sent as a summary
+ *
+ * @param {string} action The action performed ('uploaded' or 'deleted')
+ * @param {string} filePath The file path
+ */
+const queueNotification = (action, filePath) => {
+    if (!config.data.ftp.notify) {
+        return;
+    }
+    pendingNotifications.push({ action, filePath });
+    if (notificationTimer) {
+        clearTimeout(notificationTimer);
+    }
+    notificationTimer = setTimeout(flushNotifications, NOTIFICATION_DELAY_MS);
+};
 
 /**
  * Get the source path and make sure it starts with the correct root path
@@ -52,6 +106,45 @@ const getRemotePath = (remotePath) => {
 };
 
 /**
+ * Get FTP credentials from environment variables
+ *
+ * @returns {{ server: string, user: string, pass: string }} The credentials
+ * @throws {Error} If credentials are missing
+ */
+const getCredentials = () => {
+    const env = process.env.FTP_ENVIRONMENT ?? 'live';
+    if (env === 'dev') {
+        if (
+            typeof process.env.FTP_DEV_SERVER === 'string' &&
+            typeof process.env.FTP_DEV_USERNAME === 'string' &&
+            typeof process.env.FTP_DEV_PASSWORD === 'string'
+        ) {
+            return {
+                server: process.env.FTP_DEV_SERVER,
+                user: process.env.FTP_DEV_USERNAME,
+                pass: process.env.FTP_DEV_PASSWORD,
+            };
+        }
+        throw new Error('The dev FTP credentials are missing');
+    }
+    if (
+        typeof process.env.FTP_SERVER === 'string' &&
+        typeof process.env.FTP_USERNAME === 'string' &&
+        typeof process.env.FTP_PASSWORD === 'string' &&
+        process.env.FTP_SERVER &&
+        process.env.FTP_USERNAME &&
+        process.env.FTP_PASSWORD
+    ) {
+        return {
+            server: process.env.FTP_SERVER,
+            user: process.env.FTP_USERNAME,
+            pass: process.env.FTP_PASSWORD,
+        };
+    }
+    throw new Error('The FTP credentials are missing');
+};
+
+/**
  * Connect to the FTP server
  *
  * @param {Client} client The FTP client
@@ -60,45 +153,71 @@ const getRemotePath = (remotePath) => {
 const connect = async (client) => {
     const env = process.env.FTP_ENVIRONMENT ?? 'live';
     fancyLog(chalk.green('FTP environment: '), chalk.cyan(env));
-    if (typeof process.env.FTP_SERVER === 'string' && typeof process.env.FTP_USERNAME === 'string' && typeof process.env.FTP_PASSWORD === 'string') {
-        let server = process.env.FTP_SERVER;
-        let user = process.env.FTP_USERNAME;
-        let pass = process.env.FTP_PASSWORD;
-        if (env === 'dev') {
-            if (
-                typeof process.env.FTP_DEV_SERVER === 'string'
-                && typeof process.env.FTP_DEV_USERNAME === 'string'
-                && typeof process.env.FTP_DEV_PASSWORD === 'string'
-            ) {
-                server = process.env.FTP_DEV_SERVER;
-                user = process.env.FTP_DEV_USERNAME;
-                pass = process.env.FTP_DEV_PASSWORD;
-            } else {
-                fancyLog(logSymbols.error, chalk.red('The dev FTP credentials are missing'));
-                process.exit();
-            }
-        }
-        if (server && user && pass) {
-            try {
-                await client.access({
-                    host: server,
-                    user,
-                    password: pass,
-                });
-            } catch (error) {
-                fancyLog(logSymbols.error, chalk.red('FTP connection error: ', error));
-                process.exit();
-            }
-        } else {
-            // eslint-disable-next-line no-console -- Need to log the error
-            console.warn('The FTP credentials are missing');
-            process.exit();
-        }
-    } else {
-        fancyLog(logSymbols.error, chalk.red('The FTP credentials are missing'));
-        process.exit();
-    }
+
+    const credentials = getCredentials();
+    await client.access({
+        host: credentials.server,
+        user: credentials.user,
+        password: credentials.pass,
+    });
+
     return client;
+};
+
+/**
+ * Execute an FTP operation with automatic retry on transient errors.
+ * Creates a fresh client and connection for each attempt.
+ *
+ * @param {Function} operation A function that receives a connected basicFtp.Client and performs the FTP work
+ * @param {string} label A label for log messages (e.g. 'Upload file.txt')
+ * @param {object} [options] Options
+ * @param {boolean} [options.trackProgress] Whether to enable progress tracking on the client
+ * @returns {Promise<void>}
+ */
+const withRetry = async (operation, label, options = {}) => {
+    /* eslint-disable no-await-in-loop -- Retries must be sequential */
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        const client = new basicFtp.Client();
+        client.ftp.timeout = 30000;
+        if (options.trackProgress) {
+            client.trackProgress((info) => {
+                fancyLog(
+                    `${chalk.magenta(`FTP ${info.type}`)} ${chalk.cyan(
+                        info.name,
+                    )} ${info.bytes} bytes`,
+                );
+            });
+        }
+        try {
+            await connect(client);
+            await operation(client);
+            client.close();
+            return;
+        } catch (err) {
+            client.close();
+            if (attempt < MAX_RETRIES) {
+                const delay = BASE_DELAY_MS * 2 ** (attempt - 1);
+                fancyLog(
+                    logSymbols.warning,
+                    chalk.yellow(
+                        `${label} failed (attempt ${attempt}/${MAX_RETRIES}): ${err.message}`,
+                    ),
+                );
+                fancyLog(chalk.yellow(`Retrying in ${delay / 1000}s...`));
+                await new Promise((resolve) => {
+                    setTimeout(resolve, delay);
+                });
+            } else {
+                fancyLog(
+                    logSymbols.error,
+                    chalk.red(
+                        `${label} failed after ${MAX_RETRIES} attempts: ${err.message}`,
+                    ),
+                );
+            }
+        }
+    }
+    /* eslint-enable no-await-in-loop */
 };
 
 /**
@@ -115,34 +234,14 @@ export async function deleteFile(filePath) {
 
     fancyLog(chalk.magenta('Deleting file'), chalk.cyan(filePath));
 
-    // Get the FTP connection
-    const client = new basicFtp.Client();
-    client.trackProgress((info) => {
-        fancyLog(
-            `${chalk.magenta(`FTP ${info.type}`)
-            } ${chalk.cyan(removePath)
-            } to ${chalk.cyan(info.name)}`,
-        );
-    });
-
-    try {
-        await connect(client);
+    await withRetry(async (client) => {
         await client.remove(removePath);
         fancyLog(
             logSymbols.success,
             chalk.green(`File deleted from server: ${filePath}`),
         );
-        if (config.data.ftp.notify) {
-            notifier.notify({
-                title: 'Deploy',
-                message: 'File deleted from FTP server!',
-                sound: true,
-            });
-        }
-    } catch (err) {
-        fancyLog(chalk.red(err));
-    }
-    client.close();
+        queueNotification('deleted', filePath);
+    }, `Delete ${filePath}`);
 }
 
 /**
@@ -156,45 +255,27 @@ export async function deployFile(filePath) {
 
     fancyLog(chalk.magenta('Uploading file'), chalk.cyan(filePath));
 
-    // Get the FTP connection
-    const client = new basicFtp.Client();
-    client.trackProgress((info) => {
-        fancyLog(
-            `${chalk.magenta(`FTP ${info.type}`)
-            } ${chalk.cyan(info.name)
-            } ${info.bytes} bytes`,
-        );
-    });
-
-    try {
-        await connect(client);
-        await client
-            .ensureDir(remotePath.substring(0, remotePath.lastIndexOf('/')))
-            .then(async () => {
-                await client.uploadFrom(srcPath, remotePath).then(() => {
-                    fancyLog(
-                        logSymbols.success,
-                        chalk.green(`Upload complete: ${filePath}`),
-                    );
-                    if (config.data.ftp.notify) {
-                        notifier.notify({
-                            title: 'Deploy',
-                            message: 'File uploaded to FTP server!',
-                            sound: true,
-                        });
-                    }
-                });
-            });
-    } catch (err) {
-        fancyLog(chalk.red(err));
-    }
-    client.close();
+    await withRetry(
+        async (client) => {
+            await client.ensureDir(
+                remotePath.substring(0, remotePath.lastIndexOf('/')),
+            );
+            await client.uploadFrom(srcPath, remotePath);
+            fancyLog(
+                logSymbols.success,
+                chalk.green(`Upload complete: ${filePath}`),
+            );
+            queueNotification('uploaded', filePath);
+        },
+        `Upload ${filePath}`,
+        { trackProgress: true },
+    );
 }
 
 /**
  * Download a file from the server
  *
- * @param {string} filePath The file path to downlpad
+ * @param {string} filePath The file path to download
  */
 async function downloadFile(filePath) {
     const srcPath = getSourcePath(filePath);
@@ -202,33 +283,20 @@ async function downloadFile(filePath) {
 
     fancyLog(chalk.magenta('Downloading file'), chalk.cyan(filePath));
 
-    // Get the FTP connection
-    const client = new basicFtp.Client();
-    client.trackProgress((info) => {
-        if (info.bytes > 0) {
+    // Make sure that the destination directory exists
+    fs.ensureDirSync(path.dirname(srcPath));
+
+    await withRetry(
+        async (client) => {
+            await client.downloadTo(srcPath, remotePath);
             fancyLog(
-                `${chalk.magenta(`FTP ${info.type}`)
-                } ${chalk.cyan(filePath)
-                } to ${chalk.cyan(prefixBuildPath(info.name))
-                } ${info.bytes} bytes`,
+                logSymbols.success,
+                chalk.green(`Download complete: ${filePath}`),
             );
-        }
-    });
-
-    try {
-        // Make sure that the destination directory exists
-        fs.ensureDirSync(path.dirname(srcPath));
-
-        await connect(client);
-        await client.downloadTo(srcPath, remotePath);
-        fancyLog(
-            logSymbols.success,
-            chalk.green(`Download complete: ${filePath}`),
-        );
-    } catch (err) {
-        fancyLog(chalk.red(err));
-    }
-    client.close();
+        },
+        `Download ${filePath}`,
+        { trackProgress: true },
+    );
 }
 
 /**
@@ -240,22 +308,16 @@ export async function deleteDir(dir) {
     const srcPath = getSourcePath(dir);
     fs.removeSync(srcPath);
     const removePath = getRemotePath(dir);
-    // Get the FTP connection
-    const client = new basicFtp.Client();
 
     fancyLog(chalk.magenta('Deleting directory'), chalk.cyan(dir));
 
-    try {
-        await connect(client);
+    await withRetry(async (client) => {
         await client.removeDir(removePath);
         fancyLog(
             logSymbols.success,
             chalk.green(`Directory deleted from server: ${dir}`),
         );
-    } catch (err) {
-        fancyLog(chalk.red(err));
-    }
-    client.close();
+    }, `Delete directory ${dir}`);
 }
 
 /**
@@ -270,27 +332,18 @@ async function deployDir(dir) {
     fancyLog(chalk.magenta('Uploading directory'), chalk.cyan(dir));
 
     fs.ensureDirSync(srcPath);
-    // Get the FTP connection
-    const client = new basicFtp.Client();
-    client.trackProgress((info) => {
-        fancyLog(
-            `${chalk.magenta(`FTP ${info.type}`)
-            } ${chalk.cyan(info.name)
-            } ${info.bytes} bytes`,
-        );
-    });
 
-    try {
-        await connect(client);
-        await client.uploadFromDir(srcPath, remotePath);
-        fancyLog(
-            logSymbols.success,
-            chalk.green(`Directory upload complete: ${dir}`),
-        );
-    } catch (err) {
-        fancyLog(chalk.red(err));
-    }
-    client.close();
+    await withRetry(
+        async (client) => {
+            await client.uploadFromDir(srcPath, remotePath);
+            fancyLog(
+                logSymbols.success,
+                chalk.green(`Directory upload complete: ${dir}`),
+            );
+        },
+        `Upload directory ${dir}`,
+        { trackProgress: true },
+    );
 }
 
 /**
@@ -304,29 +357,17 @@ async function downloadDir(dir) {
 
     fancyLog(chalk.magenta('Downloading directory'), chalk.cyan(dir));
 
-    // Get the FTP connection
-    const client = new basicFtp.Client();
-    client.trackProgress((info) => {
-        if (info.type === 'download') {
+    await withRetry(
+        async (client) => {
+            await client.downloadToDir(localPath, remotePath);
             fancyLog(
-                `${chalk.magenta(`FTP ${info.type}`)
-                } ${chalk.cyan(info.name)
-                } ${info.bytes} bytes`,
+                logSymbols.success,
+                chalk.green(`Directory download complete: ${dir}`),
             );
-        }
-    });
-
-    try {
-        await connect(client);
-        await client.downloadToDir(localPath, remotePath);
-        fancyLog(
-            logSymbols.success,
-            chalk.green(`Directory download complete: ${dir}`),
-        );
-    } catch (err) {
-        fancyLog(chalk.red(err));
-    }
-    client.close();
+        },
+        `Download directory ${dir}`,
+        { trackProgress: true },
+    );
 }
 
 /**
