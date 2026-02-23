@@ -11,7 +11,7 @@ npm link
 
 In the project's folder that you want to use this library, use `npm link @aptuitiv/website-build-tools` to install the package locally.
 
-If you need to update the rets-client library do the following.
+If you need to update the library do the following.
 
 ### Unlink the project
 
