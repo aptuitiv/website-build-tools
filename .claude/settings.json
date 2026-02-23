@@ -1,0 +1,23 @@
+{
+  "permissions": {
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./.claude/hooks/post-edit-eslint.sh",
+            "async": true
+          },
+          {
+            "type": "command",
+            "command": "./.claude/hooks/post-edit-typecheck.sh",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}
