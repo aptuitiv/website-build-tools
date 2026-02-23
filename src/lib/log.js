@@ -6,8 +6,6 @@ import chalk from 'chalk';
 import fancyLog from 'fancy-log';
 import logSymbols from 'log-symbols';
 
-
-
 /**
  * Log an info message
  *
@@ -16,11 +14,15 @@ import logSymbols from 'log-symbols';
  */
 export const logInfo = (message, additionalMessage) => {
     if (additionalMessage) {
-        fancyLog(logSymbols.info, chalk.blue(message), chalk.cyan(additionalMessage));
+        fancyLog(
+            logSymbols.info,
+            chalk.blue(message),
+            chalk.cyan(additionalMessage),
+        );
     } else {
         fancyLog(logSymbols.info, chalk.blue(message));
     }
-}
+};
 
 /**
  * Conditionally log an info message
@@ -33,7 +35,7 @@ export const logConditionalInfo = (outputLog, message, additionalMessage) => {
     if (outputLog) {
         logInfo(message, additionalMessage);
     }
-}
+};
 
 /**
  * Log a message
@@ -43,7 +45,7 @@ export const logConditionalInfo = (outputLog, message, additionalMessage) => {
  */
 export const logMessage = (message, additionalMessage) => {
     fancyLog(chalk.cyan(message), additionalMessage ?? '');
-}
+};
 
 /**
  * Conditionally log a message
@@ -52,11 +54,15 @@ export const logMessage = (message, additionalMessage) => {
  * @param {string} message The message to output
  * @param {string} [additionalMessage] An additional message to output in cyan
  */
-export const logConditionalMessage = (outputLog, message, additionalMessage) => {
+export const logConditionalMessage = (
+    outputLog,
+    message,
+    additionalMessage,
+) => {
     if (outputLog) {
         logMessage(message, additionalMessage);
     }
-}
+};
 
 /**
  * Log a success message
@@ -66,11 +72,15 @@ export const logConditionalMessage = (outputLog, message, additionalMessage) => 
  */
 export const logSuccess = (message, additionalMessage) => {
     if (additionalMessage) {
-        fancyLog(logSymbols.success, chalk.green(message), chalk.cyan(additionalMessage));
+        fancyLog(
+            logSymbols.success,
+            chalk.green(message),
+            chalk.cyan(additionalMessage),
+        );
     } else {
         fancyLog(logSymbols.success, chalk.green(message));
     }
-}
+};
 
 /**
  * Conditionally log a success message
@@ -79,11 +89,15 @@ export const logSuccess = (message, additionalMessage) => {
  * @param {string} message The message to output
  * @param {string} [additionalMessage] An additional message to output in cyan
  */
-export const logConditionalSuccess = (outputLog, message, additionalMessage) => {
+export const logConditionalSuccess = (
+    outputLog,
+    message,
+    additionalMessage,
+) => {
     if (outputLog) {
         logSuccess(message, additionalMessage);
     }
-}
+};
 
 /**
  * Log a warning message
@@ -92,7 +106,7 @@ export const logConditionalSuccess = (outputLog, message, additionalMessage) => 
  */
 export const logWarning = (message) => {
     fancyLog(logSymbols.success, chalk.green(message));
-}
+};
 
 /**
  * Conditionally log a warning message
@@ -104,4 +118,4 @@ export const logConditionalWarning = (outputLog, message) => {
     if (outputLog) {
         logWarning(message);
     }
-}
+};

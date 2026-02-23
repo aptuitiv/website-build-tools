@@ -69,9 +69,9 @@ export const prefixPath = (path, basePath, baseFolder) => {
     }
     // Prepend the base path if the path doesn't already start with it or equal to it
     if (
-        !returnValue.startsWith(`${base}/`)
-        && returnValue !== base
-        && returnValue !== baseFolder
+        !returnValue.startsWith(`${base}/`) &&
+        returnValue !== base &&
+        returnValue !== baseFolder
     ) {
         returnValue = `${base}/${returnValue}`;
     }
@@ -102,7 +102,8 @@ const prefixPaths = (path, prefixes) => {
  * @param {Array} [additionalPrefixes] An array of additional prefixes to add to the path
  * @returns {string}
  */
-export const prefixRootPath = (path, additionalPrefixes) => prefixPath(prefixPaths(path, additionalPrefixes), config.data.root);
+export const prefixRootPath = (path, additionalPrefixes) =>
+    prefixPath(prefixPaths(path, additionalPrefixes), config.data.root);
 
 /**
  * Prefix the build path
@@ -110,7 +111,8 @@ export const prefixRootPath = (path, additionalPrefixes) => prefixPath(prefixPat
  * @param {string} path The file/glob path
  * @returns {string}
  */
-export const prefixBuildPath = (path) => prefixPath(path, config.data.build.base);
+export const prefixBuildPath = (path) =>
+    prefixPath(path, config.data.build.base);
 
 /**
  * Prefix the root and build paths to the path
@@ -118,7 +120,8 @@ export const prefixBuildPath = (path) => prefixPath(path, config.data.build.base
  * @param {string} path The file/glob path
  * @returns {string}
  */
-export const prefixRootBuildPath = (path) => prefixRootPath(prefixBuildPath(path));
+export const prefixRootBuildPath = (path) =>
+    prefixRootPath(prefixBuildPath(path));
 
 /**
  * Prefix the src path
@@ -127,7 +130,8 @@ export const prefixRootBuildPath = (path) => prefixRootPath(prefixBuildPath(path
  * @param {Array} [additionalPrefixes] An array of additional prefixes to add to the path
  * @returns {string}
  */
-export const prefixSrcPath = (path, additionalPrefixes) => prefixPath(prefixPaths(path, additionalPrefixes), config.data.src);
+export const prefixSrcPath = (path, additionalPrefixes) =>
+    prefixPath(prefixPaths(path, additionalPrefixes), config.data.src);
 
 /**
  * Prefix the src and root paths
@@ -136,7 +140,8 @@ export const prefixSrcPath = (path, additionalPrefixes) => prefixPath(prefixPath
  * @param {Array} [additionalPrefixes] An array of additional prefixes to add to the path
  * @returns {string}
  */
-export const prefixRootSrcPath = (path, additionalPrefixes) => prefixRootPath(prefixSrcPath(prefixPaths(path, additionalPrefixes)));
+export const prefixRootSrcPath = (path, additionalPrefixes) =>
+    prefixRootPath(prefixSrcPath(prefixPaths(path, additionalPrefixes)));
 
 /**
  * Prefix the theme build path
@@ -145,7 +150,8 @@ export const prefixRootSrcPath = (path, additionalPrefixes) => prefixRootPath(pr
  * @param {Array} [additionalPrefixes] An array of additional prefixes to add to the path
  * @returns {string}
  */
-export const prefixThemeBuildPath = (path, additionalPrefixes) => prefixPath(prefixPaths(path, additionalPrefixes), config.data.build.theme);
+export const prefixThemeBuildPath = (path, additionalPrefixes) =>
+    prefixPath(prefixPaths(path, additionalPrefixes), config.data.build.theme);
 
 /**
  * Prefix the theme build and root paths to the path
@@ -154,7 +160,8 @@ export const prefixThemeBuildPath = (path, additionalPrefixes) => prefixPath(pre
  * @param {Array} [additionalPrefixes] An array of additional prefixes to add to the path
  * @returns {string}
  */
-export const prefixRootThemeBuildPath = (path, additionalPrefixes) => prefixRootPath(prefixThemeBuildPath(prefixPaths(path, additionalPrefixes)));
+export const prefixRootThemeBuildPath = (path, additionalPrefixes) =>
+    prefixRootPath(prefixThemeBuildPath(prefixPaths(path, additionalPrefixes)));
 
 /**
  * Removes the prefix from the path
@@ -166,7 +173,8 @@ export const prefixRootThemeBuildPath = (path, additionalPrefixes) => prefixRoot
 export const removePrefix = (path, prefix) => {
     if (path.startsWith(prefix)) {
         return path.slice(prefix.length);
-    } if (path.startsWith(`/${prefix}`)) {
+    }
+    if (path.startsWith(`/${prefix}`)) {
         return path.slice(prefix.length + 1);
     }
     return path;
@@ -227,7 +235,8 @@ export const removeRootSrcPrefix = (path, additionalPrefixes) => {
  * @param {string} path The path to the remove the prefixes from
  * @returns {string}
  */
-export const removeRootThemeBuildPrefix = (path) => removePrefixes(path, [config.data.build.theme, config.data.root]);
+export const removeRootThemeBuildPrefix = (path) =>
+    removePrefixes(path, [config.data.build.theme, config.data.root]);
 
 /**
  * Set up the root directory and change the working directory if necessary
@@ -281,9 +290,11 @@ export const getObjectKeysRecursive = (obj) => {
  */
 export const sortObjectByKeys = (obj) => {
     const sorted = {};
-    Object.keys(obj).sort().forEach((key) => {
-        sorted[key] = obj[key];
-    });
+    Object.keys(obj)
+        .sort()
+        .forEach((key) => {
+            sorted[key] = obj[key];
+        });
     return sorted;
 };
 

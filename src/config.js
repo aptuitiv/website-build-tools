@@ -3,9 +3,7 @@
 =========================================================================== */
 
 import resolveFrom from 'resolve-from';
-import {
-    isAbsolute, dirname, join, resolve,
-} from 'path';
+import { isAbsolute, dirname, join, resolve } from 'path';
 import deepmerge from 'deepmerge';
 import { cosmiconfig } from 'cosmiconfig';
 import dotenv from 'dotenv';
@@ -202,15 +200,17 @@ class Config {
             transform: (cosmiconfigResult) => {
                 let foundConfig = {};
                 if (
-                    isObjectWithValues(cosmiconfigResult)
-                    && isObjectWithValues(cosmiconfigResult.config)
+                    isObjectWithValues(cosmiconfigResult) &&
+                    isObjectWithValues(cosmiconfigResult.config)
                 ) {
                     foundConfig = cosmiconfigResult.config;
                 }
                 // Merge the default configuration with the configuration file contents.
                 // If there are arrays, overwrite the default array with the found array.
                 // https://github.com/TehShrike/deepmerge?tab=readme-ov-file#arraymerge
-                return deepmerge(defaultConfig, foundConfig, { arrayMerge: (destinationArray, sourceArray) => sourceArray });
+                return deepmerge(defaultConfig, foundConfig, {
+                    arrayMerge: (destinationArray, sourceArray) => sourceArray,
+                });
             },
             searchStrategy: 'project',
         });
@@ -233,7 +233,9 @@ class Config {
         // Load the configuration file if it exists
         try {
             if (typeof configFile === 'string') {
-                const configPath = resolveFrom.silent(cwd, configFile) || join(cwd, configFile);
+                const configPath =
+                    resolveFrom.silent(cwd, configFile) ||
+                    join(cwd, configFile);
                 await configExplorer
                     .load(configPath)
                     .then((result) => {
@@ -256,8 +258,15 @@ class Config {
                 });
             }
         } catch (error) {
-            fancyLog(logSymbols.error, chalk.red('Error loading configuration file'), error);
-            fancyLog(logSymbols.warning, chalk.yellow('Continuing with the default configuration'));
+            fancyLog(
+                logSymbols.error,
+                chalk.red('Error loading configuration file'),
+                error,
+            );
+            fancyLog(
+                logSymbols.warning,
+                chalk.yellow('Continuing with the default configuration'),
+            );
         }
 
         // Override the root folder if it was passed in as an argument

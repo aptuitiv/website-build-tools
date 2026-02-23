@@ -129,7 +129,7 @@ export const addDependency = (name, version) => {
     const packageJson = fs.readJsonSync('package.json');
     packageJson.dependencies[name] = version;
     fs.writeJSONSync('package.json', packageJson, { spaces: 4 });
-}
+};
 
 /**
  * Get the scripts for the package.json file
@@ -160,7 +160,7 @@ const getScripts = (currentScripts, theme) => {
         build: 'aptuitiv-build build',
         copy: 'aptuitiv-build copy',
         css: 'aptuitiv-build css',
-        'download': 'aptuitiv-build download -t',
+        download: 'aptuitiv-build download -t',
         'download-content-docs': 'aptuitiv-build download -p docs',
         'download-content-images': 'aptuitiv-build download -p images',
         'download-templates': `aptuitiv-build download -p theme/${theme ?? 'custom'}/templates`,
@@ -170,7 +170,7 @@ const getScripts = (currentScripts, theme) => {
         env: 'aptuitiv-build env',
         export: 'aptuitiv-build export',
         fonts: 'aptuitiv-build push-fonts',
-        "format-theme-json": 'aptuitiv-build format-theme-json',
+        'format-theme-json': 'aptuitiv-build format-theme-json',
         icons: 'aptuitiv-build icons',
         images: 'aptuitiv-build images',
         init: 'aptuitiv-build init',
@@ -213,11 +213,17 @@ export const setupPackageJsonScripts = async (args) => {
     const packageJson = await fs.readJson('package.json');
 
     // Get the correct scripts
-    packageJson.scripts = getScripts(packageJson.scripts, args?.theme ?? 'custom');
+    packageJson.scripts = getScripts(
+        packageJson.scripts,
+        args?.theme ?? 'custom',
+    );
 
     // Write the updated package.json back to the file
     fs.writeJSONSync('package.json', packageJson, { spaces: 4 });
-    fancyLog(logSymbols.success, chalk.green('Updated the scripts in the package.json file'));
+    fancyLog(
+        logSymbols.success,
+        chalk.green('Updated the scripts in the package.json file'),
+    );
 };
 
 /**
@@ -297,35 +303,49 @@ export const formatPackageJson = async (args) => {
             switch (section) {
                 case 'dependencies':
                     // Remove the dependencies that are not needed
-                    newPackageJson[section] = getDependencies(packageJson[section]);
+                    newPackageJson[section] = getDependencies(
+                        packageJson[section],
+                    );
                     break;
                 case 'devDependencies':
                     // Remove the dependencies that are not needed
-                    newPackageJson[section] = getDevDependencies(packageJson[section]);
+                    newPackageJson[section] = getDevDependencies(
+                        packageJson[section],
+                    );
                     break;
                 case 'name':
                     if (args?.packageName) {
-                        newPackageJson[section] = formatPackageName(args?.packageName);
+                        newPackageJson[section] = formatPackageName(
+                            args?.packageName,
+                        );
                     } else {
                         newPackageJson[section] = packageJson[section];
                     }
                     break;
                 case 'scripts':
                     // Setup the scripts
-                    newPackageJson[section] = getScripts(packageJson[section], args?.theme ?? 'custom');
+                    newPackageJson[section] = getScripts(
+                        packageJson[section],
+                        args?.theme ?? 'custom',
+                    );
                     break;
                 default:
                     newPackageJson[section] = packageJson[section];
             }
         } else if (typeof packageJson[section] === 'undefined') {
-            if (['dependencies', 'devDependencies', 'scripts'].includes(section)) {
+            if (
+                ['dependencies', 'devDependencies', 'scripts'].includes(section)
+            ) {
                 // One or more of these sections don't exist in the package.json file. Add them.
                 if (section === 'dependencies') {
                     newPackageJson.dependencies = getDependencies({});
                 } else if (section === 'devDependencies') {
                     newPackageJson.devDependencies = getDevDependencies({});
                 } else if (section === 'scripts') {
-                    newPackageJson.scripts = getScripts({}, args?.theme ?? 'custom');
+                    newPackageJson.scripts = getScripts(
+                        {},
+                        args?.theme ?? 'custom',
+                    );
                 }
             } else if (section === 'author') {
                 let author = 'Aptuitiv, Inc <hello@aptuitiv.com>';
@@ -338,15 +358,18 @@ export const formatPackageJson = async (args) => {
                 newPackageJson[section] = author;
             } else if (section === 'bugs') {
                 newPackageJson[section] = {
-                    email: args?.packageBugs || 'support@aptuitiv.com'
+                    email: args?.packageBugs || 'support@aptuitiv.com',
                 };
             } else if (section === 'copyright') {
-                newPackageJson[section] = args?.packageCopyright || 'Aptuitiv, Inc';
+                newPackageJson[section] =
+                    args?.packageCopyright || 'Aptuitiv, Inc';
             } else if (section === 'description') {
                 newPackageJson[section] = '';
             } else if (section === 'name') {
                 // Set the name based off of the directory name
-                newPackageJson[section] = formatPackageName(args?.packageName || process.cwd().split('/').pop());
+                newPackageJson[section] = formatPackageName(
+                    args?.packageName || process.cwd().split('/').pop(),
+                );
             } else if (section === 'private') {
                 newPackageJson[section] = true;
             } else if (section === 'version') {
@@ -370,7 +393,9 @@ export const setupLicense = (args) => {
         const license = args?.license || defaultLicense;
         if (license === 'Apache-2.0') {
             // Copy the LICENSE file
-            const licenseContent = fs.readFileSync(`${__dirname}/source-files/apache-license.txt`);
+            const licenseContent = fs.readFileSync(
+                `${__dirname}/source-files/apache-license.txt`,
+            );
             fs.writeFileSync('LICENSE', licenseContent);
         }
     }

@@ -24,7 +24,12 @@ import { imageHandler } from './src/image.js';
 import { initiaizeHandler } from './src/initialize.js';
 import { jsHandler } from './src/javascript.js';
 import { packageJsonHandler } from './src/package-json.js';
-import { pullHandler, pullImages, pullTemplates, pullThemeConfig } from './src/pull.js';
+import {
+    pullHandler,
+    pullImages,
+    pullTemplates,
+    pullThemeConfig,
+} from './src/pull.js';
 import { pushTemplates } from './src/template.js';
 import { formatThemeJson, pushTheme } from './src/theme.js';
 import watchHandler from './src/watch.js';
@@ -152,7 +157,9 @@ program
 /**
  * AI commands
  */
-const aiCommand = program.command('ai').description('Commands to set up AI tools');
+const aiCommand = program
+    .command('ai')
+    .description('Commands to set up AI tools');
 aiCommand
     .command('cursor')
     .description('Copy cursor AI rules to the project')
@@ -180,7 +187,9 @@ program
  */
 program
     .command('push-fonts')
-    .description('Copy the font files from the source directory to the build directory')
+    .description(
+        'Copy the font files from the source directory to the build directory',
+    )
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
@@ -189,7 +198,9 @@ program
     });
 program
     .command('pull-fonts')
-    .description('Copy the font files from the build directory to the source directory')
+    .description(
+        'Copy the font files from the build directory to the source directory',
+    )
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
@@ -245,7 +256,10 @@ program
     .alias('upgrade-gulp')
     .alias('gulp-upgrade')
     .description('Convert the old Gulp build process to use the build tools')
-    .option('-l, --license <license>', 'The license for the project. https://docs.npmjs.com/cli/v10/configuring-npm/package-json#license')
+    .option(
+        '-l, --license <license>',
+        'The license for the project. https://docs.npmjs.com/cli/v10/configuring-npm/package-json#license',
+    )
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
@@ -261,9 +275,15 @@ program
     .alias('icons')
     .addOption(configFileOption)
     .addOption(rootOption)
-    .option('-p, --path <folderPath>', 'Path to the icon folder. For example, "icons".')
-    .option('-o, --output <filePath>', `The path, including the file name,
-        for the output Twig file within the "templates" folder. For example, "snippets/svg-icons.twig".`)
+    .option(
+        '-p, --path <folderPath>',
+        'Path to the icon folder. For example, "icons".',
+    )
+    .option(
+        '-o, --output <filePath>',
+        `The path, including the file name,
+        for the output Twig file within the "templates" folder. For example, "snippets/svg-icons.twig".`,
+    )
     .action(async (args) => {
         await config.init(args);
         iconHandler(args);
@@ -289,7 +309,10 @@ program
     .command('initialize')
     .alias('init')
     .description('Initialize the project')
-    .option('--no-build', 'Do not run the build process after initializing the project')
+    .option(
+        '--no-build',
+        'Do not run the build process after initializing the project',
+    )
     .option('-n, --name <name>', 'The name of the project')
     .option('-t, --type <name>', 'The type of project')
     .addOption(configFileOption)
@@ -300,15 +323,23 @@ program
         if (success) {
             if (args.build) {
                 if (hasFiles('src')) {
-                    logMessage('The project has been initialized. Running the build process.');
+                    logMessage(
+                        'The project has been initialized. Running the build process.',
+                    );
                     await runBuild(args);
                     logSuccess('The build process has completed.');
-                    logInfo('You can now run "npm run watch" to start the watch process. Or run "npm run deploy" to upload files to the server.');
+                    logInfo(
+                        'You can now run "npm run watch" to start the watch process. Or run "npm run deploy" to upload files to the server.',
+                    );
                 } else {
-                    logMessage('The project has been initialized. You can add your source files to the "src" folder.');
+                    logMessage(
+                        'The project has been initialized. You can add your source files to the "src" folder.',
+                    );
                 }
             } else {
-                logMessage('The project has been initialized. You can now run "npm run build" to build the project.');
+                logMessage(
+                    'The project has been initialized. You can now run "npm run build" to build the project.',
+                );
             }
         }
     });
@@ -349,22 +380,35 @@ program
 /**
  * Package.json command
  */
-const packageJsonCommand = program.command('package-json').description('Process the package.json file');
+const packageJsonCommand = program
+    .command('package-json')
+    .description('Process the package.json file');
 packageJsonCommand
     .command('format')
     .description('Format the package.json file')
     .addOption(rootOption)
-    .option('-l, --license <license>', 'The license for the project. https://docs.npmjs.com/cli/v10/configuring-npm/package-json#license')
-    .option('-t, --theme <themeName>', 'Set the theme name. This sets the path to download and upload theme files. Defaults to "custom".')
+    .option(
+        '-l, --license <license>',
+        'The license for the project. https://docs.npmjs.com/cli/v10/configuring-npm/package-json#license',
+    )
+    .option(
+        '-t, --theme <themeName>',
+        'Set the theme name. This sets the path to download and upload theme files. Defaults to "custom".',
+    )
     .action(async (args) => {
         packageJsonHandler(args, 'format');
     });
 
 packageJsonCommand
     .command('scripts')
-    .description('Update the scripts in the package.json to the recommended ones')
+    .description(
+        'Update the scripts in the package.json to the recommended ones',
+    )
     .addOption(rootOption)
-    .option('-t, --theme <themeName>', 'Set the theme name. This sets the path to download and upload theme files. Defaults to "custom".')
+    .option(
+        '-t, --theme <themeName>',
+        'Set the theme name. This sets the path to download and upload theme files. Defaults to "custom".',
+    )
     .action(async (args) => {
         packageJsonHandler(args, 'scripts');
     });
@@ -374,7 +418,9 @@ packageJsonCommand
  */
 program
     .command('push-templates')
-    .description('Push the theme twig templates from the source directory to the build directory')
+    .description(
+        'Push the theme twig templates from the source directory to the build directory',
+    )
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
@@ -390,7 +436,10 @@ program
     .description('Pull files from the build directory to the source directory')
     .addOption(configFileOption)
     .addOption(rootOption)
-    .requiredOption('-p, --path <filePath>', 'The path to the files to pull. For example, "theme/custom/templates", "theme/custom/config", or "images".')
+    .requiredOption(
+        '-p, --path <filePath>',
+        'The path to the files to pull. For example, "theme/custom/templates", "theme/custom/config", or "images".',
+    )
     .action(async (args) => {
         await config.init(args);
         pullHandler(args);
@@ -398,7 +447,9 @@ program
 
 program
     .command('pull-images')
-    .description('Pull the images from the build theme directory to the source theme directory')
+    .description(
+        'Pull the images from the build theme directory to the source theme directory',
+    )
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
@@ -407,7 +458,9 @@ program
     });
 program
     .command('pull-templates')
-    .description('Pull the theme twig templates from the build directory to the source directory')
+    .description(
+        'Pull the theme twig templates from the build directory to the source directory',
+    )
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
@@ -416,7 +469,9 @@ program
     });
 program
     .command('pull-theme-config')
-    .description('Pull the theme config files from the build directory to the source directory')
+    .description(
+        'Pull the theme config files from the build directory to the source directory',
+    )
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
@@ -430,7 +485,10 @@ program
 program
     .command('format-theme-json')
     .description('Format the theme configuration JSON file')
-    .option('-f, --file <fileName>', 'The name of the theme configuration JSON file to format')
+    .option(
+        '-f, --file <fileName>',
+        'The name of the theme configuration JSON file to format',
+    )
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
@@ -440,7 +498,9 @@ program
 
 program
     .command('push-theme-config')
-    .description('Push the theme config files from the source directory to the build directory')
+    .description(
+        'Push the theme config files from the source directory to the build directory',
+    )
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {

@@ -47,7 +47,11 @@ const removeFiles = () => {
         if (fs.existsSync(file)) {
             fs.removeSync(file);
             removed += 1;
-            fancyLog(logSymbols.success, chalk.green('Removed the file'), chalk.cyan(file));
+            fancyLog(
+                logSymbols.success,
+                chalk.green('Removed the file'),
+                chalk.cyan(file),
+            );
         }
     });
     if (removed === 0) {
@@ -113,18 +117,31 @@ const parseGulpConfigArrayObject = (node, keys, variables) => {
                         property.value.elements.forEach((propertyElement) => {
                             if (propertyElement.type === 'Literal') {
                                 // The array item value is a string
-                                arrayObject[property.key.name].push(propertyElement.value);
-                            } else if (propertyElement.type === 'BinaryExpression') {
+                                arrayObject[property.key.name].push(
+                                    propertyElement.value,
+                                );
+                            } else if (
+                                propertyElement.type === 'BinaryExpression'
+                            ) {
                                 // The value is a binary expression. This is likely `src + '/some/path/to/file.js'`.
-                                const binaryValue = parseGulpConfigBinaryExpression(propertyElement, variables);
+                                const binaryValue =
+                                    parseGulpConfigBinaryExpression(
+                                        propertyElement,
+                                        variables,
+                                    );
                                 if (binaryValue) {
-                                    arrayObject[property.key.name].push(binaryValue);
+                                    arrayObject[property.key.name].push(
+                                        binaryValue,
+                                    );
                                 }
                             }
                         });
                     } else if (property.value.type === 'BinaryExpression') {
                         // The value is a binary expression. This is likely `src + '/some/path/to/file.js'`.
-                        const binaryValue = parseGulpConfigBinaryExpression(property.value, variables);
+                        const binaryValue = parseGulpConfigBinaryExpression(
+                            property.value,
+                            variables,
+                        );
                         if (binaryValue) {
                             arrayObject[property.key.name] = binaryValue;
                         }
@@ -160,7 +177,10 @@ const parseGulpConfigSrc = (node, variables) => {
                 if (element.type === 'Literal') {
                     returnValue.push(element.value);
                 } else if (element.type === 'BinaryExpression') {
-                    const binaryValue = parseGulpConfigBinaryExpression(element, variables);
+                    const binaryValue = parseGulpConfigBinaryExpression(
+                        element,
+                        variables,
+                    );
                     if (binaryValue) {
                         returnValue.push(binaryValue);
                     }
@@ -188,7 +208,10 @@ const parseGulpConfig = (configFile) => {
     }
     if (contents) {
         // Parse the Javascript code
-        const ast = acorn.parse(contents, { sourceType: 'module', ecmaVersion: 2020 });
+        const ast = acorn.parse(contents, {
+            sourceType: 'module',
+            ecmaVersion: 2020,
+        });
 
         // The CSS source file(s) in the config file
         let cssSrc = [];
@@ -210,7 +233,10 @@ const parseGulpConfig = (configFile) => {
                 } else if (node.init.type === 'BinaryExpression') {
                     // This is a variable declaration with a binary expression value.
                     // We want to get the value of the variable in case we need it to build the value of another variable.
-                    variables[node.id.name] = parseGulpConfigBinaryExpression(node.init, variables);
+                    variables[node.id.name] = parseGulpConfigBinaryExpression(
+                        node.init,
+                        variables,
+                    );
                 }
             }
             if (node.type === 'Property') {
@@ -227,8 +253,12 @@ const parseGulpConfig = (configFile) => {
                     //         ],
                     //     }
                     // }
-                    const srcPaths = node.value.properties.find((property) => property.key.name === 'src');
-                    const cssSrcPath = srcPaths.value.properties.find((property) => property.key.name === 'css');
+                    const srcPaths = node.value.properties.find(
+                        (property) => property.key.name === 'src',
+                    );
+                    const cssSrcPath = srcPaths.value.properties.find(
+                        (property) => property.key.name === 'css',
+                    );
                     if (cssSrcPath) {
                         cssSrc = parseGulpConfigSrc(cssSrcPath, variables);
                     }
@@ -240,7 +270,9 @@ const parseGulpConfig = (configFile) => {
                     //     src: [srcDir + '/styles/index.css'],
                     //     watch: [srcDir + '/styles/**/*.css']
                     // }
-                    const srcPaths = node.value.properties.find((property) => property.key.name === 'src');
+                    const srcPaths = node.value.properties.find(
+                        (property) => property.key.name === 'src',
+                    );
                     if (srcPaths) {
                         cssSrc = parseGulpConfigSrc(srcPaths, variables);
                     }
@@ -253,7 +285,11 @@ const parseGulpConfig = (configFile) => {
                     //         dest: 'splide'
                     //     },
                     // ]
-                    copy = parseGulpConfigArrayObject(node, ['src', 'dest'], variables);
+                    copy = parseGulpConfigArrayObject(
+                        node,
+                        ['src', 'dest'],
+                        variables,
+                    );
                 } else if (node.key.name === 'scripts') {
                     // This is the "scripts" array specifying the Javascript files to parse.
                     // Parse the code to pull out the src and name values
@@ -288,7 +324,11 @@ const parseGulpConfig = (configFile) => {
                     //         dest: destDir + '/js'
                     //     },
                     // ]
-                    scripts = parseGulpConfigArrayObject(node, ['name', 'src', 'dest'], variables);
+                    scripts = parseGulpConfigArrayObject(
+                        node,
+                        ['name', 'src', 'dest'],
+                        variables,
+                    );
                 }
             }
         });
@@ -306,14 +346,21 @@ const parseGulpConfig = (configFile) => {
         if (cssSrc.length > 0) {
             if (cssSrc.length === 1) {
                 configContents.css = {
-                    buildFiles: removePrefixes(cssSrc[0], ['src', 'css', 'styles', '/']),
+                    buildFiles: removePrefixes(cssSrc[0], [
+                        'src',
+                        'css',
+                        'styles',
+                        '/',
+                    ]),
                 };
             } else {
                 configContents.css = {
                     buildFiles: [],
                 };
                 cssSrc.forEach((cssItem) => {
-                    configContents.css.buildFiles.push(removePrefixes(cssItem, ['src', 'css', 'styles', '/']));
+                    configContents.css.buildFiles.push(
+                        removePrefixes(cssItem, ['src', 'css', 'styles', '/']),
+                    );
                 });
             }
         }
@@ -333,7 +380,13 @@ const parseGulpConfig = (configFile) => {
                         copyObject.src = copyItem.src;
                     }
                 }
-                copyObject.dest = removePrefixes(copyItem.dest, ['dist', 'build', 'theme', 'custom', '/']);
+                copyObject.dest = removePrefixes(copyItem.dest, [
+                    'dist',
+                    'build',
+                    'theme',
+                    'custom',
+                    '/',
+                ]);
                 configContents.copy.push(copyObject);
             });
         }
@@ -346,20 +399,33 @@ const parseGulpConfig = (configFile) => {
                     script.src.forEach((srcItem) => {
                         if (srcItem.startsWith('node_modules')) {
                             // The source is from the node_modules folder. Separate these out
-                            nodeModules.push(removePrefixes(srcItem, ['node_modules/']));
+                            nodeModules.push(
+                                removePrefixes(srcItem, ['node_modules/']),
+                            );
                         } else {
                             // This is a source from the Javascript source folder.
                             // Get the value without the "src" and "js" prefixes
-                            scriptSrc.push(removePrefixes(srcItem, ['src', 'js', 'scripts', '/']));
+                            scriptSrc.push(
+                                removePrefixes(srcItem, [
+                                    'src',
+                                    'js',
+                                    'scripts',
+                                    '/',
+                                ]),
+                            );
                         }
                     });
                 } else if (script.src.startsWith('node_modules')) {
                     // The source is from the node_modules folder. Separate these out
-                    nodeModules.push(removePrefixes(script.src, ['node_modules/']));
+                    nodeModules.push(
+                        removePrefixes(script.src, ['node_modules/']),
+                    );
                 } else {
                     // This is a source from the Javascript source folder.
                     // Get the value without the "src" and "js" prefixes
-                    scriptSrc.push(removePrefixes(script.src, ['src', 'js', '/']));
+                    scriptSrc.push(
+                        removePrefixes(script.src, ['src', 'js', '/']),
+                    );
                 }
 
                 // Set up the individual bundle to have the correct properties in the correct order
@@ -371,7 +437,11 @@ const parseGulpConfig = (configFile) => {
                 }
                 bundle.src = scriptSrc;
 
-                if (!bundle.nodeModules && bundle.src.length === 1 && bundle.src[0] === bundle.build) {
+                if (
+                    !bundle.nodeModules &&
+                    bundle.src.length === 1 &&
+                    bundle.src[0] === bundle.build
+                ) {
                     // This is a single file that is the same as the build name. Add it to the files array
                     configContents.javascript.files.push(bundle.build);
                 } else {
@@ -392,15 +462,24 @@ const parseGulpConfig = (configFile) => {
 const renameFolders = () => {
     if (fs.existsSync('src/theme')) {
         fs.renameSync('src/theme', 'src/templates');
-        fancyLog(logSymbols.success, chalk.green('Renamed the "theme" folder to "templates"'));
+        fancyLog(
+            logSymbols.success,
+            chalk.green('Renamed the "theme" folder to "templates"'),
+        );
     }
     if (fs.existsSync('src/scripts')) {
         fs.renameSync('src/scripts', 'src/js');
-        fancyLog(logSymbols.success, chalk.green('Renamed the "scripts" folder to "js"'));
+        fancyLog(
+            logSymbols.success,
+            chalk.green('Renamed the "scripts" folder to "js"'),
+        );
     }
     if (fs.existsSync('src/styles')) {
         fs.renameSync('src/styles', 'src/css');
-        fancyLog(logSymbols.success, chalk.green('Renamed the "styles" folder to "css"'));
+        fancyLog(
+            logSymbols.success,
+            chalk.green('Renamed the "styles" folder to "css"'),
+        );
     }
 };
 
@@ -410,7 +489,11 @@ const renameFolders = () => {
  * @param {object} args The command line arguments
  */
 const gulpConvertHandler = async (args) => {
-    fancyLog(chalk.magenta('Converting the Gulp build process to use the build tools'));
+    fancyLog(
+        chalk.magenta(
+            'Converting the Gulp build process to use the build tools',
+        ),
+    );
     const configFile = args.config || '.aptuitiv-buildrc.js';
     setupRoot(args.root);
     // Remove the files that are not needed
@@ -427,10 +510,12 @@ const gulpConvertHandler = async (args) => {
     childProcess.execSync('npm install', { stdio: 'inherit' });
     fancyLog(logSymbols.success, chalk.green('Environment set up.'));
     fancyLog(logSymbols.success, chalk.green('Gulp build process converted.'));
-    fancyLog(chalk.blue(`Compare the ${configFile} file to the gulp/config.js file to ensure the configuration is correct.
+    fancyLog(
+        chalk.blue(`Compare the ${configFile} file to the gulp/config.js file to ensure the configuration is correct.
     Once you are done comparing the config files, remove the gulp/config.js file and the "gulp" folder.
     Then build the files with "npm run build", or start the watch process with "npm run watch", or do both with "npm run start".
-    `));
+    `),
+    );
 };
 
 export default gulpConvertHandler;

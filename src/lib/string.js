@@ -2,18 +2,17 @@
     Utility string functions
 =========================================================================== */
 
-
 /**
  * Convert a kebab-case string to a capitalized string with spaces
  *
  * @param {string} str The kebab-case string to convert
  * @returns {string} The formatted string with spaces and capitalized words
  */
-export const kebabToCapitalized = (str) => str
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-
+export const kebabToCapitalized = (str) =>
+    str
+        .split('-')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
 
 /**
  * Trims the string for any whitespace and removes the "characters" value from the start of the string
@@ -40,7 +39,10 @@ export const lTrim = (value, characters) => {
 export const rTrim = (value, characters) => {
     let returnValue = value.trim();
     if (returnValue.endsWith(characters)) {
-        returnValue = returnValue.substring(0, returnValue.length - characters.length);
+        returnValue = returnValue.substring(
+            0,
+            returnValue.length - characters.length,
+        );
     }
     return returnValue;
 };
@@ -59,7 +61,10 @@ export const trim = (value, characters) => {
             returnValue = returnValue.substring(characters.length);
         }
         if (returnValue.endsWith(characters)) {
-            returnValue = returnValue.substring(0, returnValue.length - characters.length);
+            returnValue = returnValue.substring(
+                0,
+                returnValue.length - characters.length,
+            );
         }
     }
     return returnValue;

@@ -3,10 +3,9 @@
  * See https://aptuitiv.github.io/website-build-tools/configuration for more information.
  */
 export default {
-    copy: [
-    ],
+    copy: [],
     css: {
-        buildFiles: 'main.css'
+        buildFiles: 'main.css',
     },
     javascript: {
         bundles: [
@@ -16,10 +15,10 @@ export default {
                     'script-loader.js',
                     'iframe-loader.js',
                     'navigation.js',
-                    'main.js'
-                ]
-            }
+                    'main.js',
+                ],
+            },
         ],
-        files: []
-    }
+        files: [],
+    },
 };

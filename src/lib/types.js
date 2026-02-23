@@ -2,12 +2,11 @@
 Utility functions for determining a variable's type and if it can be used
 =========================================================================== */
 
-
 /**
  * Returns if the value is an object
  *
  * https://attacomsian.com/blog/javascript-check-variable-is-object
- * 
+ *
  * @param {any} thing The value to test
  * @returns {boolean}
  */
@@ -22,8 +21,9 @@ export const isObject = (thing) =>
  * @param {any} thing The value to test
  * @returns {boolean}
  */
-export const isObjectWithValues = (thing) => Object.prototype.toString.call(thing) === '[object Object]'
-    && Object.keys(thing).length > 0;
+export const isObjectWithValues = (thing) =>
+    Object.prototype.toString.call(thing) === '[object Object]' &&
+    Object.keys(thing).length > 0;
 
 /**
  * Returns if the value is a string
@@ -39,4 +39,5 @@ export const isString = (thing) => typeof thing === 'string';
  * @param {any} thing The value to test
  * @returns {boolean}
  */
-export const isStringWithValue = (thing) => isString(thing) && thing.trim().length > 0;
+export const isStringWithValue = (thing) =>
+    isString(thing) && thing.trim().length > 0;

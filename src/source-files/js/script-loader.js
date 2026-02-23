@@ -17,7 +17,9 @@ class ScriptLoader {
         this.loadScriptsHandler = this.loadScripts.bind(this);
 
         document.addEventListener('keydown', this.loadScriptsHandler);
-        document.querySelector('body').addEventListener('click', this.loadScriptsHandler);
+        document
+            .querySelector('body')
+            .addEventListener('click', this.loadScriptsHandler);
     }
 
     /**
@@ -26,7 +28,9 @@ class ScriptLoader {
     loadScripts() {
         // Remove event listeners
         document.removeEventListener('keydown', this.loadScriptsHandler);
-        document.querySelector('body').removeEventListener('click', this.loadScriptsHandler);
+        document
+            .querySelector('body')
+            .removeEventListener('click', this.loadScriptsHandler);
 
         // Inject scripts
         const head = document.querySelector('head');

@@ -81,8 +81,8 @@ const getJpgOptimizations = () => {
         progressive: true,
     };
     if (
-        config.data.images.optimizations
-        && config.data.images.optimizations.jpg
+        config.data.images.optimizations &&
+        config.data.images.optimizations.jpg
     ) {
         opts = { ...opts, ...config.data.images.optimizations.jpg };
     }
@@ -102,8 +102,8 @@ const getPngOptimizations = () => {
         adaptiveFiltering: true,
     };
     if (
-        config.data.images.optimizations
-        && config.data.images.optimizations.png
+        config.data.images.optimizations &&
+        config.data.images.optimizations.png
     ) {
         opts = { ...opts, ...config.data.images.optimizations.png };
     }
@@ -122,8 +122,8 @@ const getWebPOptimizations = () => {
         smartSubsample: true,
     };
     if (
-        config.data.images.optimizations
-        && config.data.images.optimizations.webp
+        config.data.images.optimizations &&
+        config.data.images.optimizations.webp
     ) {
         opts = { ...opts, ...config.data.images.optimizations.webp };
     }
@@ -158,8 +158,8 @@ export const processImage = async (imageSrc) => {
 
         // Process the image
         if (
-            fileType
-            && ['gif', 'jpg', 'jpeg', 'png', 'webp'].includes(fileType.ext)
+            fileType &&
+            ['gif', 'jpg', 'jpeg', 'png', 'webp'].includes(fileType.ext)
         ) {
             const { ext } = fileType;
             fancyLog(
@@ -222,53 +222,58 @@ export const processImage = async (imageSrc) => {
  *
  * @returns {Promise}
  */
-const processImages = async () => new Promise((resolve) => {
-    const imageSrc = prefixRootSrcPath(config.data.images.src);
-    if (fs.existsSync(imageSrc)) {
-        // Get all the files in the images folder
-        const files = globSync(`${imageSrc}/**/*`);
-        if (files.length > 0) {
-            fancyLog(
-                chalk.magenta(
-                    `Processing ${files.length} files in the ${config.data.images.src} folder`,
-                ),
-            );
-            const filePromises = [];
-            files.forEach((file) => {
-                filePromises.push(processImage(file));
-            });
-            Promise.all(filePromises).then(() => {
-                fancyLog(logSymbols.success, chalk.green('Done processing images'));
+const processImages = async () =>
+    new Promise((resolve) => {
+        const imageSrc = prefixRootSrcPath(config.data.images.src);
+        if (fs.existsSync(imageSrc)) {
+            // Get all the files in the images folder
+            const files = globSync(`${imageSrc}/**/*`);
+            if (files.length > 0) {
+                fancyLog(
+                    chalk.magenta(
+                        `Processing ${files.length} files in the ${config.data.images.src} folder`,
+                    ),
+                );
+                const filePromises = [];
+                files.forEach((file) => {
+                    filePromises.push(processImage(file));
+                });
+                Promise.all(filePromises).then(() => {
+                    fancyLog(
+                        logSymbols.success,
+                        chalk.green('Done processing images'),
+                    );
+                    resolve();
+                });
+            } else {
+                fancyLog(
+                    logSymbols.warning,
+                    chalk.yellow(
+                        `No images to process in the ${config.data.images.src} folder`,
+                    ),
+                );
                 resolve();
-            });
+            }
         } else {
             fancyLog(
                 logSymbols.warning,
                 chalk.yellow(
-                    `No images to process in the ${config.data.images.src} folder`,
+                    `Nothing images to process as there is no ${config.data.images.src} folder`,
                 ),
             );
             resolve();
         }
-    } else {
-        fancyLog(
-            logSymbols.warning,
-            chalk.yellow(
-                `Nothing images to process as there is no ${config.data.images.src} folder`,
-            ),
-        );
-        resolve();
-    }
-});
+    });
 
 /**
  * Process the image request
  *
  * @returns {Promise}
  */
-export const imageHandler = () => new Promise((resolve) => {
-    // Process the images
-    processImages().then(() => {
-        resolve();
+export const imageHandler = () =>
+    new Promise((resolve) => {
+        // Process the images
+        processImages().then(() => {
+            resolve();
+        });
     });
-});

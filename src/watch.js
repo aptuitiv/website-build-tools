@@ -66,14 +66,16 @@ const watchHandler = async () => {
         chalk.magenta('Watching for changes in the CSS folder'),
         chalk.cyan(prefixSrcPath(config.data.css.src)),
     );
-    chokidar.watch(cssFolder, {
-        // Only watch CSS files
-        // https://github.com/paulmillr/chokidar?tab=readme-ov-file#upgrading
-        ignored: (path, stats) => stats?.isFile() && !path.endsWith('.css'),
-        ignoreInitial: true,
-    }).on('all', () => {
-        processCss();
-    });
+    chokidar
+        .watch(cssFolder, {
+            // Only watch CSS files
+            // https://github.com/paulmillr/chokidar?tab=readme-ov-file#upgrading
+            ignored: (path, stats) => stats?.isFile() && !path.endsWith('.css'),
+            ignoreInitial: true,
+        })
+        .on('all', () => {
+            processCss();
+        });
 
     // Watch for any font changes
     const fontSrcFolder = prefixSrcPath(config.data.fonts.src);
@@ -100,32 +102,41 @@ const watchHandler = async () => {
         chalk.magenta('Watching for changes in the Javascript folder'),
         chalk.cyan(prefixSrcPath(config.data.javascript.src)),
     );
-    chokidar.watch(jsfolder, {
-        // Only watch JS files
-        // https://github.com/paulmillr/chokidar?tab=readme-ov-file#upgrading
-        ignored: (path, stats) => stats?.isFile() && !/\.js$|\.cjs$|\.mjs$/.test(path),
-        ignoreInitial: true,
-    }).on('all', (event, path) => {
-        processJsFile(path);
-    });
+    chokidar
+        .watch(jsfolder, {
+            // Only watch JS files
+            // https://github.com/paulmillr/chokidar?tab=readme-ov-file#upgrading
+            ignored: (path, stats) =>
+                stats?.isFile() && !/\.js$|\.cjs$|\.mjs$/.test(path),
+            ignoreInitial: true,
+        })
+        .on('all', (event, path) => {
+            processJsFile(path);
+        });
 
     // Watch for any icon changes
     if (Array.isArray(config.data.icons)) {
         config.data.icons.forEach((iconConfig) => {
-            if (isStringWithValue(iconConfig.src) && isStringWithValue(iconConfig.build)) {
+            if (
+                isStringWithValue(iconConfig.src) &&
+                isStringWithValue(iconConfig.build)
+            ) {
                 const iconFolder = prefixRootSrcPath(iconConfig.src);
                 fancyLog(
                     chalk.magenta('Watching for changes in the icons folder'),
                     chalk.cyan(prefixSrcPath(iconConfig.src)),
                 );
-                chokidar.watch(iconFolder, {
-                    // Only watch SVG files
-                    // https://github.com/paulmillr/chokidar?tab=readme-ov-file#upgrading
-                    ignored: (path, stats) => stats?.isFile() && !path.endsWith('.svg'),
-                    ignoreInitial: true,
-                }).on('all', () => {
-                    createIconSprite(iconConfig.src, iconConfig.build);
-                });
+                chokidar
+                    .watch(iconFolder, {
+                        // Only watch SVG files
+                        // https://github.com/paulmillr/chokidar?tab=readme-ov-file#upgrading
+                        ignored: (path, stats) =>
+                            stats?.isFile() && !path.endsWith('.svg'),
+                        ignoreInitial: true,
+                    })
+                    .on('all', () => {
+                        createIconSprite(iconConfig.src, iconConfig.build);
+                    });
             }
         });
     }
@@ -189,8 +200,8 @@ const watchHandler = async () => {
             // https://github.com/paulmillr/chokidar
             awaitWriteFinish: {
                 stabilityThreshold: 500,
-                pollInterval: 100
-            }
+                pollInterval: 100,
+            },
         })
         .on('add', (path) => {
             copyThemeSrcToBuild(path);
@@ -226,7 +237,11 @@ const watchHandler = async () => {
         chokidar
             .watch(copyFilesToWatch, { ignoreInitial: true })
             .on('change', (path) => {
-                copyWatchFile(path, copyFilesMap[path].srcRoot, copyFilesMap[path].dest);
+                copyWatchFile(
+                    path,
+                    copyFilesMap[path].srcRoot,
+                    copyFilesMap[path].dest,
+                );
             });
     }
 };

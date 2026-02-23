@@ -202,8 +202,8 @@ const navAccess = {
                 sibling = el.nextElementSibling;
                 // If next element is a dropdown, expand it
                 if (
-                    sibling !== null
-                    && sibling.nodeName.toLowerCase() === 'ul'
+                    sibling !== null &&
+                    sibling.nodeName.toLowerCase() === 'ul'
                 ) {
                     this.activate(el.parentNode);
                 }
@@ -220,8 +220,8 @@ const navAccess = {
         } else {
             sibling = el.parentNode.previousElementSibling;
             if (
-                sibling !== null
-                && sibling.classList.contains('js-dropdownParent')
+                sibling !== null &&
+                sibling.classList.contains('js-dropdownParent')
             ) {
                 // Link before a sibling with dropdown (skip over dropdown)
                 focusEl = this.getPrevInLevel(el);
@@ -350,8 +350,8 @@ const navAccess = {
         let node = el;
         while (node !== document.body) {
             if (
-                node.classList.contains('js-dropdownParent')
-                || node.parentNode.classList.contains('js-mainNav')
+                node.classList.contains('js-dropdownParent') ||
+                node.parentNode.classList.contains('js-mainNav')
             ) {
                 break;
             }

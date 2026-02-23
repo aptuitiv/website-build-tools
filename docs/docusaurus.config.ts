@@ -4,7 +4,8 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
     title: 'Aptuitiv Website Build Tools',
-    tagline: 'Build tools to help with building and deploying websites at Aptuitiv.',
+    tagline:
+        'Build tools to help with building and deploying websites at Aptuitiv.',
     favicon: 'img/favicon.png',
 
     // Set the production url of your site here
