@@ -208,7 +208,11 @@ node_modules/
 # Files to ignore
 .DS_Store
 .env
-.stylelintcache`;
+.stylelintcache
+
+# Claude Code local settings
+.claude/*.local.json
+claude.local.md`;
         fs.writeFileSync('.gitignore', content);
         fancyLog(logSymbols.success, chalk.green('Updated .gitignore file'));
     }
