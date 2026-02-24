@@ -54,7 +54,8 @@ const getSrcPath = (filePath) => {
  * @returns {Promise}
  */
 const runStylelint = async (fileGlob) => {
-    const filesToLint = fileGlob || prefixRootSrcPath(`${config.data.css.src}/**/*.css`);
+    const filesToLint =
+        fileGlob || prefixRootSrcPath(`${config.data.css.src}/**/*.css`);
 
     // Set up the configuration.
     // https://stylelint.io/user-guide/node-api
@@ -71,10 +72,17 @@ const runStylelint = async (fileGlob) => {
             // https://github.com/stylelint/stylelint/blob/main/docs/user-guide/options.md#reportneedlessdisables
             reportNeedlessDisables: true,
             rules: {
-                'at-rule-no-unknown': [true, {
-                    // Done to support the @extend, @define-placeholder, @define-extend, and @extend-define rule from https://github.com/travco/postcss-extend
-                    ignoreAtRules: ['extend', 'define-placeholder', 'define-extend', 'extend-define'],
-                },
+                'at-rule-no-unknown': [
+                    true,
+                    {
+                        // Done to support the @extend, @define-placeholder, @define-extend, and @extend-define rule from https://github.com/travco/postcss-extend
+                        ignoreAtRules: [
+                            'extend',
+                            'define-placeholder',
+                            'define-extend',
+                            'extend-define',
+                        ],
+                    },
                 ],
                 'color-named': 'never',
                 // Override the stylelint-config-standard rule to allow custom properties in formats that aren't kebab-case
@@ -86,7 +94,7 @@ const runStylelint = async (fileGlob) => {
                         ignore: [
                             'consecutive-duplicates-with-different-values',
                             'consecutive-duplicates-with-different-syntaxes',
-                            'consecutive-duplicates-with-same-prefixless-values'
+                            'consecutive-duplicates-with-same-prefixless-values',
                         ],
                     },
                 ],
@@ -135,59 +143,60 @@ const runStylelint = async (fileGlob) => {
  * @param {string} filePath The path of the CSS file to process
  * @returns {Promise}
  */
-const runPostCss = (filePath) => new Promise((resolve) => {
-    const { base: fileName } = parse(filePath);
-    const destDir = prefixRootThemeBuildPath(config.data.css.build);
-    const dest = prefixPath(fileName, destDir);
-    // Make sure that the destination directory exists
-    if (!fs.existsSync(destDir)) {
-        fs.mkdirSync(destDir, { recursive: true });
-    }
-    fs.readFile(filePath, (err, css) => {
-        if (err) {
-            // eslint-disable-next-line no-console -- Need to output the error
-            console.error('Reading CSS file error: ', err);
+const runPostCss = (filePath) =>
+    new Promise((resolve) => {
+        const { base: fileName } = parse(filePath);
+        const destDir = prefixRootThemeBuildPath(config.data.css.build);
+        const dest = prefixPath(fileName, destDir);
+        // Make sure that the destination directory exists
+        if (!fs.existsSync(destDir)) {
+            fs.mkdirSync(destDir, { recursive: true });
         }
-        fancyLog(chalk.magenta('Building CSS'), chalk.cyan(filePath));
+        fs.readFile(filePath, (err, css) => {
+            if (err) {
+                // eslint-disable-next-line no-console -- Need to output the error
+                console.error('Reading CSS file error: ', err);
+            }
+            fancyLog(chalk.magenta('Building CSS'), chalk.cyan(filePath));
 
-        postcss([
-            postcssReporter({ clearReportedMessages: true }),
-            postcssImport(),
-            postcssExtend,
-            postcssCustomMedia,
-            autoprefixer,
-            // cssnano needs to be run last
-            cssnano({
-                preset: 'default',
-            }),
-        ])
-            .process(css, { from: filePath, to: dest })
-            .then((result) => {
-                if (areFilesDifferent(result.css, dest)) {
-                    fs.writeFileSync(dest, result.css);
-                    if (result.map) {
-                        fs.writeFileSync(
-                            `${dest}.map`,
-                            result.map.toString(),
+            postcss([
+                postcssReporter({ clearReportedMessages: true }),
+                postcssImport(),
+                postcssExtend,
+                postcssCustomMedia,
+                autoprefixer,
+                // cssnano needs to be run last
+                cssnano({
+                    preset: 'default',
+                }),
+            ])
+                .process(css, { from: filePath, to: dest })
+                .then((result) => {
+                    if (areFilesDifferent(result.css, dest)) {
+                        fs.writeFileSync(dest, result.css);
+                        if (result.map) {
+                            fs.writeFileSync(
+                                `${dest}.map`,
+                                result.map.toString(),
+                            );
+                        }
+                        fancyLog(
+                            logSymbols.success,
+                            chalk.green('Process CSS complete'),
+                            chalk.cyan(filePath),
                         );
+                        resolve();
+                    } else {
+                        fancyLog(
+                            chalk.yellow(
+                                `Skipping ${removeRootPrefix(filePath)} because the built content is the same as ${removeRootPrefix(dest)}`,
+                            ),
+                        );
+                        resolve();
                     }
-                    fancyLog(
-                        logSymbols.success,
-                        chalk.green('Process CSS complete'),
-                        chalk.cyan(filePath),
-                    );
-                    resolve();
-                } else {
-                    fancyLog(
-                        chalk.yellow(
-                            `Skipping ${removeRootPrefix(filePath)} because the built content is the same as ${removeRootPrefix(dest)}`,
-                        ),
-                    );
-                    resolve();
-                }
-            });
+                });
+        });
     });
-});
 
 /**
  * Process all the CSS files
@@ -195,41 +204,44 @@ const runPostCss = (filePath) => new Promise((resolve) => {
  * @param {boolean} lint Whether to lint the CSS files
  * @returns {Promise}
  */
-export const processCss = (lint = true) => new Promise((resolve) => {
-    const { buildFiles } = config.data.css;
-    let paths = [];
-    if (typeof buildFiles === 'string') {
-        paths = globSync(
-            prefixRootSrcPath(prefixPath(buildFiles, config.data.css.src)),
-        );
-    } else if (Array.isArray(buildFiles)) {
-        buildFiles.forEach((file) => {
-            paths = paths.concat(
-                globSync(
-                    prefixRootSrcPath(prefixPath(file, config.data.css.src)),
-                ),
+export const processCss = (lint = true) =>
+    new Promise((resolve) => {
+        const { buildFiles } = config.data.css;
+        let paths = [];
+        if (typeof buildFiles === 'string') {
+            paths = globSync(
+                prefixRootSrcPath(prefixPath(buildFiles, config.data.css.src)),
             );
-        });
-    }
-    const cssPromises = [];
-    if (lint) {
-        runStylelint().then(() => {
+        } else if (Array.isArray(buildFiles)) {
+            buildFiles.forEach((file) => {
+                paths = paths.concat(
+                    globSync(
+                        prefixRootSrcPath(
+                            prefixPath(file, config.data.css.src),
+                        ),
+                    ),
+                );
+            });
+        }
+        const cssPromises = [];
+        if (lint) {
+            runStylelint().then(() => {
+                paths.forEach((filePath) => {
+                    cssPromises.push(runPostCss(filePath));
+                });
+                Promise.all(cssPromises).then(() => {
+                    resolve();
+                });
+            });
+        } else {
             paths.forEach((filePath) => {
                 cssPromises.push(runPostCss(filePath));
             });
             Promise.all(cssPromises).then(() => {
                 resolve();
             });
-        });
-    } else {
-        paths.forEach((filePath) => {
-            cssPromises.push(runPostCss(filePath));
-        });
-        Promise.all(cssPromises).then(() => {
-            resolve();
-        });
-    }
-});
+        }
+    });
 
 /**
  * Process the css request

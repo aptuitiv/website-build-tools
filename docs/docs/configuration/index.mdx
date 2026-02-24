@@ -10,7 +10,7 @@ You can optionally set a configuration file to override any of the default confi
 
 - An `aptuitiv-build` property in the `package.json` file.
 - An `.aptuitiv-buildrc` file in JSON or YAML format. We recommend that you add the correct extension to the file (e.g. `.json`) to end up with one of the following file names:
-  - `.aptuitiv-buildrc.json`, `.aptuitiv-buildrc.yaml`, `.aptuitiv-buildrc.yml`
+    - `.aptuitiv-buildrc.json`, `.aptuitiv-buildrc.yaml`, `.aptuitiv-buildrc.yml`
 - An `.aptuitiv-buildrc.js`, `.aptuitiv-buildrc.ts`, `.aptuitiv-buildrc.mjs`, or `.aptuitiv-buildrc.cjs` file.
 - `aptuitiv-build.config.mjs` or `.aptuitiv-buildrc.mjs` file using `export default` (ES module)
 - `aptuitiv-build.config.cjs` or `.aptuitiv-buildrc.cjs` file using `module.exports` (CommonJS)
@@ -23,12 +23,9 @@ ES module example:
 
 ```js
 export default {
-    "javascript": {
-        "files": [
-            "filename.js",
-            "subFolder/my-file.js"
-        ]
-    }
+    javascript: {
+        files: ['filename.js', 'subFolder/my-file.js'],
+    },
 };
 ```
 
@@ -36,12 +33,9 @@ CommonJS example:
 
 ```js
 module.exports = {
-    "javascript": {
-        "files": [
-            "filename.js",
-            "subFolder/my-file.js"
-        ]
-    }
+    javascript: {
+        files: ['filename.js', 'subFolder/my-file.js'],
+    },
 };
 ```
 
@@ -64,47 +58,47 @@ See these examples:
 
 ## Configuration options
 
-| Name | Default | Description |
-| ---- | ------- | ----------- |
-| build | | The [build folder configuration](#build-configuration). |
-| build.base | 'dist' | The root build folder for the files to publish to the website. This is used when uploading files via FTP. |
-| build.theme | 'dist/theme/custom' |  The build folder path for all files for the theme. This is used when uploading files via FTP. |
-| css | | The [CSS configuration](/configuration/css). |
-| css.build | 'css' | The folder for the CSS files within the theme build folder. (config.build.theme) |
-| css.buildFiles | '*.css' | The glob for CSS file(s) that import the other CSS files.  This is used when building the files. This is within the root source folder. (config.src) |
-| css.src | 'css' | The source folder for the CSS files within the root source folder. (config.src) |
-| copy | [] | An array of file globs to copy and their destination folders. See [copy files action](/command-line/copy-files). |
-| eslint | {} | [Eslint configuration](/configuration/javascript#linting-javascript). |
-| fonts | | [Font file configuration](#font-configuration). |
-| fonts.build | 'fonts' | The folder for the fonts within the theme build folder. (config.build.theme) |
-| fonts.src | 'fonts' | The source folder for the fonts within the root source folder. (config.src) |
-| ftp | | FTP configuration. |
-| ftp.notify | true | Whether to do a growl notification when a file is uploaded or deleted via FTP. |
-| icons | `[{build: 'snippets/svg-icons.twig', src: 'icons'}]` | [Icon file configuration](/configuration/icons). |
-| images | | [Image file configuration](/configuration/images). |
-| images.build | 'images' | The folder for the images within the theme build folder. (config.build.theme) |
-| images.optimizations | | [Image optimization configuration](/configuration/images#image-optimizations). |
-| images.optimizations.jpg | | [JPG image optimization configuration](/configuration/images#jpg-optimizations) |
-| images.optimizations.png | | [PNG image optimization configuration](/configuration/images#png-optimizations) |
-| images.optimizations.webp | | [WebP image optimization configuration](/configuration/images#webp-optimizations) |
-| images.src | 'images' | The source folder for the image files within the root source folder. (config.src) |
-| javascript | | [Javascript configuration](/configuration/javascript). |
-| javascript.build | 'js' | The folder for the javascript files within the theme build folder. (config.build.theme) |
-| javascript.bundles | [] | An array of file globs to bundle and their destination folder. |
-| javascript.entryPoints | [] | An array entry point files to build within the src folder using [esbuild](https://esbuild.github.io/). |
-| javascript.esConfig | {} | An object containing custom configuration for [esbuild](https://esbuild.github.io/). |
-| javascript.files | [] | An array of file globs to process. |
-| javascript.minify | {} | Minification options for terser. |
-| javascript.src | 'js' | The source folder for the javascript files within the root source folder. (config.src) |
-| root | process.cwd() | The root folder for all the project files. If you need to change this then you should put it as the absolute path to the root of their project. |
-| src | 'src' | The root folder to the source files. |
-| stylelint | {} | [Stylelint configuration options](/configuration/css#linting-css-files). |
-| templates | | [Twig template file configuration](#template-configuration). |
-| templates.build | 'templates' | The folder for the theme twig templates within the theme build folder. (config.build.theme) |
-| templates.src | 'templates' |  The source folder for the theme twig templates within the root source folder. (config.src) |
-| themeConfig | | [Theme configuration files configuration](#theme-configuration-files-configuration). |
-| themeConfig.build | 'config' | The folder for the theme config files within the theme build folder. (config.build.theme) |
-| themeConfig.src | 'config' | The source folder for the theme config files within the root source folder. (config.src) |
+| Name                      | Default                                              | Description                                                                                                                                         |
+| ------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| build                     |                                                      | The [build folder configuration](#build-configuration).                                                                                             |
+| build.base                | 'dist'                                               | The root build folder for the files to publish to the website. This is used when uploading files via FTP.                                           |
+| build.theme               | 'dist/theme/custom'                                  | The build folder path for all files for the theme. This is used when uploading files via FTP.                                                       |
+| css                       |                                                      | The [CSS configuration](/configuration/css).                                                                                                        |
+| css.build                 | 'css'                                                | The folder for the CSS files within the theme build folder. (config.build.theme)                                                                    |
+| css.buildFiles            | '\*.css'                                             | The glob for CSS file(s) that import the other CSS files. This is used when building the files. This is within the root source folder. (config.src) |
+| css.src                   | 'css'                                                | The source folder for the CSS files within the root source folder. (config.src)                                                                     |
+| copy                      | []                                                   | An array of file globs to copy and their destination folders. See [copy files action](/command-line/copy-files).                                    |
+| eslint                    | {}                                                   | [Eslint configuration](/configuration/javascript#linting-javascript).                                                                               |
+| fonts                     |                                                      | [Font file configuration](#font-configuration).                                                                                                     |
+| fonts.build               | 'fonts'                                              | The folder for the fonts within the theme build folder. (config.build.theme)                                                                        |
+| fonts.src                 | 'fonts'                                              | The source folder for the fonts within the root source folder. (config.src)                                                                         |
+| ftp                       |                                                      | FTP configuration.                                                                                                                                  |
+| ftp.notify                | true                                                 | Whether to do a growl notification when a file is uploaded or deleted via FTP.                                                                      |
+| icons                     | `[{build: 'snippets/svg-icons.twig', src: 'icons'}]` | [Icon file configuration](/configuration/icons).                                                                                                    |
+| images                    |                                                      | [Image file configuration](/configuration/images).                                                                                                  |
+| images.build              | 'images'                                             | The folder for the images within the theme build folder. (config.build.theme)                                                                       |
+| images.optimizations      |                                                      | [Image optimization configuration](/configuration/images#image-optimizations).                                                                      |
+| images.optimizations.jpg  |                                                      | [JPG image optimization configuration](/configuration/images#jpg-optimizations)                                                                     |
+| images.optimizations.png  |                                                      | [PNG image optimization configuration](/configuration/images#png-optimizations)                                                                     |
+| images.optimizations.webp |                                                      | [WebP image optimization configuration](/configuration/images#webp-optimizations)                                                                   |
+| images.src                | 'images'                                             | The source folder for the image files within the root source folder. (config.src)                                                                   |
+| javascript                |                                                      | [Javascript configuration](/configuration/javascript).                                                                                              |
+| javascript.build          | 'js'                                                 | The folder for the javascript files within the theme build folder. (config.build.theme)                                                             |
+| javascript.bundles        | []                                                   | An array of file globs to bundle and their destination folder.                                                                                      |
+| javascript.entryPoints    | []                                                   | An array entry point files to build within the src folder using [esbuild](https://esbuild.github.io/).                                              |
+| javascript.esConfig       | {}                                                   | An object containing custom configuration for [esbuild](https://esbuild.github.io/).                                                                |
+| javascript.files          | []                                                   | An array of file globs to process.                                                                                                                  |
+| javascript.minify         | {}                                                   | Minification options for terser.                                                                                                                    |
+| javascript.src            | 'js'                                                 | The source folder for the javascript files within the root source folder. (config.src)                                                              |
+| root                      | process.cwd()                                        | The root folder for all the project files. If you need to change this then you should put it as the absolute path to the root of their project.     |
+| src                       | 'src'                                                | The root folder to the source files.                                                                                                                |
+| stylelint                 | {}                                                   | [Stylelint configuration options](/configuration/css#linting-css-files).                                                                            |
+| templates                 |                                                      | [Twig template file configuration](#template-configuration).                                                                                        |
+| templates.build           | 'templates'                                          | The folder for the theme twig templates within the theme build folder. (config.build.theme)                                                         |
+| templates.src             | 'templates'                                          | The source folder for the theme twig templates within the root source folder. (config.src)                                                          |
+| themeConfig               |                                                      | [Theme configuration files configuration](#theme-configuration-files-configuration).                                                                |
+| themeConfig.build         | 'config'                                             | The folder for the theme config files within the theme build folder. (config.build.theme)                                                           |
+| themeConfig.src           | 'config'                                             | The source folder for the theme config files within the root source folder. (config.src)                                                            |
 
 ### Build configuration
 
@@ -139,7 +133,7 @@ You can configure the FTP behavior with the `ftp` configuration.
 ```js
 {
     ftp: {
-        notify: false
+        notify: false;
     }
 }
 ```

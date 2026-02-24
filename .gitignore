@@ -12,3 +12,7 @@
 .idea/
 .vscode/
 /node_modules/
+
+# Claude Code local settings
+.claude/*.local.json
+claude.local.md

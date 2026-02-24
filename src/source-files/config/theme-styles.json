@@ -493,7 +493,7 @@
                     }
                 }
             ]
-        },    
+        },
         {
             "name": "Typography",
             "description": "Styles for typography throughout the website.",

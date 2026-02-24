@@ -6,7 +6,6 @@ title: Javascript Configuration
 
 In the [configuration file](/configuration/) you will want to set up how the Javscript files will be built. You can also configure [eslint](https://eslint.org/) processing.
 
-
 ## Processing Javscript files
 
 There are three ways that Javascript files can be processed.
@@ -32,66 +31,63 @@ Here are some examples:
 
 ```js
 {
-  javascript: {
-    bundles: [
-      {
-        build: 'name-of-file.js',
-        src: 'folder/**/*.js',
-      }
-    ]
-  }
+    javascript: {
+        bundles: [
+            {
+                build: 'name-of-file.js',
+                src: 'folder/**/*.js',
+            },
+        ];
+    }
 }
 ```
 
 ```js
 {
-  javascript: {
-    bundles: [
-      {
-        build: 'name-of-file.js',
-        src: [
-          'file1.js',
-          'folder/file2.js',
-          'another-file.js',
-          'glob-folder/*.js'
-        ]
-      }
-    ]
-  }
+    javascript: {
+        bundles: [
+            {
+                build: 'name-of-file.js',
+                src: [
+                    'file1.js',
+                    'folder/file2.js',
+                    'another-file.js',
+                    'glob-folder/*.js',
+                ],
+            },
+        ];
+    }
 }
 ```
 
 ```js
 {
-  javascript: {
-    bundles: [
-      {
-        build: 'path/to/name-of-file.js',
-        nodeModules: [
-          'packageName/path/to/file.js',
-          'anotherPackage/path/**/*.js'
-        ],
-        src: [
-          'some-file.js',
-          'folder/*.js'
-        ]
-      }
-    ]
-  }
+    javascript: {
+        bundles: [
+            {
+                build: 'path/to/name-of-file.js',
+                nodeModules: [
+                    'packageName/path/to/file.js',
+                    'anotherPackage/path/**/*.js',
+                ],
+                src: ['some-file.js', 'folder/*.js'],
+            },
+        ];
+    }
 }
 ```
 
 ```js
 {
-  javascript: {
-    bundles: [
-      {
-        build: 'name-of-file.js',
-        nodeModules: 'anotherPackage/path/**/*.js',
-        src: 'some-file.js',
-      }
-    ]
-  }
+    javascript: {
+        bundles: [
+            {
+                build: 'name-of-file.js',
+                nodeModules: 'anotherPackage/path/**/*.js',
+                src: 'some-file.js',
+            },
+        ];
+    }
 }
 ```
 
@@ -103,12 +99,9 @@ The `javascript.files` array is an array of file paths where the file path start
 
 ```js
 {
-  javascript: {
-    files: [
-      'filename.js',
-      'subFolder/my-file.js'
-    ]
-  }
+    javascript: {
+        files: ['filename.js', 'subFolder/my-file.js'];
+    }
 }
 ```
 
@@ -133,9 +126,9 @@ This is our recommended option because it's similar to how modern development is
 
 The ES Modules build method requires the following:
 
-* Your files must have the `.js` file extension.
-* You must use `import` to import files.
-* You must use `export` to export objects from a file.
+- Your files must have the `.js` file extension.
+- You must use `import` to import files.
+- You must use `export` to export objects from a file.
 
 If the entry file exports a variable or an object then that value can be accessed using the `globalName` value in the esbuild configuration and the name of the variable/object. For example, if the `globalName` is set to `products` and your entry file exports an object called `productsController` and that object has a method called `init`,
 then you can access that method in your inline Javascript depending on the way that you export.
@@ -146,17 +139,13 @@ then you can access that method in your inline Javascript depending on the way t
 const productsController = {
     init() {
         console.log('init');
-    }
-}
+    },
+};
 export default productsController;
 
 // Using the exported function in some other file
-<script>
-    products.default.init();
-</script>
+<script>products.default.init();</script>;
 ```
-
-
 
 ```js
 // Entry file
@@ -164,14 +153,12 @@ export default productsController;
 const productsController = {
     init() {
         console.log('init');
-    }
-}
-export {productsController};
+    },
+};
+export { productsController };
 
 // Using the exported function in some other file
-<script>
-    products.productsController.init();
-</script>
+<script>products.productsController.init();</script>;
 ```
 
 The ES Modules is the only way to use web workers in your project.
@@ -180,17 +167,15 @@ The ES Modules is the only way to use web workers in your project.
 
 The CommonJS method requires the following:
 
-* Your files must have the `.cjs` file extension.
-* You must use `require()` to import files.
-* You must use `module.exports` to export objects from a file.
+- Your files must have the `.cjs` file extension.
+- You must use `require()` to import files.
+- You must use `module.exports` to export objects from a file.
 
 If the entry file exports a variable or object then that value can be accessed using the `globalName` value in the esbuild configuration. For example, if the `globalName` is set to `products` and your entry file exports an object called `productsController` and that object has a method called `init`,
 then you can access that method in your inline Javascript like this:
 
 ```js
-<script>
-    products.init();
-</script>
+<script>products.init();</script>
 ```
 
 If you don't set the `globalName` value then the exported object will not be available in the global scope.
@@ -199,7 +184,6 @@ There are some cons to using the CommonJS method.
 
 1. The file name extension is `.cjs`, which may confuse some of your team.
 2. You can't use [web workers](#web-workers-with-esbuild) with the CommonJS method. The web worker file name must end in `.worker.js` and be imported with `import`. Since `import` doesn't work with CommonJS, web workers can't be used.
-
 
 ### Configure the entry point files
 
@@ -212,10 +196,7 @@ Set a simple array of file names/paths within the Javascript source directory (`
 ```js
 {
     javascript: {
-        entryPoints: [
-            'filename.js',
-            'path/filename2.js'
-        ]
+        entryPoints: ['filename.js', 'path/filename2.js'];
     }
 }
 ```
@@ -229,8 +210,8 @@ Set an array of objects that specify the `in` file (i.e. the entry point file) a
     javascript: {
         entryPoints: [
             { in: 'file.js', out: 'other-name' },
-            { in: 'path/filename2.js', out: 'some-path/file-out'}
-        ]
+            { in: 'path/filename2.js', out: 'some-path/file-out' },
+        ];
     }
 }
 ```
@@ -242,9 +223,9 @@ You can combine both approaches.
     javascript: {
         entryPoints: [
             { in: 'file.js', out: 'other-name' },
-            { in: 'path/filename2.js', out: 'some-path/file-out'},
-            'my-file.js'
-        ]
+            { in: 'path/filename2.js', out: 'some-path/file-out' },
+            'my-file.js',
+        ];
     }
 }
 ```
@@ -254,9 +235,7 @@ You can leave out the `out` value. If you do then the output file name will matc
 ```js
 {
     javascript: {
-        entryPoints: [
-            { in: 'file.js' },
-        ]
+        entryPoints: [{ in: 'file.js' }];
     }
 }
 ```
@@ -302,10 +281,14 @@ Set the configuration in the `javascript.entryPoints` array. You would do this b
 {
     javascript: {
         entryPoints: [
-            { in: 'file.js', out: 'outfile', config: { globalName: 'fileObject' } },
-            { in: 'path/filename2.js', out: 'some-path/file-out'},
+            {
+                in: 'file.js',
+                out: 'outfile',
+                config: { globalName: 'fileObject' },
+            },
+            { in: 'path/filename2.js', out: 'some-path/file-out' },
             { in: 'other-file.js', config: { globalName: 'myFile' } },
-        ]
+        ];
     }
 }
 ```
@@ -323,12 +306,14 @@ The IIFE format wraps the code in a self executing function, thus isolating any 
 How you use that variable to access your code depends on if you're using the [ES Modules](#es-modules-build-method) method or the [CommonJS method](#commonjs-build-method).
 
 #### ES Modules global variable
+
 Use `export` to export.
 
 ```js
 const thingToExport = {};
 export default thingToExport;
 ```
+
 If you want to export multiple variables you can do it like this:
 
 ```js
@@ -337,8 +322,8 @@ const variable2 = {};
 
 export default {
     variable1,
-    variable2
-}
+    variable2,
+};
 ```
 
 If the entry file exports a variable or an object then that value can be accessed using the `globalName` value in the esbuild configuration and the name of the variable/object. For example, if the `globalName` is set to `products` and your entry file exports an object called `productsController` and that object has a method called `init`,
@@ -350,17 +335,13 @@ then you can access that method in your inline Javascript depending on the way t
 const productsController = {
     init() {
         console.log('init');
-    }
-}
+    },
+};
 export default productsController;
 
 // Using the exported function in some other file
-<script>
-    products.default.init();
-</script>
+<script>products.default.init();</script>;
 ```
-
-
 
 ```js
 // Entry file
@@ -368,14 +349,12 @@ export default productsController;
 const productsController = {
     init() {
         console.log('init');
-    }
-}
-export {productsController};
+    },
+};
+export { productsController };
 
 // Using the exported function in some other file
-<script>
-    products.productsController.init();
-</script>
+<script>products.productsController.init();</script>;
 ```
 
 ##### Recommended approach
@@ -388,15 +367,13 @@ We recommend exporting the object as setting it to the `helper` name. It seems c
 const productsController = {
     init() {
         console.log('init');
-    }
-}
+    },
+};
 //// eslint-disable-next-line import/prefer-default-export -- See http://aptuitiv.github.io/website-build-tools/configuration/javascript#es-modules-build-method for exporting recommendations.
-export {productsController as helper};
+export { productsController as helper };
 
 // Using the exported function in some other file
-<script>
-    products.helper.init();
-</script>
+<script>products.helper.init();</script>;
 ```
 
 #### CommonJS global variable
@@ -414,17 +391,15 @@ If you want to export multiple variables you can do it like this:
 ```js
 module.exports = {
     variable1,
-    variable2
-}
+    variable2,
+};
 ```
 
 If the entry file exports a variable or object then that value can be accessed using the `globalName` value in the esbuild configuration. For example, if the `globalName` is set to `products` and your entry file exports an object called `productsController` and that object has a method called `init`,
 then you can access that method in your inline Javascript like this:
 
 ```js
-<script>
-    products.init();
-</script>
+<script>products.init();</script>
 ```
 
 ### Importing other files
@@ -438,6 +413,7 @@ You can import files with the `import` statement. The file name should end in `.
 ```js
 import { myFunction } from './my-file.js';
 ```
+
 You can also import a default export.
 
 ```js
@@ -475,12 +451,10 @@ For example:
                 out: 'out-file-name',
                 config: { globalName: 'globalVar' },
                 bundle: {
-                    nodeModules: [
-                        'nouislider/dist/nouislider.min.js'
-                    ]
-                }
-            }
-        ]
+                    nodeModules: ['nouislider/dist/nouislider.min.js'],
+                },
+            },
+        ];
     }
 }
 ```
@@ -500,16 +474,11 @@ Here is another example that includes a node_modules file and a few local Javasc
                 out: 'main',
                 config: { globalName: 'main' },
                 bundle: {
-                    nodeModules: [
-                        'micromodal/dist/micromodal.min.js'
-                    ],
-                    src: [
-                        'form.js',
-                        'script-loader.js'
-                    ]
-                }
-            }
-        ]
+                    nodeModules: ['micromodal/dist/micromodal.min.js'],
+                    src: ['form.js', 'script-loader.js'],
+                },
+            },
+        ];
     }
 }
 ```
@@ -534,7 +503,7 @@ In your web worker file have your code without any exports. For example:
 // example.worker.js
 onmessage = (e) => {
     console.log('Received data: ', e.data);
-}
+};
 
 postMessage('Some data to send back');
 ```
@@ -569,7 +538,7 @@ Typically, the only configuration that you may need to do is to add some ignore 
 
 ```js
 eslint: {
-    ignores: ['fslightbox.js']
+    ignores: ['fslightbox.js'];
 }
 ```
 
@@ -581,7 +550,7 @@ You can also ignore directories. For example, to ignore the `src/js/maps` direct
 
 ```js
 eslint: {
-    ignores: ['maps/']
+    ignores: ['maps/'];
 }
 ```
 
@@ -589,7 +558,7 @@ You can ignore both files and directories.
 
 ```js
 eslint: {
-    ignores: ['fslightbox.js', 'maps/']
+    ignores: ['fslightbox.js', 'maps/'];
 }
 ```
 
@@ -637,7 +606,7 @@ Secondly, you can cancel the minification by either setting `javascript.minify` 
 ```js
 {
     javascript: {
-        minify: false
+        minify: false;
     }
 }
 ```
@@ -645,8 +614,8 @@ Secondly, you can cancel the minification by either setting `javascript.minify` 
 ```js
 {
     javascript: {
-        minify:  {
-            compress: false
+        minify: {
+            compress: false;
         }
     }
 }

@@ -80,7 +80,11 @@ export const prepareCopyData = () => {
                                 });
                             }
                         } else {
-                            fancyLog(logSymbols.error, chalk.red('The file path is not a string'), chalk.cyan(file));
+                            fancyLog(
+                                logSymbols.error,
+                                chalk.red('The file path is not a string'),
+                                chalk.cyan(file),
+                            );
                         }
                     });
                 }

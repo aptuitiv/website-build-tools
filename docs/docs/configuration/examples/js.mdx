@@ -12,23 +12,23 @@ export default {
                 'node_modules/@splidejs/splide/dist/css/splide.min.css',
                 'node_modules/@splidejs/splide/dist/js/splide.min.js',
                 'node_modules/@splidejs/splide-extension-video/dist/js/splide-extension-video.min.js',
-                'node_modules/@splidejs/splide-extension-video/dist/css/splide-extension-video.min.css'
+                'node_modules/@splidejs/splide-extension-video/dist/css/splide-extension-video.min.css',
             ],
-            dest: 'splide'
+            dest: 'splide',
         },
         {
             src: 'node_modules/just-validate/dist/just-validate.production.min.js',
-            dest: 'just-validate'
-        }
+            dest: 'just-validate',
+        },
     ],
     eslint: {
-        'ignores': ['fslightbox.js']
+        ignores: ['fslightbox.js'],
     },
     javascript: {
         bundles: [
             {
-                'build': 'main.js',
-                'nodeModules': ['micromodal/dist/micromodal.min.js'],
+                build: 'main.js',
+                nodeModules: ['micromodal/dist/micromodal.min.js'],
                 src: [
                     'script-loader.js',
                     'iframe-loader.js',
@@ -36,13 +36,11 @@ export default {
                     'navigation.js',
                     'accordion.js',
                     'header.js',
-                    'main.js'
-                ]
-            }
+                    'main.js',
+                ],
+            },
         ],
-        files: [
-            'fslightbox.js'
-        ]
-    }
-}
+        files: ['fslightbox.js'],
+    },
+};
 ```

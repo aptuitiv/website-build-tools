@@ -39,7 +39,8 @@ export const getFileName = (path) => {
  * @param {string} filename The file name
  * @returns {string}
  */
-const getRootPath = (path, filename) => prefixPath(filename, prefixRootPath(path));
+const getRootPath = (path, filename) =>
+    prefixPath(filename, prefixRootPath(path));
 
 /**
  * Get the root src path for the file
@@ -48,7 +49,8 @@ const getRootPath = (path, filename) => prefixPath(filename, prefixRootPath(path
  * @param {string} filename The file name
  * @returns {string}
  */
-const getRootSrcPath = (path, filename) => prefixPath(filename, prefixRootSrcPath(path));
+const getRootSrcPath = (path, filename) =>
+    prefixPath(filename, prefixRootSrcPath(path));
 
 /**
  * Get the src path for the file
@@ -57,7 +59,8 @@ const getRootSrcPath = (path, filename) => prefixPath(filename, prefixRootSrcPat
  * @param {string} filename The file name
  * @returns {string}
  */
-const getSrcPath = (path, filename) => prefixPath(filename, prefixSrcPath(path));
+const getSrcPath = (path, filename) =>
+    prefixPath(filename, prefixSrcPath(path));
 
 /**
  * Get the root theme build path for the file
@@ -66,7 +69,8 @@ const getSrcPath = (path, filename) => prefixPath(filename, prefixSrcPath(path))
  * @param {string} filename The file name
  * @returns {string}
  */
-const getRootThemeBuildPath = (path, filename) => prefixPath(filename, prefixRootThemeBuildPath(path));
+const getRootThemeBuildPath = (path, filename) =>
+    prefixPath(filename, prefixRootThemeBuildPath(path));
 
 /**
  * Get the theme build path for the file
@@ -75,7 +79,8 @@ const getRootThemeBuildPath = (path, filename) => prefixPath(filename, prefixRoo
  * @param {string} filename The file name
  * @returns {string}
  */
-const getThemeBuildPath = (path, filename) => prefixPath(filename, prefixThemeBuildPath(path));
+const getThemeBuildPath = (path, filename) =>
+    prefixPath(filename, prefixThemeBuildPath(path));
 
 /**
  * Copy a file from the source path to the destination path
@@ -185,16 +190,28 @@ export const copyFileToDest = (path, destPath) => {
  * @param {string[]} skipFiles The files to skip when copying. This can be an array of file names, or glob patterns.
  *      See https://www.npmjs.com/package/recursive-readdir for more information.
  */
-const copyFolder = async (srcPath, destPath, startMessage, successMessage, skipFiles = []) => {
+const copyFolder = async (
+    srcPath,
+    destPath,
+    startMessage,
+    successMessage,
+    skipFiles = [],
+) => {
     fancyLog(chalk.magenta(startMessage));
     if (fs.existsSync(prefixRootPath(srcPath))) {
         await recursiveReadDir(prefixRootPath(srcPath), skipFiles)
             .then((files) => {
                 if (Array.isArray(files) && files.length > 0) {
                     files.forEach((file) => {
-                        const fileWithoutRoot = removeRootPrefix(file, [srcPath]);
+                        const fileWithoutRoot = removeRootPrefix(file, [
+                            srcPath,
+                        ]);
                         const fileDest = getRootPath(destPath, fileWithoutRoot);
-                        fancyLog(chalk.cyan(`Copying ${removeRootPrefix(file)}`), '=>', chalk.cyan(prefixPath(fileWithoutRoot, destPath)));
+                        fancyLog(
+                            chalk.cyan(`Copying ${removeRootPrefix(file)}`),
+                            '=>',
+                            chalk.cyan(prefixPath(fileWithoutRoot, destPath)),
+                        );
                         fs.copySync(file, fileDest);
                     });
                     fancyLog(logSymbols.success, chalk.green(successMessage));
@@ -203,10 +220,7 @@ const copyFolder = async (srcPath, destPath, startMessage, successMessage, skipF
                     if (skipFiles.length > 0) {
                         msg += ` or there are no files that don't match the skip patterns: ${skipFiles.join(', ')}`;
                     }
-                    fancyLog(
-                        logSymbols.warning,
-                        chalk.yellow(msg),
-                    );
+                    fancyLog(logSymbols.warning, chalk.yellow(msg));
                 }
             })
             .catch((err) => {
@@ -230,7 +244,12 @@ const copyFolder = async (srcPath, destPath, startMessage, successMessage, skipF
  * @param {string[]} skipFiles The files to skip when copying. This can be an array of file names, or glob patterns.
  *      See https://www.npmjs.com/package/recursive-readdir for more information.
  */
-export const copyBuildFolderToSrc = async (srcPath, destPath, type, skipFiles = []) => {
+export const copyBuildFolderToSrc = async (
+    srcPath,
+    destPath,
+    type,
+    skipFiles = [],
+) => {
     await copyFolder(
         srcPath,
         destPath,
@@ -249,7 +268,12 @@ export const copyBuildFolderToSrc = async (srcPath, destPath, type, skipFiles = 
  * @param {string[]} skipFiles The files to skip when copying. This can be an array of file names, or glob patterns.
  *      See https://www.npmjs.com/package/recursive-readdir for more information.
  */
-export const copySrcFolderToBuild = async (srcPath, destPath, type, skipFiles = []) => {
+export const copySrcFolderToBuild = async (
+    srcPath,
+    destPath,
+    type,
+    skipFiles = [],
+) => {
     await copyFolder(
         srcPath,
         destPath,

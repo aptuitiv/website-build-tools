@@ -14,13 +14,8 @@ import { objectHasValue } from './lib/object.js';
 
 // Build files
 import config from './config.js';
-import {
-    copySrcFileToThemeBuild,
-    removeFileFromThemeBuild,
-} from './files.js';
-import {
-    prefixSrcPath,
-} from './helpers.js';
+import { copySrcFileToThemeBuild, removeFileFromThemeBuild } from './files.js';
+import { prefixSrcPath } from './helpers.js';
 
 /**
  * Removes a deleted theme config file from the build directory
@@ -28,7 +23,11 @@ import {
  * @param {string} filePath The file path
  */
 export const removeThemeFileFromBuild = (filePath) => {
-    removeFileFromThemeBuild(filePath, config.data.themeConfig.build, 'theme file');
+    removeFileFromThemeBuild(
+        filePath,
+        config.data.themeConfig.build,
+        'theme file',
+    );
 };
 
 /**
@@ -54,9 +53,15 @@ const reorderJsonByName = (json) => {
 const reorderThemeConfigGroupsOrSections = (obj) => {
     const returnValue = obj;
     if (isObject(returnValue)) {
-        if (objectHasValue(returnValue, 'groups') && Array.isArray(returnValue.groups)) {
+        if (
+            objectHasValue(returnValue, 'groups') &&
+            Array.isArray(returnValue.groups)
+        ) {
             returnValue.groups = reorderJsonByName(returnValue.groups);
-        } else if (objectHasValue(returnValue, 'sections') && Array.isArray(returnValue.sections)) {
+        } else if (
+            objectHasValue(returnValue, 'sections') &&
+            Array.isArray(returnValue.sections)
+        ) {
             returnValue.sections = reorderJsonByName(returnValue.sections);
         }
     }
@@ -73,7 +78,8 @@ const reorderThemeConfigGroupsOrSections = (obj) => {
 const reorderThemeConfigProperties = (obj) => {
     if (Array.isArray(obj)) {
         return obj.map(reorderThemeConfigProperties);
-    } if (isObject(obj)) {
+    }
+    if (isObject(obj)) {
         // The data keys and the order that they should be in the object.
         // Any other keys will be added to the end of the object in the order that they already are in the object.
         const reorderKeys = ['name', 'label', 'type', 'description'];
@@ -107,7 +113,6 @@ const reorderThemeConfig = (json) => {
     return returnValue;
 };
 
-
 /**
  * Validate the theme config fields
  *
@@ -126,21 +131,46 @@ const validateThemeJsonFields = (json, parentName, parentType) => {
         for (let i = 0; i < json.length; i++) {
             const item = json[i];
             if (isObject(item)) {
-                if (objectHasValue(item, 'name') && objectHasValue(item, 'label') && objectHasValue(item, 'type')) {
+                if (
+                    objectHasValue(item, 'name') &&
+                    objectHasValue(item, 'label') &&
+                    objectHasValue(item, 'type')
+                ) {
                     returnValue = true;
                 } else {
                     returnValue = false;
-                    fancyLog(logSymbols.error, chalk.bold.red(`One of the "fields" items ${parentError} is missing a "name" property. The item is:`), "\n", chalk.red(JSON.stringify(item, null, 4)));
+                    fancyLog(
+                        logSymbols.error,
+                        chalk.bold.red(
+                            `One of the "fields" items ${parentError} is missing a "name" property. The item is:`,
+                        ),
+                        '\n',
+                        chalk.red(JSON.stringify(item, null, 4)),
+                    );
                     break;
                 }
             } else {
                 returnValue = false;
-                fancyLog(logSymbols.error, chalk.bold.red(`One of the "fields" items ${parentError} is not an object. The item is:`), "\n", chalk.red(JSON.stringify(item, null, 4)));
+                fancyLog(
+                    logSymbols.error,
+                    chalk.bold.red(
+                        `One of the "fields" items ${parentError} is not an object. The item is:`,
+                    ),
+                    '\n',
+                    chalk.red(JSON.stringify(item, null, 4)),
+                );
                 break;
             }
         }
     } else {
-        fancyLog(logSymbols.error, chalk.bold.red(`The "fields" property ${parentError} is not an array. The item is:`), "\n", chalk.red(JSON.stringify(json, null, 4)));
+        fancyLog(
+            logSymbols.error,
+            chalk.bold.red(
+                `The "fields" property ${parentError} is not an array. The item is:`,
+            ),
+            '\n',
+            chalk.red(JSON.stringify(json, null, 4)),
+        );
     }
     return returnValue;
 };
@@ -162,47 +192,87 @@ const validateThemeJsonGroupsOrSections = (json, type) => {
                     returnValue = true;
                     // Validate any fields in the group or section
                     if (objectHasValue(item, 'fields')) {
-                        returnValue = validateThemeJsonFields(item.fields, item.name, type);
+                        returnValue = validateThemeJsonFields(
+                            item.fields,
+                            item.name,
+                            type,
+                        );
                         if (!returnValue) {
                             break;
                         }
                     } else if (type === 'group') {
                         // The group doesn't have fields, which could be ok. Check to see if it has a "groups" or "sections" property.
                         if (objectHasValue(item, 'groups')) {
-                            returnValue = validateThemeJsonGroupsOrSections(item.groups, 'group');
+                            returnValue = validateThemeJsonGroupsOrSections(
+                                item.groups,
+                                'group',
+                            );
                             if (!returnValue) {
                                 break;
                             }
                         } else if (objectHasValue(item, 'sections')) {
-                            returnValue = validateThemeJsonGroupsOrSections(item.sections, 'section');
+                            returnValue = validateThemeJsonGroupsOrSections(
+                                item.sections,
+                                'section',
+                            );
                             if (!returnValue) {
                                 break;
                             }
                         } else {
                             // The group doesn't have a "groups" or "sections" property.
-                            fancyLog(logSymbols.warning, chalk.yellow(`The "${type}" "${item.name}" is missing a "fields", "groups" or "sections" property. A group with no fields, groups or sections will not be displayed.`));
+                            fancyLog(
+                                logSymbols.warning,
+                                chalk.yellow(
+                                    `The "${type}" "${item.name}" is missing a "fields", "groups" or "sections" property. A group with no fields, groups or sections will not be displayed.`,
+                                ),
+                            );
                         }
                     } else {
                         // This is a section with no fields.
-                        fancyLog(logSymbols.warning, chalk.yellow(`The "${type}" "${item.name}" is missing a "fields" property. A section with no fields will not be displayed.`));
+                        fancyLog(
+                            logSymbols.warning,
+                            chalk.yellow(
+                                `The "${type}" "${item.name}" is missing a "fields" property. A section with no fields will not be displayed.`,
+                            ),
+                        );
                     }
                 } else {
                     returnValue = false;
-                    fancyLog(logSymbols.error, chalk.bold.red(`One of the "${type}s" items is missing a "name" property. The item is:`), "\n", chalk.red(JSON.stringify(item, null, 4)));
+                    fancyLog(
+                        logSymbols.error,
+                        chalk.bold.red(
+                            `One of the "${type}s" items is missing a "name" property. The item is:`,
+                        ),
+                        '\n',
+                        chalk.red(JSON.stringify(item, null, 4)),
+                    );
                     break;
                 }
             } else {
                 returnValue = false;
-                fancyLog(logSymbols.error, chalk.bold.red(`One of the "${type}s" items is not an object. The item is:`), "\n", chalk.red(JSON.stringify(item, null, 4)));
+                fancyLog(
+                    logSymbols.error,
+                    chalk.bold.red(
+                        `One of the "${type}s" items is not an object. The item is:`,
+                    ),
+                    '\n',
+                    chalk.red(JSON.stringify(item, null, 4)),
+                );
                 break;
             }
         }
     } else {
-        fancyLog(logSymbols.error, chalk.bold.red(`The "${type}s" property is not an array. The item is:`), "\n", chalk.red(JSON.stringify(json, null, 4)));
+        fancyLog(
+            logSymbols.error,
+            chalk.bold.red(
+                `The "${type}s" property is not an array. The item is:`,
+            ),
+            '\n',
+            chalk.red(JSON.stringify(json, null, 4)),
+        );
     }
     return returnValue;
 };
-
 
 /**
  * Validate the theme config file
@@ -219,13 +289,24 @@ const validateThemeJsonFile = (json, fileName) => {
     if (isObject(json)) {
         if (Object.keys(json).length > 0) {
             if (objectHasValue(json, 'groups')) {
-                returnValue = validateThemeJsonGroupsOrSections(json.groups, 'group');
+                returnValue = validateThemeJsonGroupsOrSections(
+                    json.groups,
+                    'group',
+                );
             } else if (objectHasValue(json, 'sections')) {
-                returnValue = validateThemeJsonGroupsOrSections(json.sections, 'section');
+                returnValue = validateThemeJsonGroupsOrSections(
+                    json.sections,
+                    'section',
+                );
             } else if (objectHasValue(json, 'fields')) {
                 returnValue = validateThemeJsonFields(json.fields);
             } else {
-                fancyLog(logSymbols.error, chalk.red(`The ${fileName} file should have a "groups" or "fields" property`));
+                fancyLog(
+                    logSymbols.error,
+                    chalk.red(
+                        `The ${fileName} file should have a "groups" or "fields" property`,
+                    ),
+                );
             }
         } else {
             // This is an empty object. Mark it as valid.
@@ -251,21 +332,38 @@ const processThemeJsonFile = async (fileName) => {
         if (content.trim().length > 0) {
             const json = await fs.readJson(filePath);
             if (validateThemeJsonFile(json, fileName)) {
-                fancyLog(logSymbols.success, chalk.green(`${fileName} file is valid`));
+                fancyLog(
+                    logSymbols.success,
+                    chalk.green(`${fileName} file is valid`),
+                );
                 const formattedJson = reorderThemeConfig(json);
                 if (JSON.stringify(json) !== JSON.stringify(formattedJson)) {
                     fs.writeJSONSync(filePath, formattedJson, { spaces: 4 });
                 }
-                fancyLog(logSymbols.success, chalk.green(`Formatted the ${fileName} file`));
+                fancyLog(
+                    logSymbols.success,
+                    chalk.green(`Formatted the ${fileName} file`),
+                );
             } else {
-                fancyLog(logSymbols.error, chalk.red(`The ${fileName} file is not valid. Please fix the file and try again.`));
+                fancyLog(
+                    logSymbols.error,
+                    chalk.red(
+                        `The ${fileName} file is not valid. Please fix the file and try again.`,
+                    ),
+                );
             }
         } else {
             // This is an empty file. Mark it as valid.
-            fancyLog(logSymbols.success, chalk.green(`${fileName} is empty, but that's ok.`));
+            fancyLog(
+                logSymbols.success,
+                chalk.green(`${fileName} is empty, but that's ok.`),
+            );
         }
     } else {
-        fancyLog(logSymbols.error, chalk.red(`The ${fileName} file does not exist`));
+        fancyLog(
+            logSymbols.error,
+            chalk.red(`The ${fileName} file does not exist`),
+        );
     }
 };
 
@@ -277,13 +375,19 @@ const processThemeJsonFile = async (fileName) => {
 export const formatThemeJson = async (fileName) => {
     if (isStringWithValue(fileName)) {
         await processThemeJsonFile(fileName);
-        fancyLog(logSymbols.success, chalk.green('Done formatting the theme configuration JSON file'));
+        fancyLog(
+            logSymbols.success,
+            chalk.green('Done formatting the theme configuration JSON file'),
+        );
     } else {
         await processThemeJsonFile('theme-settings.json');
         await processThemeJsonFile('theme-styles.json');
         // eslint-disable-next-line no-console -- We do this to add a blank line to the console
         console.log('');
-        fancyLog(logSymbols.success, chalk.green('Done formatting the theme configuration JSON files'));
+        fancyLog(
+            logSymbols.success,
+            chalk.green('Done formatting the theme configuration JSON files'),
+        );
     }
 };
 
@@ -301,7 +405,11 @@ export const copyThemeSrcToBuild = async (filePath) => {
             await formatThemeJson(fileName);
         } catch (error) {
             isValid = false;
-            fancyLog(logSymbols.error, chalk.red(`Error formatting the ${fileName} file`), error);
+            fancyLog(
+                logSymbols.error,
+                chalk.red(`Error formatting the ${fileName} file`),
+                error,
+            );
         }
     }
     if (isValid) {
@@ -311,16 +419,24 @@ export const copyThemeSrcToBuild = async (filePath) => {
             config.data.themeConfig.build,
         );
     } else {
-        fancyLog(logSymbols.error, chalk.red(`Stopped processing ${fileName} due to a validation error`));
+        fancyLog(
+            logSymbols.error,
+            chalk.red(
+                `Stopped processing ${fileName} due to a validation error`,
+            ),
+        );
     }
 };
-
 
 /**
  * Process the theme request
  */
 export const pushTheme = async () => {
-    fancyLog(chalk.magenta('Copying theme config files from source folder to build folder'));
+    fancyLog(
+        chalk.magenta(
+            'Copying theme config files from source folder to build folder',
+        ),
+    );
     // Copy the legacy theme.json file to the build directory if it exists.
     copySrcFileToThemeBuild(
         'theme.json',
@@ -345,7 +461,11 @@ export const pushTheme = async () => {
             config.data.themeConfig.build,
         );
     } catch (error) {
-        fancyLog(logSymbols.error, chalk.red('Error processing the theme-settings.json file'), error);
+        fancyLog(
+            logSymbols.error,
+            chalk.red('Error processing the theme-settings.json file'),
+            error,
+        );
     }
     // Process and copy the theme-styles.json file to the build directory.
     try {
@@ -356,7 +476,16 @@ export const pushTheme = async () => {
             config.data.themeConfig.build,
         );
     } catch (error) {
-        fancyLog(logSymbols.error, chalk.red('Error processing the theme-styles.json file'), error);
+        fancyLog(
+            logSymbols.error,
+            chalk.red('Error processing the theme-styles.json file'),
+            error,
+        );
     }
-    fancyLog(logSymbols.success, chalk.green('Done copying theme config files from source folder to build folder'));
+    fancyLog(
+        logSymbols.success,
+        chalk.green(
+            'Done copying theme config files from source folder to build folder',
+        ),
+    );
 };

@@ -10,7 +10,6 @@ import fs from 'fs';
 import path from 'path';
 import { isObjectWithValues } from '../../lib/types.js';
 
-
 const cacheDir = findCacheDir({
     name: 'esbuild-plugin-inline-worker',
     create: true,
@@ -68,7 +67,10 @@ function inlineWorkerPlugin(extraConfig) {
                     //   encoding: 'utf-8',
                     // });
 
-                    const workerCode = await buildWorker(workerPath, extraConfig);
+                    const workerCode = await buildWorker(
+                        workerPath,
+                        extraConfig,
+                    );
                     return {
                         contents: `import inlineWorker from '__inline-worker'
 export default function Worker() {
@@ -77,10 +79,13 @@ export default function Worker() {
 `,
                         loader: 'js',
                     };
-                }
+                },
             );
 
-            const name = isObjectWithValues(extraConfig) && extraConfig.workerName ? { name: extraConfig.workerName } : {}
+            const name =
+                isObjectWithValues(extraConfig) && extraConfig.workerName
+                    ? { name: extraConfig.workerName }
+                    : {};
 
             const inlineWorkerFunctionCode = `
 export default function inlineWorker(scriptText) {
@@ -92,11 +97,16 @@ export default function inlineWorker(scriptText) {
 }
 `;
 
-            build.onResolve({ filter: /^__inline-worker$/ }, (resolveData) => ({ path: resolveData.path, namespace: 'inline-worker' }));
-            build.onLoad({ filter: /.*/, namespace: 'inline-worker' }, () => ({ contents: inlineWorkerFunctionCode, loader: 'js' }));
+            build.onResolve({ filter: /^__inline-worker$/ }, (resolveData) => ({
+                path: resolveData.path,
+                namespace: 'inline-worker',
+            }));
+            build.onLoad({ filter: /.*/, namespace: 'inline-worker' }, () => ({
+                contents: inlineWorkerFunctionCode,
+                loader: 'js',
+            }));
         },
     };
 }
-
 
 export default inlineWorkerPlugin;

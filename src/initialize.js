@@ -15,11 +15,29 @@ import zl from 'zip-lib';
 
 // Build scripts
 import { createEnvFile } from './env.js';
-import { getObjectKeysRecursive, setupRoot, sortObjectByKeys } from './helpers.js';
-import { logConditionalMessage, logConditionalSuccess, logConditionalWarning, logMessage, logWarning } from './lib/log.js';
+import {
+    getObjectKeysRecursive,
+    setupRoot,
+    sortObjectByKeys,
+} from './helpers.js';
+import {
+    logConditionalMessage,
+    logConditionalSuccess,
+    logConditionalWarning,
+    logMessage,
+    logWarning,
+} from './lib/log.js';
 import { kebabToCapitalized } from './lib/string.js';
-import { isObject, isObjectWithValues, isStringWithValue } from './lib/types.js';
-import { addDependency, formatPackageJson, setupLicense } from './package-json.js';
+import {
+    isObject,
+    isObjectWithValues,
+    isStringWithValue,
+} from './lib/types.js';
+import {
+    addDependency,
+    formatPackageJson,
+    setupLicense,
+} from './package-json.js';
 import { hasFilesByExtension } from './lib/files.js';
 
 // Get the directory name of the current module
@@ -52,7 +70,11 @@ const convertJsonToJs = (content) => {
 const createJsonConfigFile = (configFile, content) => {
     const contents = `${JSON.stringify(content, null, 4)}`;
     fs.writeFileSync(configFile, contents);
-    fancyLog(logSymbols.success, chalk.green('Config file created'), chalk.cyan(configFile));
+    fancyLog(
+        logSymbols.success,
+        chalk.green('Config file created'),
+        chalk.cyan(configFile),
+    );
 };
 
 /**
@@ -68,7 +90,11 @@ const createCommonJsConfigFile = (configFile, content) => {
  */
 module.exports = ${convertJsonToJs(content)};`;
     fs.writeFileSync(configFile, contents);
-    fancyLog(logSymbols.success, chalk.green('Config file created'), chalk.cyan(configFile));
+    fancyLog(
+        logSymbols.success,
+        chalk.green('Config file created'),
+        chalk.cyan(configFile),
+    );
 };
 
 /**
@@ -84,7 +110,11 @@ const createEsModuleConfigFile = (configFile, content) => {
  */
 export default ${convertJsonToJs(content)};`;
     fs.writeFileSync(configFile, contents);
-    fancyLog(logSymbols.success, chalk.green('Config file created'), chalk.cyan(configFile));
+    fancyLog(
+        logSymbols.success,
+        chalk.green('Config file created'),
+        chalk.cyan(configFile),
+    );
 };
 
 /**
@@ -99,7 +129,11 @@ const createYamlConfigFile = (configFile, content) => {
 # See https://github.com/aptuitiv/website-build-tools/blob/main/docs/Configuration.md for more information.
 ${yamlContent}`;
     fs.writeFileSync(configFile, contents);
-    fancyLog(logSymbols.success, chalk.green('Config file created'), chalk.cyan(configFile));
+    fancyLog(
+        logSymbols.success,
+        chalk.green('Config file created'),
+        chalk.cyan(configFile),
+    );
 };
 
 /**
@@ -124,7 +158,8 @@ export const createConfigFile = (configFile, content) => {
                 configContent.css = content.css;
             } else if (key === 'javascript') {
                 if (content.javascript.bundles) {
-                    configContent.javascript.bundles = content.javascript.bundles;
+                    configContent.javascript.bundles =
+                        content.javascript.bundles;
                 }
                 if (content.javascript.files) {
                     configContent.javascript.files = content.javascript.files;
@@ -173,7 +208,11 @@ node_modules/
 # Files to ignore
 .DS_Store
 .env
-.stylelintcache`;
+.stylelintcache
+
+# Claude Code local settings
+.claude/*.local.json
+claude.local.md`;
         fs.writeFileSync('.gitignore', content);
         fancyLog(logSymbols.success, chalk.green('Updated .gitignore file'));
     }
@@ -191,7 +230,7 @@ const setupEnvFile = async (name, outputLog = true) => {
     } else {
         await createEnvFile(name);
     }
-}
+};
 
 /**
  * Checks to see if the .env file exists and creates it if it doesn't
@@ -201,11 +240,15 @@ const setupEnvFile = async (name, outputLog = true) => {
  */
 const setupConfigFile = (configFile, outputLog = true) => {
     if (fs.existsSync(configFile)) {
-        logConditionalSuccess(outputLog, 'Found the configuration file', configFile);
+        logConditionalSuccess(
+            outputLog,
+            'Found the configuration file',
+            configFile,
+        );
     } else {
         createConfigFile(configFile);
     }
-}
+};
 
 /**
  * Set up the package.json file
@@ -217,7 +260,10 @@ const setupConfigFile = (configFile, outputLog = true) => {
 const setupPackageJson = async (args, name, outputLog = true) => {
     if (fs.existsSync('package.json')) {
         await formatPackageJson(args);
-        logConditionalSuccess(outputLog, 'Found and formatted the package.json file');
+        logConditionalSuccess(
+            outputLog,
+            'Found and formatted the package.json file',
+        );
     } else {
         // Get answers to build the package.json file
         logConditionalMessage(outputLog, 'Creating the package.json file');
@@ -225,10 +271,19 @@ const setupPackageJson = async (args, name, outputLog = true) => {
         if (isStringWithValue(name)) {
             packageArgs.packageName = name;
         } else {
-            packageArgs.packageName = await input({ message: 'What is the project name?', default: process.cwd().split('/').pop().toLowerCase() });
+            packageArgs.packageName = await input({
+                message: 'What is the project name?',
+                default: process.cwd().split('/').pop().toLowerCase(),
+            });
         }
-        packageArgs.packageAuthor = await input({ message: 'Who is the package author name?', default: 'Aptuitiv, Inc' });
-        packageArgs.packageAuthorEmail = await input({ message: 'What is the package author email?', default: 'hello@aptuitiv.com' });
+        packageArgs.packageAuthor = await input({
+            message: 'Who is the package author name?',
+            default: 'Aptuitiv, Inc',
+        });
+        packageArgs.packageAuthorEmail = await input({
+            message: 'What is the package author email?',
+            default: 'hello@aptuitiv.com',
+        });
         packageArgs.packageCopyright = packageArgs.packageAuthor;
 
         // Create the blank package.json file
@@ -238,7 +293,7 @@ const setupPackageJson = async (args, name, outputLog = true) => {
         await formatPackageJson(packageArgs);
         logConditionalSuccess(outputLog, 'package.json file created');
     }
-}
+};
 
 /**
  * Remove legacy files
@@ -251,7 +306,7 @@ const removeFiles = (outputLog = true) => {
         '.eslintrc.js',
         '.eslintrc.cjs',
         '.stylelintrc',
-        '.stylelintrc.cjs'
+        '.stylelintrc.cjs',
     ];
     let removed = 0;
     files.forEach((file) => {
@@ -280,7 +335,10 @@ const setupBasicWebsite = async (outputLog) => {
     fs.ensureDirSync('src/templates');
 
     // Aptuitiv build configuration
-    fs.copyFileSync(`${__dirname}/source-files/.aptuitiv-buildrc.js`, '.aptuitiv-buildrc.js');
+    fs.copyFileSync(
+        `${__dirname}/source-files/.aptuitiv-buildrc.js`,
+        '.aptuitiv-buildrc.js',
+    );
 
     // Theme config files
     if (!hasFilesByExtension('src/config', 'json')) {
@@ -290,14 +348,18 @@ const setupBasicWebsite = async (outputLog) => {
     // CSS files
     const cssFiles = fs.readdirSync('src/css');
     if (cssFiles.length === 0) {
-        const { stdout: cacaoVersion } = await execa`npm view cacao-css version`;
+        const { stdout: cacaoVersion } =
+            await execa`npm view cacao-css version`;
         addDependency('cacao-css', cacaoVersion);
         fs.copySync(`${__dirname}/source-files/css`, 'src/css');
     }
 
     // Font files
     if (!fs.existsSync('src/fonts/README.md')) {
-        fs.copyFileSync(`${__dirname}/source-files/fonts/README.md`, 'src/fonts/README.md');
+        fs.copyFileSync(
+            `${__dirname}/source-files/fonts/README.md`,
+            'src/fonts/README.md',
+        );
     }
 
     // Icon files
@@ -317,7 +379,7 @@ const setupBasicWebsite = async (outputLog) => {
     }
 
     logConditionalSuccess(outputLog, 'Basic website set up.');
-}
+};
 
 /**
  * Download an Aptuitiv theme from Github
@@ -327,27 +389,34 @@ const setupBasicWebsite = async (outputLog) => {
  * @param {boolean} [outputLog] Whether to output the log
  * @returns {Promise<void>}
  */
-const downloadTheme = async (args, theme, outputLog = true) => new Promise((resolve, reject) => {
-    (async () => {
-        logConditionalMessage(outputLog, 'Downloading the theme', theme);
-        await execa`curl -L -O https://github.com/aptuitiv/${theme}/archive/main.zip`;
-        zl.extract('./main.zip', './').then(() => {
-            fs.removeSync('./main.zip');
-            // The theme is downloaded to "theme-name-main" folder. Need to move all contents of
-            // that folder to the current directory.
-            fs.copySync(`./${theme}-main`, './');
-            fs.removeSync(`./${theme}-main`);
-            // Format the package json file
-            formatPackageJson(args).then(() => {
-                logConditionalSuccess(outputLog, 'Theme downloaded and extracted');
-                resolve();
-            });
-        }, (err) => {
-            logWarning('Error extracting the theme zip file', err);
-            reject(err);
-        })
-    })();
-})
+const downloadTheme = async (args, theme, outputLog = true) =>
+    new Promise((resolve, reject) => {
+        (async () => {
+            logConditionalMessage(outputLog, 'Downloading the theme', theme);
+            await execa`curl -L -O https://github.com/aptuitiv/${theme}/archive/main.zip`;
+            zl.extract('./main.zip', './').then(
+                () => {
+                    fs.removeSync('./main.zip');
+                    // The theme is downloaded to "theme-name-main" folder. Need to move all contents of
+                    // that folder to the current directory.
+                    fs.copySync(`./${theme}-main`, './');
+                    fs.removeSync(`./${theme}-main`);
+                    // Format the package json file
+                    formatPackageJson(args).then(() => {
+                        logConditionalSuccess(
+                            outputLog,
+                            'Theme downloaded and extracted',
+                        );
+                        resolve();
+                    });
+                },
+                (err) => {
+                    logWarning('Error extracting the theme zip file', err);
+                    reject(err);
+                },
+            );
+        })();
+    });
 
 /**
  * Install NPM packages
@@ -370,8 +439,14 @@ export const initialize = async (args, outputLog = true) => {
     if (args.name) {
         name = args.name;
     }
-    if (name === null && (!fs.existsSync('.env') || !fs.existsSync('package.json'))) {
-        name = await input({ message: 'What is the project name?', default: kebabToCapitalized(process.cwd().split('/').pop()) });
+    if (
+        name === null &&
+        (!fs.existsSync('.env') || !fs.existsSync('package.json'))
+    ) {
+        name = await input({
+            message: 'What is the project name?',
+            default: kebabToCapitalized(process.cwd().split('/').pop()),
+        });
     }
 
     let projectType = args.type ?? null;
@@ -384,13 +459,16 @@ export const initialize = async (args, outputLog = true) => {
         'theme-harvest',
         'theme-mallard',
         'theme-rivera',
-        'theme-skeleton'
+        'theme-skeleton',
     ];
     if (projectType === null || !allowedTypes.includes(projectType)) {
         projectType = await select({
             message: 'What type of project is this?',
             choices: [
-                { name: 'Existing website with project files', value: 'existing' },
+                {
+                    name: 'Existing website with project files',
+                    value: 'existing',
+                },
                 { name: 'New basic website', value: 'basic' },
                 { name: 'Arlo theme', value: 'theme-arlo' },
                 { name: 'Carmine theme', value: 'theme-carmine' },
@@ -424,7 +502,10 @@ export const initialize = async (args, outputLog = true) => {
     }
     await installNpm();
     if (outputLog) {
-        fancyLog(logSymbols.success, chalk.green('The build environment is set up now.'));
+        fancyLog(
+            logSymbols.success,
+            chalk.green('The build environment is set up now.'),
+        );
     }
 };
 

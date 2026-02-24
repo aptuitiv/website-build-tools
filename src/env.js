@@ -15,12 +15,16 @@ import { isStringWithValue } from './lib/types.js';
  */
 export const createEnvFile = async (name) => {
     logMessage('Creating the .env file with the FTP credentials');
-    logInfo('You can get the username and password from the Settings -> Domain / FTP / DNS  section in the website administration.')
+    logInfo(
+        'You can get the username and password from the Settings -> Domain / FTP / DNS  section in the website administration.',
+    );
     let envName = '';
     if (isStringWithValue(name)) {
         envName = name;
     } else {
-        envName = await input({ message: 'What is the name of this website? ' });
+        envName = await input({
+            message: 'What is the name of this website? ',
+        });
     }
     const username = await input({ message: 'What is the FTP username? ' });
     const password = await input({ message: 'What is the FTP password? ' });

@@ -30,7 +30,11 @@ export const copyCursorRules = async () => {
     // Copy the cursor rules to the destination directory
     fs.copySync(`${__dirname}/ai-source-files/cursor`, destPath);
 
-    fancyLog(logSymbols.success, chalk.green('Successfully copied cursor rules to'), chalk.cyan(destPath));
+    fancyLog(
+        logSymbols.success,
+        chalk.green('Successfully copied cursor rules to'),
+        chalk.cyan(destPath),
+    );
 };
 
 /**
@@ -40,7 +44,6 @@ export const copyCursorRules = async () => {
  * @param {string} action The action to take
  */
 export const aiHandler = async (args, action) => {
-
     if (action === 'cursor') {
         await copyCursorRules(args);
     }

@@ -14,7 +14,10 @@ import Sprite from 'svg-sprite';
 // Build files
 import config from './config.js';
 import {
-    prefixPath, prefixRootSrcPath, removePrefix, removeRootSrcPrefix,
+    prefixPath,
+    prefixRootSrcPath,
+    removePrefix,
+    removeRootSrcPrefix,
 } from './helpers.js';
 import { hasFilesByExtension } from './lib/files.js';
 import { isObjectWithValues, isStringWithValue } from './lib/types.js';
@@ -40,7 +43,7 @@ export const createIconSprite = async (srcFolderPath, outputPath) => {
             chalk.magenta('Creating icon sprite from folder'),
             chalk.cyan(removeRootSrcPrefix(iconPath)),
             chalk.magenta('to file'),
-            chalk.cyan(removeRootSrcPrefix(buildPath))
+            chalk.cyan(removeRootSrcPrefix(buildPath)),
         );
 
         // Get all the svg files in the icons folder
@@ -102,7 +105,10 @@ export const createIconSprite = async (srcFolderPath, outputPath) => {
             });
             stream.write('</svg>');
             stream.end();
-            fancyLog(logSymbols.success, chalk.green('Done creating icon sprite'));
+            fancyLog(
+                logSymbols.success,
+                chalk.green('Done creating icon sprite'),
+            );
         } catch (error) {
             // eslint-disable-next-line no-console -- Need to output the error
             console.error(error);
@@ -116,39 +122,58 @@ export const createIconSprite = async (srcFolderPath, outputPath) => {
  * @param {object} args The command line arguments, if there are any
  * @returns {Promise}
  */
-const processIcons = async (args) => new Promise((resolve) => {
-    const promises = [];
-    let processAllIcons = true;
-    if (isObjectWithValues(args) && (isStringWithValue(args.path) || isStringWithValue(args.output))) {
-        if (isStringWithValue(args.path) && isStringWithValue(args.output)) {
-            promises.push(createIconSprite(args.path, args.output));
-            processAllIcons = false;
-        } else if (isStringWithValue(args.path)) {
-            processAllIcons = false;
-            config.data.icons.forEach((iconConfig) => {
-                if (isStringWithValue(iconConfig.src) && iconConfig.src === args.path) {
-                    promises.push(createIconSprite(iconConfig.src, iconConfig.build));
+const processIcons = async (args) =>
+    new Promise((resolve) => {
+        const promises = [];
+        let processAllIcons = true;
+        if (
+            isObjectWithValues(args) &&
+            (isStringWithValue(args.path) || isStringWithValue(args.output))
+        ) {
+            if (
+                isStringWithValue(args.path) &&
+                isStringWithValue(args.output)
+            ) {
+                promises.push(createIconSprite(args.path, args.output));
+                processAllIcons = false;
+            } else if (isStringWithValue(args.path)) {
+                processAllIcons = false;
+                config.data.icons.forEach((iconConfig) => {
+                    if (
+                        isStringWithValue(iconConfig.src) &&
+                        iconConfig.src === args.path
+                    ) {
+                        promises.push(
+                            createIconSprite(iconConfig.src, iconConfig.build),
+                        );
+                    }
+                });
+                if (promises.length === 0) {
+                    fancyLog(
+                        logSymbols.error,
+                        chalk.red(
+                            `The path "${args.path}" was not found in the icons configuration`,
+                        ),
+                    );
                 }
-            });
-            if (promises.length === 0) {
-                fancyLog(
-                    logSymbols.error,
-                    chalk.red(`The path "${args.path}" was not found in the icons configuration`),
-                );
             }
         }
-    }
-    if (Array.isArray(config.data.icons) && processAllIcons) {
-        config.data.icons.forEach((iconConfig) => {
-            if (isStringWithValue(iconConfig.src) && isStringWithValue(iconConfig.build)) {
-                promises.push(createIconSprite(iconConfig.src, iconConfig.build));
-            }
+        if (Array.isArray(config.data.icons) && processAllIcons) {
+            config.data.icons.forEach((iconConfig) => {
+                if (
+                    isStringWithValue(iconConfig.src) &&
+                    isStringWithValue(iconConfig.build)
+                ) {
+                    promises.push(
+                        createIconSprite(iconConfig.src, iconConfig.build),
+                    );
+                }
+            });
+        }
+        Promise.all(promises).then(() => {
+            resolve();
         });
-    }
-    Promise.all(promises).then(() => {
-        resolve();
     });
-});
 
 /**
  * Process the icon request
