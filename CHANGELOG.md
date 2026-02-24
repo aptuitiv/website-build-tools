@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.35.0] - 2026-02-23
+
+### Changed
+
+- Improved the resiliency of the FTP functionality. Also batch the notifications for file uploads to prevent overloading system notifications.
+- Updated packages. Could not update eslint to version 10 because `eslint-plugin-import-x` in `@aptuitiv/eslint-config-aptuitiv` doesn’t support it yet. 
+Could not upgrade to Stylelint 17 because `stylelint-selector-bem-pattern` does not support it yet.
+
 ## [1.34.0] - 2026-01-20
 
 ### Changed
