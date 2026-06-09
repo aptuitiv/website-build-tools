@@ -2,6 +2,8 @@
     Object utility functions
 =========================================================================== */
 
+/* eslint-disable jsdoc/reject-any-type -- Allow the "any" type for the parameters */
+
 import { isObject, isStringWithValue } from './types.js';
 
 /**

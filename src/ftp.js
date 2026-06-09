@@ -7,12 +7,12 @@ import fancyLog from 'fancy-log';
 import fs from 'fs-extra';
 import { globSync } from 'glob';
 import logSymbols from 'log-symbols';
-import notifier from 'node-notifier';
 import * as path from 'path';
 
 // Build scripts
 import config from './config.js';
 import { processGlobPath, prefixPath, prefixRootPath } from './helpers.js';
+import { notify } from './lib/notify.js';
 
 /* global Client */
 
@@ -21,7 +21,7 @@ const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 1000;
 
 // ---- Notification batching ----
-const NOTIFICATION_DELAY_MS = 2000;
+const NOTIFICATION_DELAY_MS = 1000;
 let pendingNotifications = [];
 let notificationTimer = null;
 
@@ -48,10 +48,10 @@ const flushNotifications = () => {
         parts.push(`${deleted.length} ${label} deleted`);
     }
 
-    notifier.notify({
+    notify({
         title: 'FTP Deploy',
         message: parts.join(', '),
-        sound: true,
+        sound: config.data.ftp.sound,
     });
 
     pendingNotifications = [];
@@ -168,7 +168,7 @@ const connect = async (client) => {
  * Execute an FTP operation with automatic retry on transient errors.
  * Creates a fresh client and connection for each attempt.
  *
- * @param {Function} operation A function that receives a connected basicFtp.Client and performs the FTP work
+ * @param {(client: basicFtp.Client) => Promise<void>} operation A function that receives a connected basicFtp.Client and performs the FTP work
  * @param {string} label A label for log messages (e.g. 'Upload file.txt')
  * @param {object} [options] Options
  * @param {boolean} [options.trackProgress] Whether to enable progress tracking on the client
