@@ -21,7 +21,7 @@ const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 1000;
 
 // ---- Notification batching ----
-const NOTIFICATION_DELAY_MS = 2000;
+const NOTIFICATION_DELAY_MS = 1000;
 let pendingNotifications = [];
 let notificationTimer = null;
 
