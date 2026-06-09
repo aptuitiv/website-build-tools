@@ -7,12 +7,12 @@ import fancyLog from 'fancy-log';
 import fs from 'fs-extra';
 import { globSync } from 'glob';
 import logSymbols from 'log-symbols';
-import notifier from 'node-notifier';
 import * as path from 'path';
 
 // Build scripts
 import config from './config.js';
 import { processGlobPath, prefixPath, prefixRootPath } from './helpers.js';
+import { notify } from './lib/notify.js';
 
 /* global Client */
 
@@ -48,10 +48,9 @@ const flushNotifications = () => {
         parts.push(`${deleted.length} ${label} deleted`);
     }
 
-    notifier.notify({
+    notify({
         title: 'FTP Deploy',
         message: parts.join(', '),
-        sound: true,
     });
 
     pendingNotifications = [];
