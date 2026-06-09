@@ -27,9 +27,14 @@ const escapeAppleScript = (value) => String(value).replace(/(["\\])/g, '\\$1');
  *
  * @param {string} title The notification title
  * @param {string} message The notification message
+ * @param {string|boolean} sound The sound to use for the notification. This is only used on macOS.
  */
-const notifyMac = (title, message) => {
-    const script = `display notification "${escapeAppleScript(message)}" with title "${escapeAppleScript(title)}" sound name "default"`;
+const notifyMac = (title, message, sound) => {
+    let script = `display notification "${escapeAppleScript(message)}" with title "${escapeAppleScript(title)}"`;
+    if (sound) {
+        const soundName = typeof sound === 'string' ? sound : 'Glass';
+        script += ` sound name "${escapeAppleScript(soundName)}"`;
+    }
     const child = spawn('osascript', ['-e', script], { stdio: 'ignore' });
     child.on('error', () => {});
     child.unref();
@@ -43,11 +48,12 @@ const notifyMac = (title, message) => {
  * @param {object} options The notification options
  * @param {string} options.title The notification title
  * @param {string} options.message The notification message
+ * @param {string|boolean} options.sound The sound to use for the notification. This is only used on macOS.
  */
-export const notify = ({ title, message }) => {
+export const notify = ({ title, message, sound }) => {
     try {
         if (process.platform === 'darwin') {
-            notifyMac(title, message);
+            notifyMac(title, message, sound);
         }
         // TODO: Add Windows (e.g. PowerShell BurntToast) and Linux support as
         // needed. Other platforms are intentionally a no-op for now.

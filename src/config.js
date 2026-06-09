@@ -51,6 +51,9 @@ const defaultConfig = {
     ftp: {
         // Whether to do a growl notification when a file is uploaded or deleted via FTP.
         notify: true,
+        // A sound to use for the notification. This is only used on macOS.
+        // The default sound is "default". See sound names in /System/Library/Sounds.
+        sound: 'Bottle',
     },
     icons: [
         {

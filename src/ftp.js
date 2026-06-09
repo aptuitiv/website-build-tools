@@ -51,6 +51,7 @@ const flushNotifications = () => {
     notify({
         title: 'FTP Deploy',
         message: parts.join(', '),
+        sound: config.data.ftp.sound,
     });
 
     pendingNotifications = [];
