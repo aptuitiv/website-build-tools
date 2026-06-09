@@ -168,7 +168,7 @@ const connect = async (client) => {
  * Execute an FTP operation with automatic retry on transient errors.
  * Creates a fresh client and connection for each attempt.
  *
- * @param {Function} operation A function that receives a connected basicFtp.Client and performs the FTP work
+ * @param {(client: basicFtp.Client) => Promise<void>} operation A function that receives a connected basicFtp.Client and performs the FTP work
  * @param {string} label A label for log messages (e.g. 'Upload file.txt')
  * @param {object} [options] Options
  * @param {boolean} [options.trackProgress] Whether to enable progress tracking on the client

@@ -2,6 +2,8 @@
 Utility functions for determining a variable's type and if it can be used
 =========================================================================== */
 
+/* eslint-disable jsdoc/reject-any-type -- Allow the "any" type for the parameters */
+
 /**
  * Returns if the value is an object
  *
