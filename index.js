@@ -215,36 +215,45 @@ program
     .command('upload')
     .alias('deploy')
     .description('Upload a file, a folder, or a glob')
+    .argument('[path]', 'The path to the file, folder, or glob to upload')
     .option('-p, --path <filePath>', 'Upload a file, a folder, or a glob')
     .option('-t --theme', 'Upload all theme files')
     .addOption(configFileOption)
     .addOption(rootOption)
-    .action(async (args) => {
+    .action(async (pathArg, args) => {
         await config.init(args);
-        ftpHander('upload', args);
+        // positional path wins if provided
+        const options = pathArg ? { ...args, path: pathArg } : args;
+        ftpHander('upload', options);
     });
 
 program
     .command('download')
     .description('Download a file, a folder, or a glob')
+    .argument('[path]', 'The path to the file, folder, or glob to download')
     .option('-p, --path <filePath>', 'Download a file, a folder, or a glob')
     .option('-t --theme', 'Download all theme files')
     .addOption(configFileOption)
     .addOption(rootOption)
-    .action(async (args) => {
+    .action(async (pathArg, args) => {
         await config.init(args);
-        ftpHander('download', args);
+        // positional path wins if provided
+        const options = pathArg ? { ...args, path: pathArg } : args;
+        ftpHander('download', options);
     });
 
 program
     .command('delete')
     .description('Delete a file, a folder, or a glob')
+    .argument('[path]', 'The path to the file, folder, or glob to delete')
     .option('-p, --path <filePath>', 'Delete a file, a folder, or a glob')
     .addOption(configFileOption)
     .addOption(rootOption)
-    .action(async (args) => {
+    .action(async (pathArg, args) => {
         await config.init(args);
-        ftpHander('delete', args);
+        // positional path wins if provided
+        const options = pathArg ? { ...args, path: pathArg } : args;
+        ftpHander('delete', options);
     });
 
 /**
