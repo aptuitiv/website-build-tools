@@ -41,7 +41,7 @@
         "deepmerge": "^4.3.1",
         "dotenv": "^17.4.2",
         "esbuild": "0.28.1",
-        "eslint": "^9.39.3",
+        "eslint": "^10.7.0",
         "execa": "^10.0.0",
         "fancy-log": "^2.0.0",
         "find-cache-directory": "^6.0.0",

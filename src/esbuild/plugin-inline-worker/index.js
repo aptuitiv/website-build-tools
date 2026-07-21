@@ -3,7 +3,6 @@ This is a plugin for esbuild which allows you to import .worker.js files to get 
 Based on https://github.com/mitschabaude/esbuild-plugin-inline-worker
 =========================================================================== */
 
-/* eslint-env node */
 import esbuild from 'esbuild';
 import findCacheDir from 'find-cache-directory';
 import fs from 'fs';
