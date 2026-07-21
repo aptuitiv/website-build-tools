@@ -16,6 +16,9 @@
     },
     "author": "Eric Tompkins",
     "license": "Apache-2.0",
+    "engines": {
+        "node": ">=24.13.0"
+    },
     "bugs": {
         "url": "https://github.com/aptuitiv/website-build-tools/issues"
     },
