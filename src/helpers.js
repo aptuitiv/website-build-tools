@@ -248,12 +248,11 @@ export const removeRootThemeBuildPrefix = (path) =>
  */
 export const setupRoot = (rootPath) => {
     if (isStringWithValue(rootPath)) {
-        let cwd = process.cwd();
         let root = rootPath;
         if (!isAbsolute(root)) {
-            root = resolve(cwd, root);
+            root = resolve(process.cwd(), root);
         }
-        cwd = root;
+        process.chdir(root);
     }
 };
 

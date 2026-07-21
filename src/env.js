@@ -18,7 +18,7 @@ export const createEnvFile = async (name) => {
     logInfo(
         'You can get the username and password from the Settings -> Domain / FTP / DNS  section in the website administration.',
     );
-    let envName = '';
+    let envName;
     if (isStringWithValue(name)) {
         envName = name;
     } else {
