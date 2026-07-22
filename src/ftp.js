@@ -230,22 +230,41 @@ const withRetry = async (operation, label, options = {}) => {
  * @param {string} filePath The path to the file to delete
  */
 export async function deleteFile(filePath) {
-    // Remove the file from the dist folder
     const srcPath = getSourcePath(filePath);
-    fs.removeSync(srcPath);
     // Get the remote path for the file to remove.
     const removePath = getRemotePath(filePath);
 
     fancyLog(chalk.magenta('Deleting file'), chalk.cyan(filePath));
 
     await withRetry(async (client) => {
-        await client.remove(removePath);
-        fancyLog(
-            logSymbols.success,
-            chalk.green(`File deleted from server: ${filePath}`),
-        );
-        queueNotification('deleted', filePath);
+        try {
+            await client.remove(removePath);
+            fancyLog(
+                logSymbols.success,
+                chalk.green(`File deleted from server: ${filePath}`),
+            );
+            queueNotification('deleted', filePath);
+        } catch (error) {
+            // FTP 550: the file doesn't exist on the server, so it's already in
+            // the desired (deleted) state. Treat it as success so the local copy
+            // is still removed. Re-throw anything else so withRetry can retry it.
+            if (Number(error?.code) === 550) {
+                fancyLog(
+                    logSymbols.warning,
+                    chalk.yellow(
+                        `File not found on server (already deleted): ${filePath}`,
+                    ),
+                );
+            } else {
+                throw error;
+            }
+        }
     }, `Delete ${filePath}`);
+
+    // Remove the local file from the dist folder only after the remote delete
+    // succeeded (or the file was already gone). A genuine remote-delete failure
+    // throws before this, so the local copy isn't lost.
+    fs.removeSync(srcPath);
 }
 
 /**
@@ -310,18 +329,38 @@ async function downloadFile(filePath) {
  */
 export async function deleteDir(dir) {
     const srcPath = getSourcePath(dir);
-    fs.removeSync(srcPath);
     const removePath = getRemotePath(dir);
 
     fancyLog(chalk.magenta('Deleting directory'), chalk.cyan(dir));
 
     await withRetry(async (client) => {
-        await client.removeDir(removePath);
-        fancyLog(
-            logSymbols.success,
-            chalk.green(`Directory deleted from server: ${dir}`),
-        );
+        try {
+            await client.removeDir(removePath);
+            fancyLog(
+                logSymbols.success,
+                chalk.green(`Directory deleted from server: ${dir}`),
+            );
+        } catch (error) {
+            // FTP 550: the directory doesn't exist on the server, so it's already
+            // gone. Treat it as success so the local copy is still removed.
+            // Re-throw anything else so withRetry can retry it.
+            if (Number(error?.code) === 550) {
+                fancyLog(
+                    logSymbols.warning,
+                    chalk.yellow(
+                        `Directory not found on server (already deleted): ${dir}`,
+                    ),
+                );
+            } else {
+                throw error;
+            }
+        }
     }, `Delete directory ${dir}`);
+
+    // Remove the local directory from the dist folder only after the remote
+    // delete succeeded (or the directory was already gone). A genuine failure
+    // throws before this, so the local copy isn't lost.
+    fs.removeSync(srcPath);
 }
 
 /**
