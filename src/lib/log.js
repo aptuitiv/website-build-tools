@@ -123,7 +123,7 @@ export const logError = (message, error) => {
  * @param {string} message The message to output
  */
 export const logWarning = (message) => {
-    fancyLog(logSymbols.success, chalk.green(message));
+    fancyLog(logSymbols.warning, chalk.yellow(message));
 };
 
 /**
