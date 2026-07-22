@@ -72,6 +72,11 @@ const watchHandler = async () => {
             // https://github.com/paulmillr/chokidar?tab=readme-ov-file#upgrading
             ignored: (path, stats) => stats?.isFile() && !path.endsWith('.css'),
             ignoreInitial: true,
+            // Wait for the file to finish being written before processing.
+            // Chokidar can emit multiple events for a single save, which would
+            // otherwise trigger processCss() (a full rebuild) more than once.
+            // https://github.com/paulmillr/chokidar?tab=readme-ov-file#performance
+            awaitWriteFinish: { stabilityThreshold: 300, pollInterval: 100 },
         })
         .on('all', () => {
             processCss();
