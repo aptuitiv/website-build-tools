@@ -388,7 +388,7 @@ const showNoActionSpecified = () => {
  * @param {string} action The action to tak
  * @param {object} args Any command line arguments
  */
-const ftpHander = (action, args) => {
+const ftpHander = async (action, args) => {
     if (action === 'upload') {
         if (typeof args.path === 'string') {
             // Upload a single file, a directory, or a glob of files
@@ -396,14 +396,17 @@ const ftpHander = (action, args) => {
             const parsedGlobPath = path.parse(glob);
             if (parsedGlobPath.ext === '' && parsedGlobPath.name !== '*') {
                 // A directory path was set
-                deployDir(glob);
+                await deployDir(glob);
             } else {
                 fancyLog(chalk.green(`Uploading: ${args.path}`));
                 const paths = globSync(glob);
                 if (paths.length > 0) {
-                    paths.forEach((filePath) => {
-                        deployFile(filePath);
-                    });
+                    // Upload sequentially so that a large glob doesn't open a flood
+                    // of simultaneous FTP connections (each deployFile opens its own).
+                    for (const filePath of paths) {
+                        // eslint-disable-next-line no-await-in-loop -- Uploads must be sequential
+                        await deployFile(filePath);
+                    }
                 } else {
                     fancyLog(
                         chalk.red(
@@ -419,7 +422,7 @@ const ftpHander = (action, args) => {
                     `No path set. Using the default build path: ${config.data.build.base}`,
                 ),
             );
-            deployDir(config.data.build.base);
+            await deployDir(config.data.build.base);
         }
     } else if (action === 'download') {
         if (typeof args.path === 'string') {
@@ -427,10 +430,10 @@ const ftpHander = (action, args) => {
             const parsedPath = path.parse(args.path);
             if (parsedPath.ext.length > 0) {
                 // A single file will be downloaded
-                downloadFile(args.path);
+                await downloadFile(args.path);
             } else {
                 // A directory is set to be downloaded
-                downloadDir(args.path);
+                await downloadDir(args.path);
             }
         } else {
             // No path was set (with or without --theme). Download the root build folder.
@@ -439,7 +442,7 @@ const ftpHander = (action, args) => {
                     `No path set. Using the default build path: ${config.data.build.base}`,
                 ),
             );
-            downloadDir(config.data.build.base);
+            await downloadDir(config.data.build.base);
         }
     } else if (action === 'delete') {
         if (typeof args.path === 'string') {
@@ -447,10 +450,10 @@ const ftpHander = (action, args) => {
             const parsedPath = path.parse(args.path);
             if (parsedPath.ext.length > 0) {
                 // A single file will be deleted
-                deleteFile(args.path);
+                await deleteFile(args.path);
             } else {
                 // A directory is set to be deleted
-                deleteDir(args.path);
+                await deleteDir(args.path);
             }
         } else {
             // No valid command line options were set
