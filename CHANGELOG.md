@@ -16,7 +16,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - Updated all packages to latest versions. This included updating `eslint` to version 10 and `stylelint` to version 17.
-- Updated the `package.json` scripts to be better organized, do more scripts,  
+- Updated the `package.json` scripts to be better organized and have more scripts. Also changed the `download` and `upload` scripts to not have any parameters so that users an add specific paths to them.
+- Improved error handling for CSS files so that it doesn't crash when there is an error.
+- Improved processing CSS so that it only runs once.
+
+### Fixed
+
+- Fixed issue where the `env` file wasn't set up when installing a theme with the `init` command.
 
 ## [1.36.0] - 2026-06-09
 
