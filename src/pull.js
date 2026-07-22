@@ -25,6 +25,17 @@ export const pullHandler = async (args) => {
 };
 
 /**
+ * Pull the fonts from the build theme directory to the source theme directory
+ */
+export const pullFonts = async () => {
+    await copyBuildFolderToSrc(
+        prefixThemeBuildPath(config.data.fonts.build),
+        prefixSrcPath(config.data.fonts.src),
+        'fonts',
+    );
+};
+
+/**
  * Pull the images from the build theme directory to the source theme directory
  */
 export const pullImages = async () => {

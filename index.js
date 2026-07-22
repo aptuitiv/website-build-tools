@@ -25,6 +25,7 @@ import { initiaizeHandler } from './src/initialize.js';
 import { jsHandler } from './src/javascript.js';
 import { packageJsonHandler } from './src/package-json.js';
 import {
+    pullFonts,
     pullHandler,
     pullImages,
     pullTemplates,
@@ -205,7 +206,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        fontHandler('pull');
+        pullFonts();
     });
 
 /**
