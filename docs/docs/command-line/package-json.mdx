@@ -41,3 +41,215 @@ You can specify the theme name to use for the package.json scripts. By default i
 aptuitiv-build package-json scripts -t my-theme
 aptuitiv-build package-json scripts --theme my-theme
 ```
+
+## Available scripts in the `package.json` file
+
+The following scripts are available in the `package.json` file:
+
+### Build and process css, js, images, fonts, and templates
+
+```bash
+npm run build
+```
+
+### Copy files to the build directory
+
+```bash
+npm run copy
+```
+
+### Process CSS
+
+```bash
+# Process and lint the CSS files
+npm run css
+
+# Lint the CSS files
+npm run stylelint
+```
+
+### Delete files
+
+```bash
+npm run delete
+npm run delete theme/css/file.css
+```
+
+### Download files
+
+```bash
+npm run download
+npm run download theme/css
+
+# Download the docs folder
+npm run download-docs
+
+# Download the images folder
+npm run download-images
+
+# Download the theme folder
+npm run download-theme
+
+# Download the theme config folder
+npm run download-theme-config
+
+# Download the theme fonts folder
+npm run download-theme-fonts
+
+# Download the theme images folder
+npm run download-theme-images
+
+# Download the theme js folder
+npm run download-theme-js
+
+# Download the theme templates folder
+npm run download-theme-templates
+```
+
+### Configure the environment variables
+
+```bash
+npm run env
+```
+
+### Export the files to the build directory
+
+```bash
+npm run export
+```
+
+### Process fonts
+
+```bash
+npm run fonts
+```
+
+### Format the theme.json file
+
+```bash
+npm run format-theme-json
+```
+
+### Process icons
+
+```bash
+npm run icons
+```
+
+### Process images
+
+```bash
+npm run images
+```
+
+### Initialize the project
+
+```bash
+npm run init
+```
+
+### Process js
+
+```bash
+npm run js
+```
+
+### Lint the js files
+
+```bash
+npm run jslint
+```
+
+### Check for updates to installed packages
+
+```bash
+npm run ncu
+```
+
+### Format the package.json file
+
+```bash
+npm run package-json-format
+```
+
+### Update the package.json scripts
+
+```bash
+npm run package-json-scripts
+```
+
+### Copy files from the build directory to the source directory
+
+```bash
+# Copy template files from the build directory to the source templates directory
+npm run pull-templates
+
+# Copy the theme config from the build directory to the source theme config directory
+npm run pull-theme-config
+
+# Copy the theme fonts from the build directory to the source theme fonts directory
+npm run pull-theme-fonts
+
+# Copy the theme images from the build directory to the source theme images directory
+npm run pull-theme-images
+```
+
+### Run the build and start the watch process
+
+```bash
+npm run start
+```
+
+### Copy the theme template files from the source theme directory to the build theme directory
+
+```bash
+npm run templates
+```
+
+### Build the theme configuration JSON files
+
+```bash
+npm run theme-config
+```
+
+### Upload the files to the FTP server
+
+```bash
+# Upload all files to the FTP server
+npm run upload
+npm run upload images/file.jpg
+npm run upload images/folder
+
+# Upload the docs folder to the FTP server
+npm run upload-docs
+
+# Upload the images folder to the FTP server
+npm run upload-images
+
+# Upload the theme folder to the FTP server
+npm run upload-theme
+
+# Upload the theme config folder to the FTP server
+npm run upload-theme-config
+
+# Upload the theme CSS files to the FTP server
+npm run upload-theme-css
+
+# Upload the theme fonts folder to the FTP server
+npm run upload-theme-fonts
+
+# Upload the theme images folder to the FTP server
+npm run upload-theme-images
+
+# Upload the theme js folder to the FTP server
+npm run upload-theme-js
+
+# Upload the theme templates folder to the FTP server
+npm run upload-theme-templates
+```
+
+### Watch for changes and rebuild the files
+
+```bash
+npm run watch
+```

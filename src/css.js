@@ -51,7 +51,7 @@ const getSrcPath = (filePath) => {
  * Run stylelint on the css files
  *
  * @param {string} [fileGlob] The file glob to lint
- * @returns {Promise}
+ * @returns {Promise<boolean>} Whether stylelint found errors
  */
 const runStylelint = async (fileGlob) => {
     const filesToLint =
@@ -132,9 +132,64 @@ const runStylelint = async (fileGlob) => {
         console.log(results.report);
     }
     if (results.errored) {
-        process.exit(2);
+        // Don't call process.exit() here. This runs both as a one-shot command
+        // and from the file watcher; exiting would kill the long-running watch
+        // process on a single lint error. Return the status instead and let the
+        // caller decide (the standalone lint command sets a non-zero exit code).
+        fancyLog(logSymbols.error, chalk.red('Stylelint found errors'));
+        return true;
     }
     fancyLog(logSymbols.success, chalk.green('Stylelint finished'));
+    return false;
+};
+
+/**
+ * Log a PostCSS processing error in a readable way
+ *
+ * PostCSS syntax errors (CssSyntaxError) include the file, line, and column of
+ * the problem, so we surface those to make it easy to find where the issue is.
+ * The error's file will point at the actual offending file, even when it was
+ * pulled in via an `@import`.
+ *
+ * @param {Error} error The error thrown by PostCSS
+ * @param {string} filePath The path of the CSS file being processed
+ */
+const logPostCssError = (error, filePath) => {
+    fancyLog(
+        logSymbols.error,
+        chalk.red('Error building CSS'),
+        chalk.cyan(removeRootPrefix(filePath)),
+    );
+    if (error.name === 'CssSyntaxError') {
+        // The offending file, which may differ from filePath when the error is
+        // inside an @imported file.
+        const errorFile = error.file || filePath;
+        fancyLog(
+            chalk.red(
+                `CSS error in ${chalk.cyan(removeRootPrefix(errorFile))}${
+                    typeof error.line === 'number'
+                        ? chalk.red(
+                              ` at line ${error.line}, column ${error.column}`,
+                          )
+                        : ''
+                }`,
+            ),
+        );
+        if (error.reason) {
+            fancyLog(chalk.red(error.reason));
+        }
+        // Show a highlighted snippet of the source code where the error is.
+        if (typeof error.showSourceCode === 'function') {
+            const sourceCode = error.showSourceCode(true);
+            if (sourceCode) {
+                // eslint-disable-next-line no-console -- Need to output the code frame
+                console.log(sourceCode);
+            }
+        }
+    } else {
+        // Not a syntax error (e.g. a missing @import file). Output the message.
+        fancyLog(chalk.red(error.message || String(error)));
+    }
 };
 
 /**
@@ -154,8 +209,17 @@ const runPostCss = (filePath) =>
         }
         fs.readFile(filePath, (err, css) => {
             if (err) {
+                // Couldn't read the source file. Log the error and continue with
+                // the other CSS files instead of stopping the entire build.
+                fancyLog(
+                    logSymbols.error,
+                    chalk.red('Error reading CSS file'),
+                    chalk.cyan(removeRootPrefix(filePath)),
+                );
                 // eslint-disable-next-line no-console -- Need to output the error
-                console.error('Reading CSS file error: ', err);
+                console.error(err);
+                resolve();
+                return;
             }
             fancyLog(chalk.magenta('Building CSS'), chalk.cyan(filePath));
 
@@ -194,6 +258,12 @@ const runPostCss = (filePath) =>
                         );
                         resolve();
                     }
+                })
+                .catch((error) => {
+                    // Output a readable error and keep processing the remaining
+                    // CSS files instead of stopping the entire build.
+                    logPostCssError(error, filePath);
+                    resolve();
                 });
         });
     });
@@ -225,14 +295,19 @@ export const processCss = (lint = true) =>
         }
         const cssPromises = [];
         if (lint) {
-            runStylelint().then(() => {
-                paths.forEach((filePath) => {
-                    cssPromises.push(runPostCss(filePath));
+            // Lint, but don't let a lint failure stop the CSS from building
+            // (see defaultSeverity: 'warning'). The .catch also prevents an
+            // unexpected stylelint rejection from leaving this promise unresolved.
+            runStylelint()
+                .catch(() => true)
+                .then(() => {
+                    paths.forEach((filePath) => {
+                        cssPromises.push(runPostCss(filePath));
+                    });
+                    Promise.all(cssPromises).then(() => {
+                        resolve();
+                    });
                 });
-                Promise.all(cssPromises).then(() => {
-                    resolve();
-                });
-            });
         } else {
             paths.forEach((filePath) => {
                 cssPromises.push(runPostCss(filePath));
@@ -262,11 +337,17 @@ export const cssHandler = async (action, args) => {
             await processCss(args.lint);
         }
     } else if (action === 'lint') {
+        let errored;
         if (typeof args.path === 'string') {
             const lintPath = processGlobPath(getSrcPath(args.path));
-            await runStylelint(lintPath);
+            errored = await runStylelint(lintPath);
         } else {
-            await runStylelint();
+            errored = await runStylelint();
+        }
+        if (errored) {
+            // This is the explicit lint command, so signal failure to the shell/CI
+            // with a non-zero exit code (without abruptly killing the process).
+            process.exitCode = 1;
         }
     }
 };

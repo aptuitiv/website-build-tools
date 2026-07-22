@@ -96,15 +96,21 @@ export const createIconSprite = async (srcFolderPath, outputPath) => {
 
             // The result sprite contains some code that we don't want so we use
             // the data object to get the svg code for each icon and build the sprite.
-            const stream = fs.createWriteStream(buildPath, { flags: 'w' });
-            stream.write(
-                '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',
-            );
-            data.symbol.shapes.forEach((shape) => {
-                stream.write(shape.svg);
+            // Wrap the stream in a promise so that we wait for the write to finish
+            // (and catch write errors) before reporting the sprite as done.
+            await new Promise((resolve, reject) => {
+                const stream = fs.createWriteStream(buildPath, { flags: 'w' });
+                stream.on('error', reject);
+                stream.on('finish', resolve);
+                stream.write(
+                    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">',
+                );
+                data.symbol.shapes.forEach((shape) => {
+                    stream.write(shape.svg);
+                });
+                stream.write('</svg>');
+                stream.end();
             });
-            stream.write('</svg>');
-            stream.end();
             fancyLog(
                 logSymbols.success,
                 chalk.green('Done creating icon sprite'),

@@ -100,12 +100,30 @@ export const logConditionalSuccess = (
 };
 
 /**
+ * Log an error message
+ *
+ * @param {string} message The message to output
+ * @param {Error|string} [error] The error object, or additional error detail, to output
+ */
+export const logError = (message, error) => {
+    if (error) {
+        fancyLog(
+            logSymbols.error,
+            chalk.red(message),
+            chalk.red(error && error.message ? error.message : error),
+        );
+    } else {
+        fancyLog(logSymbols.error, chalk.red(message));
+    }
+};
+
+/**
  * Log a warning message
  *
  * @param {string} message The message to output
  */
 export const logWarning = (message) => {
-    fancyLog(logSymbols.success, chalk.green(message));
+    fancyLog(logSymbols.warning, chalk.yellow(message));
 };
 
 /**

@@ -127,6 +127,9 @@ const getDevDependencies = (currentDevDependencies) => {
  */
 export const addDependency = (name, version) => {
     const packageJson = fs.readJsonSync('package.json');
+    // Ensure the dependencies object exists so we don't throw on a package.json
+    // that has no "dependencies" key yet.
+    packageJson.dependencies = packageJson.dependencies || {};
     packageJson.dependencies[name] = version;
     fs.writeJSONSync('package.json', packageJson, { spaces: 4 });
 };
@@ -160,13 +163,16 @@ const getScripts = (currentScripts, theme) => {
         build: 'aptuitiv-build build',
         copy: 'aptuitiv-build copy',
         css: 'aptuitiv-build css',
-        download: 'aptuitiv-build download -t',
-        'download-content-docs': 'aptuitiv-build download -p docs',
-        'download-content-images': 'aptuitiv-build download -p images',
-        'download-templates': `aptuitiv-build download -p theme/${theme ?? 'custom'}/templates`,
+        delete: 'aptuitiv-build delete',
+        download: 'aptuitiv-build download',
+        'download-docs': 'aptuitiv-build download -p docs',
+        'download-images': 'aptuitiv-build download -p images',
         'download-theme': 'aptuitiv-build download -t',
         'download-theme-config': `aptuitiv-build download -p theme/${theme ?? 'custom'}/config`,
+        'download-theme-fonts': `aptuitiv-build download -p theme/${theme ?? 'custom'}/fonts`,
         'download-theme-images': `aptuitiv-build download -p theme/${theme ?? 'custom'}/images`,
+        'download-theme-js': `aptuitiv-build download -p theme/${theme ?? 'custom'}/js`,
+        'download-theme-templates': `aptuitiv-build download -p theme/${theme ?? 'custom'}/templates`,
         env: 'aptuitiv-build env',
         export: 'aptuitiv-build export',
         fonts: 'aptuitiv-build push-fonts',
@@ -181,19 +187,22 @@ const getScripts = (currentScripts, theme) => {
         'package-json-scripts': 'aptuitiv-build package-json scripts',
         'pull-templates': 'aptuitiv-build pull-templates',
         'pull-theme-config': 'aptuitiv-build pull-theme-config',
+        'pull-theme-fonts': 'aptuitiv-build pull-theme-fonts',
         'pull-theme-images': 'aptuitiv-build pull-images',
         start: 'aptuitiv-build start',
         stylelint: 'aptuitiv-build stylelint',
         templates: 'aptuitiv-build push-templates',
         'theme-config': 'aptuitiv-build push-theme-config',
-        upload: 'aptuitiv-build upload -t',
-        'upload-css': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/css`,
-        'upload-fonts': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/fonts`,
-        'upload-images': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/images`,
-        'upload-js': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/js`,
-        'upload-templates': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/templates`,
+        upload: 'aptuitiv-build upload',
+        'upload-docs': `aptuitiv-build upload -p docs`,
+        'upload-images': `aptuitiv-build upload -p images`,
         'upload-theme': 'aptuitiv-build upload -t',
         'upload-theme-config': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/config`,
+        'upload-theme-css': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/css`,
+        'upload-theme-fonts': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/fonts`,
+        'upload-theme-images': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/images`,
+        'upload-theme-js': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/js`,
+        'upload-theme-templates': `aptuitiv-build upload -p theme/${theme ?? 'custom'}/templates`,
         watch: 'aptuitiv-build watch',
     };
     remove.forEach((item) => {

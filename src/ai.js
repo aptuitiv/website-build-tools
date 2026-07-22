@@ -22,7 +22,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
  * - https://github.com/ivangrynenko/cursorrules
  */
 export const copyCursorRules = async () => {
-    fancyLog(chalk.magenta('Copying cursor rules to ', chalk.cyan('.cursor')));
+    fancyLog(chalk.magenta('Copying cursor rules to'), chalk.cyan('.cursor'));
     const destPath = prefixRootPath('.cursor');
     // Ensure the destination directory exists
     fs.ensureDirSync(destPath);

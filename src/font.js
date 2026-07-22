@@ -5,7 +5,6 @@
 // Build files
 import config from './config.js';
 import {
-    copyBuildFolderToSrc,
     copySrcFileToThemeBuild,
     copySrcFolderToBuild,
     removeFileFromThemeBuild,
@@ -31,7 +30,12 @@ export const copyFontSrcToBuild = (path) => {
  * @param {string} path The font file path
  */
 export const removeFontFileFromBuild = (path) => {
-    removeFileFromThemeBuild(path, config.data.fonts.build, 'font file');
+    removeFileFromThemeBuild(
+        path,
+        config.data.fonts.src,
+        config.data.fonts.build,
+        'font file',
+    );
 };
 
 /**
@@ -40,13 +44,7 @@ export const removeFontFileFromBuild = (path) => {
  * @param {string} action The action to take
  */
 export const fontHandler = async (action) => {
-    if (action === 'pull') {
-        await copyBuildFolderToSrc(
-            prefixThemeBuildPath(config.data.fonts.build),
-            prefixSrcPath(config.data.fonts.src),
-            'fonts',
-        );
-    } else if (action === 'push') {
+    if (action === 'push') {
         await copySrcFolderToBuild(
             prefixSrcPath(config.data.fonts.src),
             prefixThemeBuildPath(config.data.fonts.build),

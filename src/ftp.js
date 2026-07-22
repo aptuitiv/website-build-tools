@@ -214,6 +214,10 @@ const withRetry = async (operation, label, options = {}) => {
                         `${label} failed after ${MAX_RETRIES} attempts: ${err.message}`,
                     ),
                 );
+                // Re-throw the last error so that callers can detect the failure.
+                // One-shot commands let this propagate to the CLI so it exits with a
+                // non-zero code; watch-mode callers catch it so the watcher survives.
+                throw err;
             }
         }
     }
@@ -226,22 +230,41 @@ const withRetry = async (operation, label, options = {}) => {
  * @param {string} filePath The path to the file to delete
  */
 export async function deleteFile(filePath) {
-    // Remove the file from the dist folder
     const srcPath = getSourcePath(filePath);
-    fs.removeSync(srcPath);
     // Get the remote path for the file to remove.
     const removePath = getRemotePath(filePath);
 
     fancyLog(chalk.magenta('Deleting file'), chalk.cyan(filePath));
 
     await withRetry(async (client) => {
-        await client.remove(removePath);
-        fancyLog(
-            logSymbols.success,
-            chalk.green(`File deleted from server: ${filePath}`),
-        );
-        queueNotification('deleted', filePath);
+        try {
+            await client.remove(removePath);
+            fancyLog(
+                logSymbols.success,
+                chalk.green(`File deleted from server: ${filePath}`),
+            );
+            queueNotification('deleted', filePath);
+        } catch (error) {
+            // FTP 550: the file doesn't exist on the server, so it's already in
+            // the desired (deleted) state. Treat it as success so the local copy
+            // is still removed. Re-throw anything else so withRetry can retry it.
+            if (Number(error?.code) === 550) {
+                fancyLog(
+                    logSymbols.warning,
+                    chalk.yellow(
+                        `File not found on server (already deleted): ${filePath}`,
+                    ),
+                );
+            } else {
+                throw error;
+            }
+        }
     }, `Delete ${filePath}`);
+
+    // Remove the local file from the dist folder only after the remote delete
+    // succeeded (or the file was already gone). A genuine remote-delete failure
+    // throws before this, so the local copy isn't lost.
+    fs.removeSync(srcPath);
 }
 
 /**
@@ -306,18 +329,38 @@ async function downloadFile(filePath) {
  */
 export async function deleteDir(dir) {
     const srcPath = getSourcePath(dir);
-    fs.removeSync(srcPath);
     const removePath = getRemotePath(dir);
 
     fancyLog(chalk.magenta('Deleting directory'), chalk.cyan(dir));
 
     await withRetry(async (client) => {
-        await client.removeDir(removePath);
-        fancyLog(
-            logSymbols.success,
-            chalk.green(`Directory deleted from server: ${dir}`),
-        );
+        try {
+            await client.removeDir(removePath);
+            fancyLog(
+                logSymbols.success,
+                chalk.green(`Directory deleted from server: ${dir}`),
+            );
+        } catch (error) {
+            // FTP 550: the directory doesn't exist on the server, so it's already
+            // gone. Treat it as success so the local copy is still removed.
+            // Re-throw anything else so withRetry can retry it.
+            if (Number(error?.code) === 550) {
+                fancyLog(
+                    logSymbols.warning,
+                    chalk.yellow(
+                        `Directory not found on server (already deleted): ${dir}`,
+                    ),
+                );
+            } else {
+                throw error;
+            }
+        }
     }, `Delete directory ${dir}`);
+
+    // Remove the local directory from the dist folder only after the remote
+    // delete succeeded (or the directory was already gone). A genuine failure
+    // throws before this, so the local copy isn't lost.
+    fs.removeSync(srcPath);
 }
 
 /**
@@ -388,41 +431,41 @@ const showNoActionSpecified = () => {
  * @param {string} action The action to tak
  * @param {object} args Any command line arguments
  */
-const ftpHander = (action, args) => {
+const ftpHandler = async (action, args) => {
     if (action === 'upload') {
-        if (Object.keys(args).length > 0) {
-            if (typeof args.path === 'string') {
-                // Upload a single file, a directory, or a glob of files
-                const glob = processGlobPath(args.path);
-                const parsedGlobPath = path.parse(glob);
-                if (parsedGlobPath.ext === '' && parsedGlobPath.name !== '*') {
-                    // A directory path was set
-                    deployDir(glob);
-                } else {
-                    fancyLog(chalk.green(`Uploading: ${args.path}`));
-                    const paths = globSync(glob);
-                    if (paths.length > 0) {
-                        paths.forEach((filePath) => {
-                            deployFile(filePath);
-                        });
-                    } else {
-                        fancyLog(
-                            chalk.red(
-                                'Your path did not match any files to upload. ',
-                            ) + args.path,
-                        );
-                    }
-                }
-            } else if (args.theme) {
-                // Deploy the theme files
-                deployDir(config.data.build.theme);
+        if (typeof args.path === 'string') {
+            // Upload a single file, a directory, or a glob of files
+            const glob = processGlobPath(args.path);
+            const parsedGlobPath = path.parse(glob);
+            if (parsedGlobPath.ext === '' && parsedGlobPath.name !== '*') {
+                // A directory path was set
+                await deployDir(glob);
             } else {
-                // No valid command line options were set
-                showNoActionSpecified();
+                fancyLog(chalk.green(`Uploading: ${args.path}`));
+                const paths = globSync(glob);
+                if (paths.length > 0) {
+                    // Upload sequentially so that a large glob doesn't open a flood
+                    // of simultaneous FTP connections (each deployFile opens its own).
+                    for (const filePath of paths) {
+                        // eslint-disable-next-line no-await-in-loop -- Uploads must be sequential
+                        await deployFile(filePath);
+                    }
+                } else {
+                    fancyLog(
+                        chalk.red(
+                            'Your path did not match any files to upload. ',
+                        ) + args.path,
+                    );
+                }
             }
         } else {
-            // Upload all files
-            deployDir(config.data.build.base);
+            // No path was set (with or without --theme). Upload the root build folder.
+            fancyLog(
+                chalk.green(
+                    `No path set. Using the default build path: ${config.data.build.base}`,
+                ),
+            );
+            await deployDir(config.data.build.base);
         }
     } else if (action === 'download') {
         if (typeof args.path === 'string') {
@@ -430,17 +473,19 @@ const ftpHander = (action, args) => {
             const parsedPath = path.parse(args.path);
             if (parsedPath.ext.length > 0) {
                 // A single file will be downloaded
-                downloadFile(args.path);
+                await downloadFile(args.path);
             } else {
                 // A directory is set to be downloaded
-                downloadDir(args.path);
+                await downloadDir(args.path);
             }
-        } else if (args.theme) {
-            // Download the theme files
-            downloadDir(config.data.build.theme);
         } else {
-            // No valid command line options were set
-            showNoActionSpecified();
+            // No path was set (with or without --theme). Download the root build folder.
+            fancyLog(
+                chalk.green(
+                    `No path set. Using the default build path: ${config.data.build.base}`,
+                ),
+            );
+            await downloadDir(config.data.build.base);
         }
     } else if (action === 'delete') {
         if (typeof args.path === 'string') {
@@ -448,10 +493,10 @@ const ftpHander = (action, args) => {
             const parsedPath = path.parse(args.path);
             if (parsedPath.ext.length > 0) {
                 // A single file will be deleted
-                deleteFile(args.path);
+                await deleteFile(args.path);
             } else {
                 // A directory is set to be deleted
-                deleteDir(args.path);
+                await deleteDir(args.path);
             }
         } else {
             // No valid command line options were set
@@ -460,4 +505,4 @@ const ftpHander = (action, args) => {
     }
 };
 
-export default ftpHander;
+export default ftpHandler;

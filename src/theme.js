@@ -25,6 +25,7 @@ import { prefixSrcPath } from './helpers.js';
 export const removeThemeFileFromBuild = (filePath) => {
     removeFileFromThemeBuild(
         filePath,
+        config.data.themeConfig.src,
         config.data.themeConfig.build,
         'theme file',
     );
@@ -39,7 +40,7 @@ export const removeThemeFileFromBuild = (filePath) => {
 const reorderJsonByName = (json) => {
     let returnValue = json;
     if (Array.isArray(json)) {
-        returnValue = json.toSorted((a, b) => a.name.localeCompare(b.name));
+        returnValue = [...json].sort((a, b) => a.name.localeCompare(b.name));
     }
     return returnValue;
 };
@@ -114,6 +115,21 @@ const reorderThemeConfig = (json) => {
 };
 
 /**
+ * Log a theme config validation error along with the offending item.
+ *
+ * @param {string} message The validation error message
+ * @param {object} item The offending JSON value to display
+ */
+const logThemeValidationError = (message, item) => {
+    fancyLog(
+        logSymbols.error,
+        chalk.bold.red(message),
+        '\n',
+        chalk.red(JSON.stringify(item, null, 4)),
+    );
+};
+
+/**
  * Validate the theme config fields
  *
  * @param {string} json The JSON object to validate
@@ -139,37 +155,25 @@ const validateThemeJsonFields = (json, parentName, parentType) => {
                     returnValue = true;
                 } else {
                     returnValue = false;
-                    fancyLog(
-                        logSymbols.error,
-                        chalk.bold.red(
-                            `One of the "fields" items ${parentError} is missing a "name" property. The item is:`,
-                        ),
-                        '\n',
-                        chalk.red(JSON.stringify(item, null, 4)),
+                    logThemeValidationError(
+                        `One of the "fields" items ${parentError} is missing a "name" property. The item is:`,
+                        item,
                     );
                     break;
                 }
             } else {
                 returnValue = false;
-                fancyLog(
-                    logSymbols.error,
-                    chalk.bold.red(
-                        `One of the "fields" items ${parentError} is not an object. The item is:`,
-                    ),
-                    '\n',
-                    chalk.red(JSON.stringify(item, null, 4)),
+                logThemeValidationError(
+                    `One of the "fields" items ${parentError} is not an object. The item is:`,
+                    item,
                 );
                 break;
             }
         }
     } else {
-        fancyLog(
-            logSymbols.error,
-            chalk.bold.red(
-                `The "fields" property ${parentError} is not an array. The item is:`,
-            ),
-            '\n',
-            chalk.red(JSON.stringify(json, null, 4)),
+        logThemeValidationError(
+            `The "fields" property ${parentError} is not an array. The item is:`,
+            json,
         );
     }
     return returnValue;
@@ -238,37 +242,25 @@ const validateThemeJsonGroupsOrSections = (json, type) => {
                     }
                 } else {
                     returnValue = false;
-                    fancyLog(
-                        logSymbols.error,
-                        chalk.bold.red(
-                            `One of the "${type}s" items is missing a "name" property. The item is:`,
-                        ),
-                        '\n',
-                        chalk.red(JSON.stringify(item, null, 4)),
+                    logThemeValidationError(
+                        `One of the "${type}s" items is missing a "name" property. The item is:`,
+                        item,
                     );
                     break;
                 }
             } else {
                 returnValue = false;
-                fancyLog(
-                    logSymbols.error,
-                    chalk.bold.red(
-                        `One of the "${type}s" items is not an object. The item is:`,
-                    ),
-                    '\n',
-                    chalk.red(JSON.stringify(item, null, 4)),
+                logThemeValidationError(
+                    `One of the "${type}s" items is not an object. The item is:`,
+                    item,
                 );
                 break;
             }
         }
     } else {
-        fancyLog(
-            logSymbols.error,
-            chalk.bold.red(
-                `The "${type}s" property is not an array. The item is:`,
-            ),
-            '\n',
-            chalk.red(JSON.stringify(json, null, 4)),
+        logThemeValidationError(
+            `The "${type}s" property is not an array. The item is:`,
+            json,
         );
     }
     return returnValue;
@@ -324,6 +316,7 @@ const validateThemeJsonFile = (json, fileName) => {
  * Validate and format the theme config file
  *
  * @param {string} fileName The name of the theme config file to process
+ * @returns {Promise<boolean>} Whether the file is valid (an empty or missing-but-empty file counts as valid)
  */
 const processThemeJsonFile = async (fileName) => {
     const filePath = `${prefixSrcPath(config.data.themeConfig.src)}/${fileName}`;
@@ -339,56 +332,59 @@ const processThemeJsonFile = async (fileName) => {
                 const formattedJson = reorderThemeConfig(json);
                 if (JSON.stringify(json) !== JSON.stringify(formattedJson)) {
                     fs.writeJSONSync(filePath, formattedJson, { spaces: 4 });
+                    fancyLog(
+                        logSymbols.success,
+                        chalk.green(`Formatted the ${fileName} file`),
+                    );
                 }
-                fancyLog(
-                    logSymbols.success,
-                    chalk.green(`Formatted the ${fileName} file`),
-                );
-            } else {
-                fancyLog(
-                    logSymbols.error,
-                    chalk.red(
-                        `The ${fileName} file is not valid. Please fix the file and try again.`,
-                    ),
-                );
+                return true;
             }
-        } else {
-            // This is an empty file. Mark it as valid.
             fancyLog(
-                logSymbols.success,
-                chalk.green(`${fileName} is empty, but that's ok.`),
+                logSymbols.error,
+                chalk.red(
+                    `The ${fileName} file is not valid. Please fix the file and try again.`,
+                ),
             );
+            return false;
         }
-    } else {
+        // This is an empty file. Mark it as valid.
         fancyLog(
-            logSymbols.error,
-            chalk.red(`The ${fileName} file does not exist`),
+            logSymbols.success,
+            chalk.green(`${fileName} is empty, but that's ok.`),
         );
+        return true;
     }
+    fancyLog(
+        logSymbols.error,
+        chalk.red(`The ${fileName} file does not exist`),
+    );
+    return false;
 };
 
 /**
  * Format a single theme setting file or all theme setting files
  *
  * @param {string} [fileName] The name of the file to format. If not set then all theme setting files will be formatted.
+ * @returns {Promise<boolean>} Whether all processed files are valid
  */
 export const formatThemeJson = async (fileName) => {
     if (isStringWithValue(fileName)) {
-        await processThemeJsonFile(fileName);
+        const isValid = await processThemeJsonFile(fileName);
         fancyLog(
             logSymbols.success,
             chalk.green('Done formatting the theme configuration JSON file'),
         );
-    } else {
-        await processThemeJsonFile('theme-settings.json');
-        await processThemeJsonFile('theme-styles.json');
-        // eslint-disable-next-line no-console -- We do this to add a blank line to the console
-        console.log('');
-        fancyLog(
-            logSymbols.success,
-            chalk.green('Done formatting the theme configuration JSON files'),
-        );
+        return isValid;
     }
+    const settingsValid = await processThemeJsonFile('theme-settings.json');
+    const stylesValid = await processThemeJsonFile('theme-styles.json');
+    // eslint-disable-next-line no-console -- We do this to add a blank line to the console
+    console.log('');
+    fancyLog(
+        logSymbols.success,
+        chalk.green('Done formatting the theme configuration JSON files'),
+    );
+    return settingsValid && stylesValid;
 };
 
 /**
@@ -402,7 +398,7 @@ export const copyThemeSrcToBuild = async (filePath) => {
     if (fileName !== 'theme-config.json') {
         // @todo Validate the theme-config.json file.
         try {
-            await formatThemeJson(fileName);
+            isValid = await formatThemeJson(fileName);
         } catch (error) {
             isValid = false;
             fancyLog(
@@ -453,13 +449,16 @@ export const pushTheme = async () => {
     );
 
     // Process and copy the theme-settings.json file to the build directory.
+    // Only copy the file to the build folder if it passed validation so that an
+    // invalid file isn't deployed.
     try {
-        await processThemeJsonFile('theme-settings.json');
-        copySrcFileToThemeBuild(
-            'theme-settings.json',
-            config.data.themeConfig.src,
-            config.data.themeConfig.build,
-        );
+        if (await processThemeJsonFile('theme-settings.json')) {
+            copySrcFileToThemeBuild(
+                'theme-settings.json',
+                config.data.themeConfig.src,
+                config.data.themeConfig.build,
+            );
+        }
     } catch (error) {
         fancyLog(
             logSymbols.error,
@@ -469,12 +468,13 @@ export const pushTheme = async () => {
     }
     // Process and copy the theme-styles.json file to the build directory.
     try {
-        await processThemeJsonFile('theme-styles.json');
-        copySrcFileToThemeBuild(
-            'theme-styles.json',
-            config.data.themeConfig.src,
-            config.data.themeConfig.build,
-        );
+        if (await processThemeJsonFile('theme-styles.json')) {
+            copySrcFileToThemeBuild(
+                'theme-styles.json',
+                config.data.themeConfig.src,
+                config.data.themeConfig.build,
+            );
+        }
     } catch (error) {
         fancyLog(
             logSymbols.error,

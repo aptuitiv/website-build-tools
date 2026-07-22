@@ -185,7 +185,7 @@ const navAccess = {
      * @param {boolean} jumping Whether jumping to the next/previous top level navigation link
      */
     focus(event, el, next, jumping) {
-        let focusEl = null;
+        let focusEl;
         const isFirst = this.isDropdownFirst(el);
         const isLast = this.isDropdownLast(el);
         let sibling;

@@ -315,12 +315,22 @@ const removeFile = (path, msgPath, itemType, folderName) => {
 /**
  * Removes the file from the theme build folder
  *
- * @param {string} path The path to th efile
+ * @param {string} path The path to the file. This is a path within the source folder.
+ * @param {string} srcPath The source path for the file in the "src" folder. Used to strip the prefix from 'path' to get the file name.
  * @param {string} buildPath The path to the file in the theme build folder
  * @param {string} itemType The type of item to remove. Used in the messaging.
  */
-export const removeFileFromThemeBuild = (path, buildPath, itemType) => {
-    const filename = removeRootSrcPrefix(path, [buildPath]);
+export const removeFileFromThemeBuild = (
+    path,
+    srcPath,
+    buildPath,
+    itemType,
+) => {
+    // The watched 'path' is source-rooted, so strip the source prefix (not the
+    // build prefix) to get the file name, then rebuild it against the build path.
+    // Mirrors copySrcFileToThemeBuild(); using buildPath here only worked when the
+    // source and build folders happened to share the same name.
+    const filename = removeRootSrcPrefix(path, [srcPath]);
     const removePath = getRootThemeBuildPath(buildPath, filename);
     const msgPath = getThemeBuildPath(buildPath, filename);
     removeFile(removePath, msgPath, itemType, 'theme build');

@@ -8,7 +8,7 @@ import { isAbsolute, resolve } from 'path';
 
 // Build scripts
 import config from './config.js';
-import { isStringWithValue, isObjectWithValues } from './lib/types.js';
+import { isString, isStringWithValue, isObjectWithValues } from './lib/types.js';
 
 /**
  * Get the processed glob path
@@ -17,6 +17,9 @@ import { isStringWithValue, isObjectWithValues } from './lib/types.js';
  * @returns {string}
  */
 export const processGlobPath = (glob) => {
+    if (!isString(glob)) {
+        return glob;
+    }
     let returnValue = glob;
     // If the glob ends with "/" then assume that the developer intended to
     // reference all files in the folder
@@ -49,9 +52,16 @@ export const getGlob = (glob) => globSync(processGlobPath(glob));
  * @returns {string}
  */
 export const prefixPath = (path, basePath, baseFolder) => {
+    if (!isString(path)) {
+        return '';
+    }
     let returnValue = path;
     if (returnValue.startsWith('/')) {
         returnValue = returnValue.slice(1);
+    }
+    if (!isString(basePath)) {
+        // Without a valid base path there is nothing to prefix; return the cleaned path.
+        return returnValue;
     }
     let base = basePath;
     if (base.endsWith('/')) {
@@ -248,12 +258,11 @@ export const removeRootThemeBuildPrefix = (path) =>
  */
 export const setupRoot = (rootPath) => {
     if (isStringWithValue(rootPath)) {
-        let cwd = process.cwd();
         let root = rootPath;
         if (!isAbsolute(root)) {
-            root = resolve(cwd, root);
+            root = resolve(process.cwd(), root);
         }
-        cwd = root;
+        process.chdir(root);
     }
 };
 

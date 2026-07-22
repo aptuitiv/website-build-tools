@@ -17,14 +17,15 @@ import { cssHandler } from './src/css.js';
 import { envHandler } from './src/env.js';
 import exportHandler from './src/export.js';
 import { fontHandler } from './src/font.js';
-import ftpHander from './src/ftp.js';
+import ftpHandler from './src/ftp.js';
 import gulpConvertHandler from './src/gulp-convert.js';
 import { iconHandler } from './src/icons.js';
 import { imageHandler } from './src/image.js';
-import { initiaizeHandler } from './src/initialize.js';
+import { initializeHandler } from './src/initialize.js';
 import { jsHandler } from './src/javascript.js';
 import { packageJsonHandler } from './src/package-json.js';
 import {
+    pullFonts,
     pullHandler,
     pullImages,
     pullTemplates,
@@ -34,7 +35,7 @@ import { pushTemplates } from './src/template.js';
 import { formatThemeJson, pushTheme } from './src/theme.js';
 import watchHandler from './src/watch.js';
 import { hasFiles } from './src/lib/files.js';
-import { logInfo, logMessage, logSuccess } from './src/lib/log.js';
+import { logError, logInfo, logMessage, logSuccess } from './src/lib/log.js';
 
 // Get the directory name of the current module
 
@@ -57,6 +58,21 @@ const rootOption = new Option(
     '--root <folderPath>',
     'The root folder of the project',
 );
+
+/**
+ * Merge a positional path argument into the options object.
+ * The positional path takes precedence over the --path option when provided.
+ *
+ * @param {string} [pathArg] The positional path argument
+ * @param {object} args The command options
+ * @returns {object} The options with the positional path applied if it was set
+ */
+const withPositionalPath = (pathArg, args) => {
+    if (pathArg) {
+        return { ...args, path: pathArg };
+    }
+    return args;
+};
 
 /**
  * Run the build process
@@ -85,7 +101,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        runBuild();
+        await runBuild(args);
     });
 
 program
@@ -95,9 +111,8 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        runBuild().then(() => {
-            watchHandler();
-        });
+        await runBuild(args);
+        await watchHandler();
     });
 
 /**
@@ -110,7 +125,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        copyHandler();
+        await copyHandler();
     });
 
 /**
@@ -125,7 +140,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        cssHandler('css', args);
+        await cssHandler('css', args);
     });
 program
     .command('stylelint')
@@ -140,7 +155,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        cssHandler('lint', args);
+        await cssHandler('lint', args);
     });
 
 /**
@@ -166,7 +181,7 @@ aiCommand
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        aiHandler(args, 'cursor');
+        await aiHandler(args, 'cursor');
     });
 
 /**
@@ -179,7 +194,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        exportHandler();
+        await exportHandler();
     });
 
 /**
@@ -194,7 +209,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        fontHandler('push');
+        await fontHandler('push');
     });
 program
     .command('pull-fonts')
@@ -205,7 +220,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        fontHandler('pull');
+        await pullFonts();
     });
 
 /**
@@ -215,36 +230,45 @@ program
     .command('upload')
     .alias('deploy')
     .description('Upload a file, a folder, or a glob')
+    .argument('[path]', 'The path to the file, folder, or glob to upload')
     .option('-p, --path <filePath>', 'Upload a file, a folder, or a glob')
     .option('-t --theme', 'Upload all theme files')
     .addOption(configFileOption)
     .addOption(rootOption)
-    .action(async (args) => {
+    .action(async (pathArg, args) => {
         await config.init(args);
-        ftpHander('upload', args);
+        // positional path wins if provided
+        const options = withPositionalPath(pathArg, args);
+        await ftpHandler('upload', options);
     });
 
 program
     .command('download')
     .description('Download a file, a folder, or a glob')
+    .argument('[path]', 'The path to the file, folder, or glob to download')
     .option('-p, --path <filePath>', 'Download a file, a folder, or a glob')
     .option('-t --theme', 'Download all theme files')
     .addOption(configFileOption)
     .addOption(rootOption)
-    .action(async (args) => {
+    .action(async (pathArg, args) => {
         await config.init(args);
-        ftpHander('download', args);
+        // positional path wins if provided
+        const options = withPositionalPath(pathArg, args);
+        await ftpHandler('download', options);
     });
 
 program
     .command('delete')
     .description('Delete a file, a folder, or a glob')
+    .argument('[path]', 'The path to the file, folder, or glob to delete')
     .option('-p, --path <filePath>', 'Delete a file, a folder, or a glob')
     .addOption(configFileOption)
     .addOption(rootOption)
-    .action(async (args) => {
+    .action(async (pathArg, args) => {
         await config.init(args);
-        ftpHander('delete', args);
+        // positional path wins if provided
+        const options = withPositionalPath(pathArg, args);
+        await ftpHandler('delete', options);
     });
 
 /**
@@ -263,7 +287,7 @@ program
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
-        gulpConvertHandler(args);
+        await gulpConvertHandler(args);
     });
 
 /**
@@ -286,7 +310,7 @@ program
     )
     .action(async (args) => {
         await config.init(args);
-        iconHandler(args);
+        await iconHandler(args);
     });
 
 /**
@@ -299,7 +323,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        imageHandler();
+        await imageHandler();
     });
 
 /**
@@ -319,7 +343,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        const success = await initiaizeHandler(args);
+        const success = await initializeHandler(args);
         if (success) {
             if (args.build) {
                 if (hasFiles('src')) {
@@ -358,7 +382,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        jsHandler('process', args);
+        await jsHandler('process', args);
     });
 program
     .command('jslint')
@@ -374,7 +398,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        jsHandler('lint', args);
+        await jsHandler('lint', args);
     });
 
 /**
@@ -396,7 +420,7 @@ packageJsonCommand
         'Set the theme name. This sets the path to download and upload theme files. Defaults to "custom".',
     )
     .action(async (args) => {
-        packageJsonHandler(args, 'format');
+        await packageJsonHandler(args, 'format');
     });
 
 packageJsonCommand
@@ -410,7 +434,7 @@ packageJsonCommand
         'Set the theme name. This sets the path to download and upload theme files. Defaults to "custom".',
     )
     .action(async (args) => {
-        packageJsonHandler(args, 'scripts');
+        await packageJsonHandler(args, 'scripts');
     });
 
 /**
@@ -425,7 +449,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        pushTemplates();
+        await pushTemplates();
     });
 
 /**
@@ -442,7 +466,7 @@ program
     )
     .action(async (args) => {
         await config.init(args);
-        pullHandler(args);
+        await pullHandler(args);
     });
 
 program
@@ -454,7 +478,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        pullImages();
+        await pullImages();
     });
 program
     .command('pull-templates')
@@ -465,7 +489,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        pullTemplates();
+        await pullTemplates();
     });
 program
     .command('pull-theme-config')
@@ -476,7 +500,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        pullThemeConfig();
+        await pullThemeConfig();
     });
 
 /**
@@ -493,7 +517,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        formatThemeJson(args.file);
+        await formatThemeJson(args.file);
     });
 
 program
@@ -505,7 +529,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        pushTheme();
+        await pushTheme();
     });
 
 /**
@@ -518,8 +542,14 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        watchHandler();
+        await watchHandler();
     });
 
-// Parse the command line arguments
-program.parse();
+// Parse the command line arguments.
+// parseAsync() awaits the (async) command action handlers, so any error thrown by a
+// handler rejects here and is reported cleanly with a non-zero exit code instead of
+// surfacing as an unhandled promise rejection.
+program.parseAsync().catch((error) => {
+    logError('The command failed with an error:', error);
+    process.exitCode = 1;
+});

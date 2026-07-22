@@ -13,8 +13,14 @@ import fs from 'fs-extra';
 export const hasFiles = (path) => {
     let returnValue = false;
     if (fs.pathExistsSync(path)) {
-        const files = fs.readdirSync(path, { recursive: true });
-        returnValue = files.length > 0;
+        // Use withFileTypes so we can exclude directory entries. A recursive
+        // readdir includes subdirectories, so a tree of only (empty) folders
+        // would otherwise be reported as having files. .some() also short-circuits.
+        const entries = fs.readdirSync(path, {
+            recursive: true,
+            withFileTypes: true,
+        });
+        returnValue = entries.some((entry) => entry.isFile());
     }
     return returnValue;
 };
@@ -30,12 +36,16 @@ export const hasFilesByExtension = (path, extension) => {
     const ext = `.${extension}`;
     let returnValue = false;
     if (fs.pathExistsSync(path)) {
-        const files = fs.readdirSync(path, { recursive: true });
-        files.forEach((file) => {
-            if (file.endsWith(ext)) {
-                returnValue = true;
-            }
+        // Use withFileTypes so directory entries (e.g. a folder literally named
+        // "foo.svg") aren't counted as matching files. .some() short-circuits
+        // once a match is found instead of scanning the whole tree.
+        const entries = fs.readdirSync(path, {
+            recursive: true,
+            withFileTypes: true,
         });
+        returnValue = entries.some(
+            (entry) => entry.isFile() && entry.name.endsWith(ext),
+        );
     }
     return returnValue;
 };

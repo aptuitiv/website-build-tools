@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.37.0] - 2026-07-22
+
+### Added
+
+- Added recommended `node` version to the `package.json`. Set to `>=24.13.0` as thats the lowest version that dependencies currently require.
+`stylelint-selector-bem-pattern@5` requires that version of node.
+- Added 'pull-fonts` action to copy fonts from the build directory to the source directory.
+
+### Changed
+
+- Updated all packages to latest versions. This included updating `eslint` to version 10 and `stylelint` to version 17.
+- Updated the `package.json` scripts to be better organized and have more scripts. Also changed the `download` and `upload` scripts to not have any parameters so that users an add specific paths to them.
+- Improved error handling for CSS files so that it doesn't crash when there is an error. Also improved error handling in other functions.
+- Improved processing CSS so that it only runs once.
+- Improved running commands and capturing errors by properly waiting for tasks to complete.
+- Improved the security with setting up the `.env` file so that passwords don't show in plain text and the `.env` file is only readable by it's owner.
+- Improved the downloading of themes so that they no longer clobber the current working directory or hang.
+- Moved shared functionality to shared functions.
+
+### Fixed
+
+- Fixed issue where the `env` file wasn't set up when installing a theme with the `init` command.
+- Fixed minor linting issues.
+
 ## [1.36.0] - 2026-06-09
 
 ### Changed

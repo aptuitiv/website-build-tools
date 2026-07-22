@@ -10,6 +10,8 @@ import {
     prefixSrcPath,
     prefixThemeBuildPath,
 } from './helpers.js';
+import { logError } from './lib/log.js';
+import { isStringWithValue } from './lib/types.js';
 
 /**
  * Pull a specific directory from the build directory to the source directory
@@ -19,9 +21,26 @@ import {
  * @param {object} args The arguments from the command line
  */
 export const pullHandler = async (args) => {
-    const { path } = args;
+    const path = args?.path;
+    if (!isStringWithValue(path)) {
+        logError(
+            'You must provide a path to pull. For example: aptuitiv-build pull -p theme/custom/templates',
+        );
+        return;
+    }
     const buildPath = prefixBuildPath(path);
     await copyBuildFolderToSrc(buildPath, path, path);
+};
+
+/**
+ * Pull the fonts from the build theme directory to the source theme directory
+ */
+export const pullFonts = async () => {
+    await copyBuildFolderToSrc(
+        prefixThemeBuildPath(config.data.fonts.build),
+        prefixSrcPath(config.data.fonts.src),
+        'fonts',
+    );
 };
 
 /**
