@@ -325,6 +325,7 @@ const validateThemeJsonFile = (json, fileName) => {
  * Validate and format the theme config file
  *
  * @param {string} fileName The name of the theme config file to process
+ * @returns {Promise<boolean>} Whether the file is valid (an empty or missing-but-empty file counts as valid)
  */
 const processThemeJsonFile = async (fileName) => {
     const filePath = `${prefixSrcPath(config.data.themeConfig.src)}/${fileName}`;
@@ -345,51 +346,54 @@ const processThemeJsonFile = async (fileName) => {
                     logSymbols.success,
                     chalk.green(`Formatted the ${fileName} file`),
                 );
-            } else {
-                fancyLog(
-                    logSymbols.error,
-                    chalk.red(
-                        `The ${fileName} file is not valid. Please fix the file and try again.`,
-                    ),
-                );
+                return true;
             }
-        } else {
-            // This is an empty file. Mark it as valid.
             fancyLog(
-                logSymbols.success,
-                chalk.green(`${fileName} is empty, but that's ok.`),
+                logSymbols.error,
+                chalk.red(
+                    `The ${fileName} file is not valid. Please fix the file and try again.`,
+                ),
             );
+            return false;
         }
-    } else {
+        // This is an empty file. Mark it as valid.
         fancyLog(
-            logSymbols.error,
-            chalk.red(`The ${fileName} file does not exist`),
+            logSymbols.success,
+            chalk.green(`${fileName} is empty, but that's ok.`),
         );
+        return true;
     }
+    fancyLog(
+        logSymbols.error,
+        chalk.red(`The ${fileName} file does not exist`),
+    );
+    return false;
 };
 
 /**
  * Format a single theme setting file or all theme setting files
  *
  * @param {string} [fileName] The name of the file to format. If not set then all theme setting files will be formatted.
+ * @returns {Promise<boolean>} Whether all processed files are valid
  */
 export const formatThemeJson = async (fileName) => {
     if (isStringWithValue(fileName)) {
-        await processThemeJsonFile(fileName);
+        const isValid = await processThemeJsonFile(fileName);
         fancyLog(
             logSymbols.success,
             chalk.green('Done formatting the theme configuration JSON file'),
         );
-    } else {
-        await processThemeJsonFile('theme-settings.json');
-        await processThemeJsonFile('theme-styles.json');
-        // eslint-disable-next-line no-console -- We do this to add a blank line to the console
-        console.log('');
-        fancyLog(
-            logSymbols.success,
-            chalk.green('Done formatting the theme configuration JSON files'),
-        );
+        return isValid;
     }
+    const settingsValid = await processThemeJsonFile('theme-settings.json');
+    const stylesValid = await processThemeJsonFile('theme-styles.json');
+    // eslint-disable-next-line no-console -- We do this to add a blank line to the console
+    console.log('');
+    fancyLog(
+        logSymbols.success,
+        chalk.green('Done formatting the theme configuration JSON files'),
+    );
+    return settingsValid && stylesValid;
 };
 
 /**
@@ -403,7 +407,7 @@ export const copyThemeSrcToBuild = async (filePath) => {
     if (fileName !== 'theme-config.json') {
         // @todo Validate the theme-config.json file.
         try {
-            await formatThemeJson(fileName);
+            isValid = await formatThemeJson(fileName);
         } catch (error) {
             isValid = false;
             fancyLog(
@@ -454,13 +458,16 @@ export const pushTheme = async () => {
     );
 
     // Process and copy the theme-settings.json file to the build directory.
+    // Only copy the file to the build folder if it passed validation so that an
+    // invalid file isn't deployed.
     try {
-        await processThemeJsonFile('theme-settings.json');
-        copySrcFileToThemeBuild(
-            'theme-settings.json',
-            config.data.themeConfig.src,
-            config.data.themeConfig.build,
-        );
+        if (await processThemeJsonFile('theme-settings.json')) {
+            copySrcFileToThemeBuild(
+                'theme-settings.json',
+                config.data.themeConfig.src,
+                config.data.themeConfig.build,
+            );
+        }
     } catch (error) {
         fancyLog(
             logSymbols.error,
@@ -470,12 +477,13 @@ export const pushTheme = async () => {
     }
     // Process and copy the theme-styles.json file to the build directory.
     try {
-        await processThemeJsonFile('theme-styles.json');
-        copySrcFileToThemeBuild(
-            'theme-styles.json',
-            config.data.themeConfig.src,
-            config.data.themeConfig.build,
-        );
+        if (await processThemeJsonFile('theme-styles.json')) {
+            copySrcFileToThemeBuild(
+                'theme-styles.json',
+                config.data.themeConfig.src,
+                config.data.themeConfig.build,
+            );
+        }
     } catch (error) {
         fancyLog(
             logSymbols.error,
