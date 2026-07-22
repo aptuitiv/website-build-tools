@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated the `package.json` scripts to be better organized and have more scripts. Also changed the `download` and `upload` scripts to not have any parameters so that users an add specific paths to them.
 - Improved error handling for CSS files so that it doesn't crash when there is an error.
 - Improved processing CSS so that it only runs once.
+- Improved running commands and capturing errors by properly waiting for tasks to complete.
 
 ### Fixed
 

@@ -43,7 +43,7 @@ const exportFiles = async () => {
  * Process the export request
  */
 const exportHandler = async () => {
-    exportFiles();
+    await exportFiles();
 };
 
 export default exportHandler;

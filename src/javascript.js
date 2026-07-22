@@ -729,23 +729,24 @@ export const processJsFile = async (filePath, lint = true) => {
             });
             await lintJs(filesToLint);
         }
-        // Process each bundle
-        matchedBundles.forEach((bundle) => {
-            processBundle(bundle);
-        });
+        // Process each bundle. Each bundle writes to its own uniquely-named temp
+        // file, so they can safely be processed in parallel.
+        await Promise.all(
+            matchedBundles.map((bundle) => processBundle(bundle)),
+        );
     } else {
         const matchedFile = files.find((f) => f === file);
         if (matchedFile) {
             if (lint) {
                 await lintJs(file);
             }
-            processFile(file);
+            await processFile(file);
         } else if (entryPoints.length > 0) {
             // Assume that this file is part of a build
             if (lint) {
                 await lintJs(file);
             }
-            processEsbuilds(entryPoints);
+            await processEsbuilds(entryPoints);
         } else {
             fancyLog(
                 logSymbols.error,
