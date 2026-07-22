@@ -127,6 +127,9 @@ const getDevDependencies = (currentDevDependencies) => {
  */
 export const addDependency = (name, version) => {
     const packageJson = fs.readJsonSync('package.json');
+    // Ensure the dependencies object exists so we don't throw on a package.json
+    // that has no "dependencies" key yet.
+    packageJson.dependencies = packageJson.dependencies || {};
     packageJson.dependencies[name] = version;
     fs.writeJSONSync('package.json', packageJson, { spaces: 4 });
 };
