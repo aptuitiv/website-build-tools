@@ -160,7 +160,7 @@ const logPostCssError = (error, filePath) => {
         const errorFile = error.file || filePath;
         fancyLog(
             chalk.red(
-                `CSS syntax error in ${chalk.cyan(removeRootPrefix(errorFile))}${
+                `CSS error in ${chalk.cyan(removeRootPrefix(errorFile))}${
                     typeof error.line === 'number'
                         ? chalk.red(
                               ` at line ${error.line}, column ${error.column}`,
