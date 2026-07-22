@@ -26,6 +26,35 @@ import { logError } from './lib/log.js';
 import { isStringWithValue } from './lib/types.js';
 
 /**
+ * Wrap a watch event handler so that synchronous throws and asynchronous
+ * rejections are logged instead of crashing the long-running watch process.
+ *
+ * @param {string} message The message to log if the handler fails
+ * @param {(...handlerArgs: string[]) => (void | Promise<void>)} handler The event handler (may be synchronous or asynchronous)
+ * @returns {(...handlerArgs: string[]) => void} The wrapped handler
+ */
+const safeHandler =
+    (message, handler) =>
+    (...handlerArgs) => {
+        Promise.resolve()
+            .then(() => handler(...handlerArgs))
+            .catch((error) => {
+                logError(message, error);
+            });
+    };
+
+/**
+ * Create a handler for a chokidar "error" event (e.g. EMFILE or permission
+ * errors) that logs the error without terminating the watch process.
+ *
+ * @param {string} name The name of the watched location, for context
+ * @returns {(error: Error) => void} The error handler
+ */
+const watchError = (name) => (error) => {
+    logError(`Error watching the ${name}:`, error);
+};
+
+/**
  * Process the watch request
  */
 const watchHandler = async () => {
@@ -51,23 +80,27 @@ const watchHandler = async () => {
             // This is intended to prevent uploading the file multiple times.
             awaitWriteFinish: { stabilityThreshold: 500 },
         })
-        .on('add', (path) => {
-            // Tolerate FTP failures so a single failed upload doesn't crash the
-            // long-running watch process (withRetry re-throws after exhausting retries).
-            deployFile(removePrefix(path, rootDistFolder)).catch((error) => {
-                logError('Failed to upload the file:', error);
-            });
-        })
-        .on('change', (path) => {
-            deployFile(removePrefix(path, rootDistFolder)).catch((error) => {
-                logError('Failed to upload the file:', error);
-            });
-        })
-        .on('unlink', (path) => {
-            deleteFile(removePrefix(path, rootDistFolder)).catch((error) => {
-                logError('Failed to delete the file:', error);
-            });
-        });
+        // Tolerate FTP failures so a single failed upload/delete doesn't crash the
+        // long-running watch process (withRetry re-throws after exhausting retries).
+        .on(
+            'add',
+            safeHandler('Failed to upload the file:', (path) =>
+                deployFile(removePrefix(path, rootDistFolder)),
+            ),
+        )
+        .on(
+            'change',
+            safeHandler('Failed to upload the file:', (path) =>
+                deployFile(removePrefix(path, rootDistFolder)),
+            ),
+        )
+        .on(
+            'unlink',
+            safeHandler('Failed to delete the file:', (path) =>
+                deleteFile(removePrefix(path, rootDistFolder)),
+            ),
+        )
+        .on('error', watchError('dist folder'));
 
     // Watch for any CSS changes
     const cssFolder = prefixRootSrcPath(config.data.css.src);
@@ -87,9 +120,11 @@ const watchHandler = async () => {
             // https://github.com/paulmillr/chokidar?tab=readme-ov-file#performance
             awaitWriteFinish: { stabilityThreshold: 300, pollInterval: 100 },
         })
-        .on('all', () => {
-            processCss();
-        });
+        .on(
+            'all',
+            safeHandler('Error processing the CSS:', () => processCss()),
+        )
+        .on('error', watchError('CSS folder'));
 
     // Watch for any font changes
     const fontSrcFolder = prefixSrcPath(config.data.fonts.src);
@@ -100,15 +135,25 @@ const watchHandler = async () => {
     );
     chokidar
         .watch(fontFolder, { ignoreInitial: true })
-        .on('add', (path) => {
-            copyFontSrcToBuild(path);
-        })
-        .on('change', (path) => {
-            copyFontSrcToBuild(path);
-        })
-        .on('unlink', (path) => {
-            removeFontFileFromBuild(path);
-        });
+        .on(
+            'add',
+            safeHandler('Error copying the font file:', (path) =>
+                copyFontSrcToBuild(path),
+            ),
+        )
+        .on(
+            'change',
+            safeHandler('Error copying the font file:', (path) =>
+                copyFontSrcToBuild(path),
+            ),
+        )
+        .on(
+            'unlink',
+            safeHandler('Error removing the font file:', (path) =>
+                removeFontFileFromBuild(path),
+            ),
+        )
+        .on('error', watchError('font folder'));
 
     // Watch for any CSS changes
     const jsfolder = prefixRootSrcPath(config.data.javascript.src);
@@ -124,9 +169,34 @@ const watchHandler = async () => {
                 stats?.isFile() && !/\.js$|\.cjs$|\.mjs$/.test(path),
             ignoreInitial: true,
         })
-        .on('all', (event, path) => {
-            processJsFile(path);
-        });
+        // Split the events (instead of using "all") so that directory events
+        // (addDir/unlinkDir) are ignored and a just-deleted file is never processed.
+        .on(
+            'add',
+            safeHandler('Error processing the Javascript file:', (path) =>
+                processJsFile(path),
+            ),
+        )
+        .on(
+            'change',
+            safeHandler('Error processing the Javascript file:', (path) =>
+                processJsFile(path),
+            ),
+        )
+        .on('unlink', (path) => {
+            // A bundled source file was removed; there is no 1:1 build file to
+            // delete here, so note it so the developer knows to rebuild the JS.
+            fancyLog(
+                chalk.yellow('Javascript source file removed:'),
+                chalk.cyan(
+                    removePrefix(
+                        path,
+                        prefixRootSrcPath(config.data.javascript.src),
+                    ),
+                ),
+            );
+        })
+        .on('error', watchError('Javascript folder'));
 
     // Watch for any icon changes
     if (Array.isArray(config.data.icons)) {
@@ -148,9 +218,13 @@ const watchHandler = async () => {
                             stats?.isFile() && !path.endsWith('.svg'),
                         ignoreInitial: true,
                     })
-                    .on('all', () => {
-                        createIconSprite(iconConfig.src, iconConfig.build);
-                    });
+                    .on(
+                        'all',
+                        safeHandler('Error creating the icon sprite:', () =>
+                            createIconSprite(iconConfig.src, iconConfig.build),
+                        ),
+                    )
+                    .on('error', watchError('icons folder'));
             }
         });
     }
@@ -164,15 +238,25 @@ const watchHandler = async () => {
     );
     chokidar
         .watch(imageFolder, { ignoreInitial: true })
-        .on('add', (path) => {
-            processImage(path);
-        })
-        .on('change', (path) => {
-            processImage(path);
-        })
-        .on('unlink', (path) => {
-            removeImageFileFromBuild(path);
-        });
+        .on(
+            'add',
+            safeHandler('Error processing the image:', (path) =>
+                processImage(path),
+            ),
+        )
+        .on(
+            'change',
+            safeHandler('Error processing the image:', (path) =>
+                processImage(path),
+            ),
+        )
+        .on(
+            'unlink',
+            safeHandler('Error removing the image file:', (path) =>
+                removeImageFileFromBuild(path),
+            ),
+        )
+        .on('error', watchError('images folder'));
 
     // Watch for any template file changes
     const templateSrcFolder = prefixSrcPath(config.data.templates.src);
@@ -183,15 +267,25 @@ const watchHandler = async () => {
     );
     chokidar
         .watch(templateFolder, { ignoreInitial: true })
-        .on('add', (path) => {
-            copyTemplateSrcToBuild(path);
-        })
-        .on('change', (path) => {
-            copyTemplateSrcToBuild(path);
-        })
-        .on('unlink', (path) => {
-            removeTemplateFileFromBuild(path);
-        });
+        .on(
+            'add',
+            safeHandler('Error copying the template file:', (path) =>
+                copyTemplateSrcToBuild(path),
+            ),
+        )
+        .on(
+            'change',
+            safeHandler('Error copying the template file:', (path) =>
+                copyTemplateSrcToBuild(path),
+            ),
+        )
+        .on(
+            'unlink',
+            safeHandler('Error removing the template file:', (path) =>
+                removeTemplateFileFromBuild(path),
+            ),
+        )
+        .on('error', watchError('template folder'));
 
     // Watch for any theme configuration file changes
     const themeSrcFolder = prefixSrcPath(config.data.themeConfig.src);
@@ -217,15 +311,25 @@ const watchHandler = async () => {
                 pollInterval: 100,
             },
         })
-        .on('add', (path) => {
-            copyThemeSrcToBuild(path);
-        })
-        .on('change', (path) => {
-            copyThemeSrcToBuild(path);
-        })
-        .on('unlink', (path) => {
-            removeThemeFileFromBuild(path);
-        });
+        .on(
+            'add',
+            safeHandler('Error copying the theme file:', (path) =>
+                copyThemeSrcToBuild(path),
+            ),
+        )
+        .on(
+            'change',
+            safeHandler('Error copying the theme file:', (path) =>
+                copyThemeSrcToBuild(path),
+            ),
+        )
+        .on(
+            'unlink',
+            safeHandler('Error removing the theme file:', (path) =>
+                removeThemeFileFromBuild(path),
+            ),
+        )
+        .on('error', watchError('theme folder'));
 
     // Watch an "copy" files
     const copyFilesToWatch = [];
@@ -250,13 +354,18 @@ const watchHandler = async () => {
         // This is watching individual files so we're only going to process the "change" event.
         chokidar
             .watch(copyFilesToWatch, { ignoreInitial: true })
-            .on('change', (path) => {
-                copyWatchFile(
-                    path,
-                    copyFilesMap[path].srcRoot,
-                    copyFilesMap[path].dest,
-                );
-            });
+            .on(
+                'change',
+                safeHandler('Error copying the file:', (path) => {
+                    // Guard against a path that isn't a key in the map (e.g. due to
+                    // path normalization/casing) so we don't throw on undefined.
+                    const entry = copyFilesMap[path];
+                    if (entry) {
+                        copyWatchFile(path, entry.srcRoot, entry.dest);
+                    }
+                }),
+            )
+            .on('error', watchError('copy configuration source files'));
     }
 };
 
