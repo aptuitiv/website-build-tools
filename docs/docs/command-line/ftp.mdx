@@ -6,6 +6,20 @@ title: FTP
 
 You can upload files or directories, download files or directories, and delete files or directories via FTP.
 
+You can use the `-p` or `--path` flag to specify the path to the file or directory to upload, download, or delete.
+
+```bash
+aptuitiv-build upload -p 'dist/theme/custom/css/main.css'
+aptuitiv-build download --path 'dist/theme/custom/css/main.css'
+```
+
+Or you can use positional parameters instead of the `-p` or `--path` flag.
+
+```bash
+aptuitiv-build upload dist/theme/custom/css/main.css
+aptuitiv-build download dist/theme/custom/css/main.css
+```
+
 ## Upload files and directories
 
 ### Upload all files in the build directory
@@ -19,6 +33,7 @@ aptuitiv-build upload
 ```bash
 aptuitiv-build upload -t
 aptuitiv-build upload --theme
+aptuitiv-build upload theme
 ```
 
 ### Upload a single file
@@ -26,6 +41,7 @@ aptuitiv-build upload --theme
 ```bash
 aptuitiv-build upload -p 'dist/theme/custom/css/main.css'
 aptuitiv-build upload --path 'dist/theme/custom/css/main.css'
+aptuitiv-build upload dist/theme/custom/css/main.css
 ```
 
 Or the build folder can be left off.
@@ -33,6 +49,7 @@ Or the build folder can be left off.
 ```bash
 aptuitiv-build upload -p 'theme/custom/css/main.css'
 aptuitiv-build upload --path 'theme/custom/css/main.css'
+aptuitiv-build upload theme/custom/css/main.css
 ```
 
 ### Upload a folder
@@ -40,6 +57,7 @@ aptuitiv-build upload --path 'theme/custom/css/main.css'
 ```bash
 aptuitiv-build upload -p 'dist/theme/custom/css'
 aptuitiv-build upload --path 'dist/theme/custom/css'
+aptuitiv-build upload dist/theme/custom/css
 ```
 
 Or the build folder can be left off.
@@ -47,6 +65,7 @@ Or the build folder can be left off.
 ```bash
 aptuitiv-build upload -p 'theme/custom/css'
 aptuitiv-build upload --path 'theme/custom/css'
+aptuitiv-build upload theme/custom/css
 ```
 
 ### Upload a glob of files
@@ -54,6 +73,7 @@ aptuitiv-build upload --path 'theme/custom/css'
 ```bash
 aptuitiv-build upload -p 'dist/theme/custom/js/*'
 aptuitiv-build upload --path 'dist/theme/custom/js/*'
+aptuitiv-build upload dist/theme/custom/js/*
 ```
 
 Or the build folder can be left off.
@@ -61,15 +81,23 @@ Or the build folder can be left off.
 ```bash
 aptuitiv-build upload -p 'theme/custom/js/**/*.js'
 aptuitiv-build upload --path 'theme/custom/js/**/*.js'
+aptuitiv-build upload theme/custom/js/*
 ```
 
 ## Download files or directories
+
+### Download all files, including those in the FTP root directory
+
+```bash
+aptuitiv-build download
+```
 
 ### Download a folder
 
 ```bash
 aptuitiv-build download -p 'dist/theme/custom/js'
 aptuitiv-build download --path 'dist/theme/custom/js'
+aptuitiv-build download dist/theme/custom/js
 ```
 
 Or the build folder can be left off.
@@ -77,6 +105,7 @@ Or the build folder can be left off.
 ```bash
 aptuitiv-build download -p 'theme/custom/js'
 aptuitiv-build download --path 'theme/custom/js'
+aptuitiv-build download theme/custom/js
 ```
 
 ### Download a file
@@ -84,6 +113,7 @@ aptuitiv-build download --path 'theme/custom/js'
 ```bash
 aptuitiv-build download -p 'dist/theme/custom/js/main.js'
 aptuitiv-build download --path 'dist/theme/custom/js/main.js'
+aptuitiv-build download dist/theme/custom/js/main.js
 ```
 
 Or the build folder can be left off.
@@ -91,6 +121,7 @@ Or the build folder can be left off.
 ```bash
 aptuitiv-build download -p 'theme/custom/js/main.js'
 aptuitiv-build download --path 'theme/custom/js/main.js'
+aptuitiv-build download theme/custom/js/main.js
 ```
 
 ### Download all the theme files
@@ -98,6 +129,7 @@ aptuitiv-build download --path 'theme/custom/js/main.js'
 ```bash
 aptuitiv-build download -t
 aptuitiv-build download --theme
+aptuitiv-build download theme
 ```
 
 ## Delete files or directories
@@ -109,6 +141,7 @@ Delete a file or folder.
 ```bash
 aptuitiv-build delete -p 'dist/theme/custom/js/main.js'
 aptuitiv-build delete --path 'dist/theme/custom/js/main.js'
+aptuitiv-build delete dist/theme/custom/js/main.js
 ```
 
 Or the build folder can be left off.
@@ -116,6 +149,7 @@ Or the build folder can be left off.
 ```bash
 aptuitiv-build delete -p 'theme/custom/js/main.js'
 aptuitiv-build delete --path 'theme/custom/js/main.js'
+aptuitiv-build delete theme/custom/js/main.js
 ```
 
 ### Delete a folder
@@ -123,6 +157,7 @@ aptuitiv-build delete --path 'theme/custom/js/main.js'
 ```bash
 aptuitiv-build delete -p 'dist/theme/custom/js'
 aptuitiv-build delete --path 'dist/theme/custom/js'
+aptuitiv-build delete dist/theme/custom/js
 ```
 
 Or the build folder can be left off.
@@ -130,4 +165,5 @@ Or the build folder can be left off.
 ```bash
 aptuitiv-build delete -p 'theme/custom/js'
 aptuitiv-build delete --path 'theme/custom/js'
+aptuitiv-build delete theme/custom/js
 ```
