@@ -7,11 +7,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added recommended `node` version to the `package.json`. Set to `>=24.13.0` as thats the lowest version that dependencies currently require.
+`stylelint-selector-bem-pattern@5` requires that version of node.
+- Added 'pull-fonts` action to copy fonts from the build directory to the source directory.
+
 ### Changed
 
 - Updated all packages to latest versions. This included updating `eslint` to version 10 and `stylelint` to version 17.
-- Added recommended `node` version to the `package.json`. Set to `>=24.13.0` as thats the lowest version that dependencies currently require.
-`stylelint-selector-bem-pattern@5` requires that version of node.
+- Updated the `package.json` scripts to be better organized, do more scripts,  
 
 ## [1.36.0] - 2026-06-09
 
