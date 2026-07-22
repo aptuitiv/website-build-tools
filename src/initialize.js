@@ -7,9 +7,10 @@ import { execa } from 'execa';
 import fancyLog from 'fancy-log';
 import fs from 'fs-extra';
 import logSymbols from 'log-symbols';
-import { dirname, parse } from 'path';
+import { tmpdir } from 'os';
+import { dirname, join, parse } from 'path';
 import yaml from 'json-to-pretty-yaml';
-import { input, select } from '@inquirer/prompts';
+import { confirm, input, select } from '@inquirer/prompts';
 import { fileURLToPath } from 'url';
 import zl from 'zip-lib';
 
@@ -25,7 +26,6 @@ import {
     logConditionalSuccess,
     logConditionalWarning,
     logMessage,
-    logWarning,
 } from './lib/log.js';
 import { kebabToCapitalized } from './lib/string.js';
 import {
@@ -389,34 +389,71 @@ const setupBasicWebsite = async (outputLog) => {
  * @param {boolean} [outputLog] Whether to output the log
  * @returns {Promise<void>}
  */
-const downloadTheme = async (args, theme, outputLog = true) =>
-    new Promise((resolve, reject) => {
-        (async () => {
-            logConditionalMessage(outputLog, 'Downloading the theme', theme);
-            await execa`curl -L -O https://github.com/aptuitiv/${theme}/archive/main.zip`;
-            zl.extract('./main.zip', './').then(
-                () => {
-                    fs.removeSync('./main.zip');
-                    // The theme is downloaded to "theme-name-main" folder. Need to move all contents of
-                    // that folder to the current directory.
-                    fs.copySync(`./${theme}-main`, './');
-                    fs.removeSync(`./${theme}-main`);
-                    // Format the package json file
-                    formatPackageJson(args).then(() => {
-                        logConditionalSuccess(
-                            outputLog,
-                            'Theme downloaded and extracted',
-                        );
-                        resolve();
-                    });
-                },
-                (err) => {
-                    logWarning('Error extracting the theme zip file', err);
-                    reject(err);
-                },
+const downloadTheme = async (args, theme, outputLog = true) => {
+    logConditionalMessage(outputLog, 'Downloading the theme', theme);
+
+    // Download and extract into a unique temp directory. This avoids leaving
+    // artifacts (main.zip / <theme>-main) in the project directory and avoids
+    // reusing stale artifacts from a previous failed run.
+    // Resolve the real path because on macOS os.tmpdir() is a symlink
+    // (/var/folders -> /private/var/folders). zip-lib compares each entry's
+    // resolved real path against the target directory and would otherwise refuse
+    // to write ("Refuse to write file outside ...") due to the symlink mismatch.
+    const tmpDir = fs.realpathSync(
+        fs.mkdtempSync(join(tmpdir(), 'aptuitiv-theme-')),
+    );
+    const zipPath = join(tmpDir, 'main.zip');
+    const extractDir = join(tmpDir, 'extracted');
+
+    try {
+        await execa`curl -L -o ${zipPath} https://github.com/aptuitiv/${theme}/archive/main.zip`;
+        fs.ensureDirSync(extractDir);
+        await zl.extract(zipPath, extractDir);
+
+        // The archive extracts to a "<theme>-main" folder. We copy its contents
+        // into the current directory.
+        const themeFolder = join(extractDir, `${theme}-main`);
+        if (!fs.existsSync(themeFolder)) {
+            throw new Error(
+                `The extracted theme folder "${theme}-main" could not be found.`,
             );
-        })();
-    });
+        }
+
+        // Guard against clobbering existing project files. Prompt before
+        // overwriting anything that already exists in the current directory.
+        const conflicts = fs
+            .readdirSync(themeFolder)
+            .filter((entry) => fs.existsSync(entry));
+        let overwrite = true;
+        if (conflicts.length > 0) {
+            logConditionalWarning(
+                outputLog,
+                `These files/folders already exist and would be overwritten by the theme: ${conflicts.join(', ')}`,
+            );
+            overwrite = await confirm({
+                message:
+                    'Overwrite the existing files with the theme files?',
+                default: false,
+            });
+            if (!overwrite) {
+                throw new Error(
+                    'Theme installation cancelled to avoid overwriting existing files.',
+                );
+            }
+        }
+
+        // Copy the theme contents into the current directory.
+        fs.copySync(themeFolder, './', { overwrite });
+
+        // Format the package json file
+        await formatPackageJson(args);
+        logConditionalSuccess(outputLog, 'Theme downloaded and extracted');
+    } finally {
+        // Always clean up the temp directory, even on failure. Errors propagate
+        // to initiaizeHandler, which handles CTRL+C gracefully and reports the rest.
+        fs.removeSync(tmpDir);
+    }
+};
 
 /**
  * Install NPM packages

@@ -20,6 +20,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Improved error handling for CSS files so that it doesn't crash when there is an error.
 - Improved processing CSS so that it only runs once.
 - Improved running commands and capturing errors by properly waiting for tasks to complete.
+- Improved the security with setting up the `.env` file so that passwords don't show in plain text and the `.env` file is only readable by it's owner.
+- Improved the downloading of themes so that they no longer clobber the current working directory or hang.
 
 ### Fixed
 
