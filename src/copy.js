@@ -29,6 +29,30 @@ export const copyWatchFile = (src, srcRoot, dest) => {
 };
 
 /**
+ * Build a copy-data entry for a single source path or glob.
+ *
+ * @param {string} src The source file path or glob pattern
+ * @param {string} dest The destination path
+ * @returns {?object} The copy entry ({ files, srcRoot, dest }), or null if the source matched no files
+ */
+const buildCopyEntry = (src, dest) => {
+    const files = globSync(src);
+    if (files.length === 0) {
+        return null;
+    }
+    // Determine the correct source root path so the destination path can be built correctly.
+    let srcRoot;
+    if (hasMagic(src)) {
+        // Get the source root path before the first "*" (i.e. before the glob pattern)
+        srcRoot = src.split('*').shift();
+    } else {
+        // The source is not a glob so the source root path is the directory of the source file
+        srcRoot = parse(src).dir;
+    }
+    return { files, srcRoot, dest };
+};
+
+/**
  * Prepares the data for copying files
  *
  * @returns {Array} An array of objects containing the files to copy, the source root path, and the destination path
@@ -39,45 +63,19 @@ export const prepareCopyData = () => {
         // Format the copy data
         config.data.copy.forEach((copy) => {
             if (isStringWithValue(copy.dest)) {
-                let filesToCopy = [];
-                // Need to set the correct source root path for the file(s) to copy
-                // so that the destination path can be built correctly
-                let srcRoot = '';
                 if (isStringWithValue(copy.src)) {
-                    filesToCopy = globSync(copy.src);
-                    if (hasMagic(copy.src)) {
-                        // Get the source root path before the first "*" (i.e. before the glob pattern)
-                        srcRoot = copy.src.split('*').shift();
-                    } else {
-                        // The source is not a glob so the source root path will be the directory of the source file
-                        srcRoot = parse(copy.src).dir;
-                    }
-                    if (filesToCopy.length > 0) {
-                        returnData.push({
-                            files: filesToCopy,
-                            srcRoot,
-                            dest: copy.dest,
-                        });
+                    const entry = buildCopyEntry(copy.src, copy.dest);
+                    if (entry) {
+                        returnData.push(entry);
                     }
                 } else if (Array.isArray(copy.src) && copy.src.length > 0) {
                     // An array of files/globs was specified.
-                    // Need to treat each one individually to get the correct source root path.
+                    // Treat each one individually to get the correct source root path.
                     copy.src.forEach((file) => {
                         if (isStringWithValue(file)) {
-                            filesToCopy = globSync(file);
-                            if (hasMagic(file)) {
-                                // Get the source root path before the first "*" (i.e. before the glob pattern)
-                                srcRoot = file.split('*').shift();
-                            } else {
-                                // The source is not a glob so the source root path will be the directory of the source file
-                                srcRoot = parse(file).dir;
-                            }
-                            if (filesToCopy.length > 0) {
-                                returnData.push({
-                                    files: filesToCopy,
-                                    srcRoot,
-                                    dest: copy.dest,
-                                });
+                            const entry = buildCopyEntry(file, copy.dest);
+                            if (entry) {
+                                returnData.push(entry);
                             }
                         } else {
                             fancyLog(

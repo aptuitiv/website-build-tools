@@ -115,6 +115,21 @@ const reorderThemeConfig = (json) => {
 };
 
 /**
+ * Log a theme config validation error along with the offending item.
+ *
+ * @param {string} message The validation error message
+ * @param {object} item The offending JSON value to display
+ */
+const logThemeValidationError = (message, item) => {
+    fancyLog(
+        logSymbols.error,
+        chalk.bold.red(message),
+        '\n',
+        chalk.red(JSON.stringify(item, null, 4)),
+    );
+};
+
+/**
  * Validate the theme config fields
  *
  * @param {string} json The JSON object to validate
@@ -140,37 +155,25 @@ const validateThemeJsonFields = (json, parentName, parentType) => {
                     returnValue = true;
                 } else {
                     returnValue = false;
-                    fancyLog(
-                        logSymbols.error,
-                        chalk.bold.red(
-                            `One of the "fields" items ${parentError} is missing a "name" property. The item is:`,
-                        ),
-                        '\n',
-                        chalk.red(JSON.stringify(item, null, 4)),
+                    logThemeValidationError(
+                        `One of the "fields" items ${parentError} is missing a "name" property. The item is:`,
+                        item,
                     );
                     break;
                 }
             } else {
                 returnValue = false;
-                fancyLog(
-                    logSymbols.error,
-                    chalk.bold.red(
-                        `One of the "fields" items ${parentError} is not an object. The item is:`,
-                    ),
-                    '\n',
-                    chalk.red(JSON.stringify(item, null, 4)),
+                logThemeValidationError(
+                    `One of the "fields" items ${parentError} is not an object. The item is:`,
+                    item,
                 );
                 break;
             }
         }
     } else {
-        fancyLog(
-            logSymbols.error,
-            chalk.bold.red(
-                `The "fields" property ${parentError} is not an array. The item is:`,
-            ),
-            '\n',
-            chalk.red(JSON.stringify(json, null, 4)),
+        logThemeValidationError(
+            `The "fields" property ${parentError} is not an array. The item is:`,
+            json,
         );
     }
     return returnValue;
@@ -239,37 +242,25 @@ const validateThemeJsonGroupsOrSections = (json, type) => {
                     }
                 } else {
                     returnValue = false;
-                    fancyLog(
-                        logSymbols.error,
-                        chalk.bold.red(
-                            `One of the "${type}s" items is missing a "name" property. The item is:`,
-                        ),
-                        '\n',
-                        chalk.red(JSON.stringify(item, null, 4)),
+                    logThemeValidationError(
+                        `One of the "${type}s" items is missing a "name" property. The item is:`,
+                        item,
                     );
                     break;
                 }
             } else {
                 returnValue = false;
-                fancyLog(
-                    logSymbols.error,
-                    chalk.bold.red(
-                        `One of the "${type}s" items is not an object. The item is:`,
-                    ),
-                    '\n',
-                    chalk.red(JSON.stringify(item, null, 4)),
+                logThemeValidationError(
+                    `One of the "${type}s" items is not an object. The item is:`,
+                    item,
                 );
                 break;
             }
         }
     } else {
-        fancyLog(
-            logSymbols.error,
-            chalk.bold.red(
-                `The "${type}s" property is not an array. The item is:`,
-            ),
-            '\n',
-            chalk.red(JSON.stringify(json, null, 4)),
+        logThemeValidationError(
+            `The "${type}s" property is not an array. The item is:`,
+            json,
         );
     }
     return returnValue;
