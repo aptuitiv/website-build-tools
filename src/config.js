@@ -218,8 +218,12 @@ class Config {
             searchStrategy: 'project',
         });
 
-        // Set the initial configuration as the default configuration
-        let config = defaultConfig;
+        // Set the initial configuration as a clone of the default configuration.
+        // A clone (not a reference) is important: if config loading falls all the
+        // way through to the default, the later `config.root = ...` and
+        // `config.packageRoot = ...` assignments would otherwise mutate the shared
+        // defaultConfig singleton and pollute it for any later reload().
+        let config = deepmerge({}, defaultConfig);
 
         // Set up the root folder
         let overrideRoot = false;
