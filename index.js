@@ -60,6 +60,21 @@ const rootOption = new Option(
 );
 
 /**
+ * Merge a positional path argument into the options object.
+ * The positional path takes precedence over the --path option when provided.
+ *
+ * @param {string} [pathArg] The positional path argument
+ * @param {object} args The command options
+ * @returns {object} The options with the positional path applied if it was set
+ */
+const withPositionalPath = (pathArg, args) => {
+    if (pathArg) {
+        return { ...args, path: pathArg };
+    }
+    return args;
+};
+
+/**
  * Run the build process
  *
  * @param {object} args The command line arguments
@@ -223,7 +238,7 @@ program
     .action(async (pathArg, args) => {
         await config.init(args);
         // positional path wins if provided
-        const options = pathArg ? { ...args, path: pathArg } : args;
+        const options = withPositionalPath(pathArg, args);
         await ftpHandler('upload', options);
     });
 
@@ -238,7 +253,7 @@ program
     .action(async (pathArg, args) => {
         await config.init(args);
         // positional path wins if provided
-        const options = pathArg ? { ...args, path: pathArg } : args;
+        const options = withPositionalPath(pathArg, args);
         await ftpHandler('download', options);
     });
 
@@ -252,7 +267,7 @@ program
     .action(async (pathArg, args) => {
         await config.init(args);
         // positional path wins if provided
-        const options = pathArg ? { ...args, path: pathArg } : args;
+        const options = withPositionalPath(pathArg, args);
         await ftpHandler('delete', options);
     });
 
