@@ -25,6 +25,7 @@ import { prefixSrcPath } from './helpers.js';
 export const removeThemeFileFromBuild = (filePath) => {
     removeFileFromThemeBuild(
         filePath,
+        config.data.themeConfig.src,
         config.data.themeConfig.build,
         'theme file',
     );

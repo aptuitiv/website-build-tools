@@ -30,7 +30,12 @@ export const copyFontSrcToBuild = (path) => {
  * @param {string} path The font file path
  */
 export const removeFontFileFromBuild = (path) => {
-    removeFileFromThemeBuild(path, config.data.fonts.build, 'font file');
+    removeFileFromThemeBuild(
+        path,
+        config.data.fonts.src,
+        config.data.fonts.build,
+        'font file',
+    );
 };
 
 /**

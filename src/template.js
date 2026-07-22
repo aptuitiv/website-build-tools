@@ -34,6 +34,7 @@ export const copyTemplateSrcToBuild = (path) => {
 export const removeTemplateFileFromBuild = (path) => {
     removeFileFromThemeBuild(
         path,
+        config.data.templates.src,
         config.data.templates.build,
         'template file',
     );

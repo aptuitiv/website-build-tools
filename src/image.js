@@ -31,7 +31,12 @@ import {
  * @param {string} path The image file path
  */
 export const removeImageFileFromBuild = (path) => {
-    removeFileFromThemeBuild(path, config.data.images.build, 'image');
+    removeFileFromThemeBuild(
+        path,
+        config.data.images.src,
+        config.data.images.build,
+        'image',
+    );
 };
 
 /**
