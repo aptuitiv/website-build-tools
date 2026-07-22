@@ -3,7 +3,7 @@
 =========================================================================== */
 
 import fs from 'fs-extra';
-import { input } from '@inquirer/prompts';
+import { input, password } from '@inquirer/prompts';
 
 import { logInfo, logMessage, logSuccess } from './lib/log.js';
 import { isStringWithValue } from './lib/types.js';
@@ -27,7 +27,10 @@ export const createEnvFile = async (name) => {
         });
     }
     const username = await input({ message: 'What is the FTP username? ' });
-    const password = await input({ message: 'What is the FTP password? ' });
+    const ftpPassword = await password({
+        message: 'What is the FTP password? ',
+        mask: '*',
+    });
 
     const contents = `# ${envName} FTP
 FTP_ENVIRONMENT = live
