@@ -40,7 +40,7 @@ export const removeThemeFileFromBuild = (filePath) => {
 const reorderJsonByName = (json) => {
     let returnValue = json;
     if (Array.isArray(json)) {
-        returnValue = json.toSorted((a, b) => a.name.localeCompare(b.name));
+        returnValue = [...json].sort((a, b) => a.name.localeCompare(b.name));
     }
     return returnValue;
 };
