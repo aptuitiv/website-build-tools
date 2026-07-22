@@ -36,8 +36,9 @@ export const createEnvFile = async (name) => {
 FTP_ENVIRONMENT = live
 FTP_SERVER = ftp1.branchcms.com
 FTP_USERNAME = ${username}
-FTP_PASSWORD = ${password} `;
-    fs.writeFileSync('.env', contents);
+FTP_PASSWORD = ${ftpPassword}`;
+    // Restrict permissions to the owner since this file contains FTP credentials.
+    fs.writeFileSync('.env', contents, { mode: 0o600 });
     logSuccess('The .env file has been created');
 };
 
