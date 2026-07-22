@@ -450,7 +450,7 @@ const downloadTheme = async (args, theme, outputLog = true) => {
         logConditionalSuccess(outputLog, 'Theme downloaded and extracted');
     } finally {
         // Always clean up the temp directory, even on failure. Errors propagate
-        // to initiaizeHandler, which handles CTRL+C gracefully and reports the rest.
+        // to initializeHandler, which handles CTRL+C gracefully and reports the rest.
         fs.removeSync(tmpDir);
     }
 };
@@ -553,7 +553,7 @@ export const initialize = async (args, outputLog = true) => {
  * @param {object} args The command line arguments
  * @returns {Promise<boolean>} Returns true if the initialization was successful, false otherwise
  */
-export const initiaizeHandler = async (args) => {
+export const initializeHandler = async (args) => {
     let returnValue = false;
     try {
         setupRoot(args.root);

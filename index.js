@@ -17,11 +17,11 @@ import { cssHandler } from './src/css.js';
 import { envHandler } from './src/env.js';
 import exportHandler from './src/export.js';
 import { fontHandler } from './src/font.js';
-import ftpHander from './src/ftp.js';
+import ftpHandler from './src/ftp.js';
 import gulpConvertHandler from './src/gulp-convert.js';
 import { iconHandler } from './src/icons.js';
 import { imageHandler } from './src/image.js';
-import { initiaizeHandler } from './src/initialize.js';
+import { initializeHandler } from './src/initialize.js';
 import { jsHandler } from './src/javascript.js';
 import { packageJsonHandler } from './src/package-json.js';
 import {
@@ -224,7 +224,7 @@ program
         await config.init(args);
         // positional path wins if provided
         const options = pathArg ? { ...args, path: pathArg } : args;
-        await ftpHander('upload', options);
+        await ftpHandler('upload', options);
     });
 
 program
@@ -239,7 +239,7 @@ program
         await config.init(args);
         // positional path wins if provided
         const options = pathArg ? { ...args, path: pathArg } : args;
-        await ftpHander('download', options);
+        await ftpHandler('download', options);
     });
 
 program
@@ -253,7 +253,7 @@ program
         await config.init(args);
         // positional path wins if provided
         const options = pathArg ? { ...args, path: pathArg } : args;
-        await ftpHander('delete', options);
+        await ftpHandler('delete', options);
     });
 
 /**
@@ -328,7 +328,7 @@ program
     .addOption(rootOption)
     .action(async (args) => {
         await config.init(args);
-        const success = await initiaizeHandler(args);
+        const success = await initializeHandler(args);
         if (success) {
             if (args.build) {
                 if (hasFiles('src')) {

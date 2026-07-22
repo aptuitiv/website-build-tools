@@ -431,7 +431,7 @@ const showNoActionSpecified = () => {
  * @param {string} action The action to tak
  * @param {object} args Any command line arguments
  */
-const ftpHander = async (action, args) => {
+const ftpHandler = async (action, args) => {
     if (action === 'upload') {
         if (typeof args.path === 'string') {
             // Upload a single file, a directory, or a glob of files
@@ -505,4 +505,4 @@ const ftpHander = async (action, args) => {
     }
 };
 
-export default ftpHander;
+export default ftpHandler;
