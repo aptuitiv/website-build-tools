@@ -22,6 +22,7 @@ import {
     removeTemplateFileFromBuild,
 } from './template.js';
 import { copyThemeSrcToBuild, removeThemeFileFromBuild } from './theme.js';
+import { logError } from './lib/log.js';
 import { isStringWithValue } from './lib/types.js';
 
 /**
@@ -51,13 +52,21 @@ const watchHandler = async () => {
             awaitWriteFinish: { stabilityThreshold: 500 },
         })
         .on('add', (path) => {
-            deployFile(removePrefix(path, rootDistFolder));
+            // Tolerate FTP failures so a single failed upload doesn't crash the
+            // long-running watch process (withRetry re-throws after exhausting retries).
+            deployFile(removePrefix(path, rootDistFolder)).catch((error) => {
+                logError('Failed to upload the file:', error);
+            });
         })
         .on('change', (path) => {
-            deployFile(removePrefix(path, rootDistFolder));
+            deployFile(removePrefix(path, rootDistFolder)).catch((error) => {
+                logError('Failed to upload the file:', error);
+            });
         })
         .on('unlink', (path) => {
-            deleteFile(removePrefix(path, rootDistFolder));
+            deleteFile(removePrefix(path, rootDistFolder)).catch((error) => {
+                logError('Failed to delete the file:', error);
+            });
         });
 
     // Watch for any CSS changes

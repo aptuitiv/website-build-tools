@@ -214,6 +214,10 @@ const withRetry = async (operation, label, options = {}) => {
                         `${label} failed after ${MAX_RETRIES} attempts: ${err.message}`,
                     ),
                 );
+                // Re-throw the last error so that callers can detect the failure.
+                // One-shot commands let this propagate to the CLI so it exits with a
+                // non-zero code; watch-mode callers catch it so the watcher survives.
+                throw err;
             }
         }
     }
