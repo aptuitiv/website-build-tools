@@ -138,6 +138,55 @@ const runStylelint = async (fileGlob) => {
 };
 
 /**
+ * Log a PostCSS processing error in a readable way
+ *
+ * PostCSS syntax errors (CssSyntaxError) include the file, line, and column of
+ * the problem, so we surface those to make it easy to find where the issue is.
+ * The error's file will point at the actual offending file, even when it was
+ * pulled in via an `@import`.
+ *
+ * @param {Error} error The error thrown by PostCSS
+ * @param {string} filePath The path of the CSS file being processed
+ */
+const logPostCssError = (error, filePath) => {
+    fancyLog(
+        logSymbols.error,
+        chalk.red('Error building CSS'),
+        chalk.cyan(removeRootPrefix(filePath)),
+    );
+    if (error.name === 'CssSyntaxError') {
+        // The offending file, which may differ from filePath when the error is
+        // inside an @imported file.
+        const errorFile = error.file || filePath;
+        fancyLog(
+            chalk.red(
+                `CSS syntax error in ${chalk.cyan(removeRootPrefix(errorFile))}${
+                    typeof error.line === 'number'
+                        ? chalk.red(
+                              ` at line ${error.line}, column ${error.column}`,
+                          )
+                        : ''
+                }`,
+            ),
+        );
+        if (error.reason) {
+            fancyLog(chalk.red(error.reason));
+        }
+        // Show a highlighted snippet of the source code where the error is.
+        if (typeof error.showSourceCode === 'function') {
+            const sourceCode = error.showSourceCode(true);
+            if (sourceCode) {
+                // eslint-disable-next-line no-console -- Need to output the code frame
+                console.log(sourceCode);
+            }
+        }
+    } else {
+        // Not a syntax error (e.g. a missing @import file). Output the message.
+        fancyLog(chalk.red(error.message || String(error)));
+    }
+};
+
+/**
  * Run PostCSS on the file
  *
  * @param {string} filePath The path of the CSS file to process
@@ -154,8 +203,17 @@ const runPostCss = (filePath) =>
         }
         fs.readFile(filePath, (err, css) => {
             if (err) {
+                // Couldn't read the source file. Log the error and continue with
+                // the other CSS files instead of stopping the entire build.
+                fancyLog(
+                    logSymbols.error,
+                    chalk.red('Error reading CSS file'),
+                    chalk.cyan(removeRootPrefix(filePath)),
+                );
                 // eslint-disable-next-line no-console -- Need to output the error
-                console.error('Reading CSS file error: ', err);
+                console.error(err);
+                resolve();
+                return;
             }
             fancyLog(chalk.magenta('Building CSS'), chalk.cyan(filePath));
 
@@ -194,6 +252,12 @@ const runPostCss = (filePath) =>
                         );
                         resolve();
                     }
+                })
+                .catch((error) => {
+                    // Output a readable error and keep processing the remaining
+                    // CSS files instead of stopping the entire build.
+                    logPostCssError(error, filePath);
+                    resolve();
                 });
         });
     });
