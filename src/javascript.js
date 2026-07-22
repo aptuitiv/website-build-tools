@@ -354,6 +354,7 @@ const processFile = async (filePath) => {
     // Write the minified file to the build directory
     const contents = fs.readFileSync(filePath, 'utf-8');
     const minifyOptions = getMinifyOptions();
+    let hasError = false;
     if (
         config.data.javascript.minify === false ||
         minifyOptions.compress === false
@@ -366,6 +367,7 @@ const processFile = async (filePath) => {
             const results = await minify(contents, minifyOptions);
             fs.writeFileSync(buildFile, results.code);
         } catch (error) {
+            hasError = true;
             fancyLog(
                 logSymbols.error,
                 chalk.red('Error minifying Javascript file'),
@@ -374,13 +376,15 @@ const processFile = async (filePath) => {
             fancyLog(chalk.red(error));
         }
     }
-    fancyLog(
-        logSymbols.success,
-        chalk.green(
-            'Javascript file processing finished',
-            chalk.cyan(fileToProcess),
-        ),
-    );
+    if (!hasError) {
+        fancyLog(
+            logSymbols.success,
+            chalk.green(
+                'Javascript file processing finished',
+                chalk.cyan(fileToProcess),
+            ),
+        );
+    }
 };
 
 /**

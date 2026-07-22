@@ -341,11 +341,11 @@ const processThemeJsonFile = async (fileName) => {
                 const formattedJson = reorderThemeConfig(json);
                 if (JSON.stringify(json) !== JSON.stringify(formattedJson)) {
                     fs.writeJSONSync(filePath, formattedJson, { spaces: 4 });
+                    fancyLog(
+                        logSymbols.success,
+                        chalk.green(`Formatted the ${fileName} file`),
+                    );
                 }
-                fancyLog(
-                    logSymbols.success,
-                    chalk.green(`Formatted the ${fileName} file`),
-                );
                 return true;
             }
             fancyLog(
