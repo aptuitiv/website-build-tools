@@ -390,38 +390,35 @@ const showNoActionSpecified = () => {
  */
 const ftpHander = (action, args) => {
     if (action === 'upload') {
-        if (Object.keys(args).length > 0) {
-            if (typeof args.path === 'string') {
-                // Upload a single file, a directory, or a glob of files
-                const glob = processGlobPath(args.path);
-                const parsedGlobPath = path.parse(glob);
-                if (parsedGlobPath.ext === '' && parsedGlobPath.name !== '*') {
-                    // A directory path was set
-                    deployDir(glob);
-                } else {
-                    fancyLog(chalk.green(`Uploading: ${args.path}`));
-                    const paths = globSync(glob);
-                    if (paths.length > 0) {
-                        paths.forEach((filePath) => {
-                            deployFile(filePath);
-                        });
-                    } else {
-                        fancyLog(
-                            chalk.red(
-                                'Your path did not match any files to upload. ',
-                            ) + args.path,
-                        );
-                    }
-                }
-            } else if (args.theme) {
-                // Deploy the theme files
-                deployDir(config.data.build.theme);
+        if (typeof args.path === 'string') {
+            // Upload a single file, a directory, or a glob of files
+            const glob = processGlobPath(args.path);
+            const parsedGlobPath = path.parse(glob);
+            if (parsedGlobPath.ext === '' && parsedGlobPath.name !== '*') {
+                // A directory path was set
+                deployDir(glob);
             } else {
-                // No valid command line options were set
-                showNoActionSpecified();
+                fancyLog(chalk.green(`Uploading: ${args.path}`));
+                const paths = globSync(glob);
+                if (paths.length > 0) {
+                    paths.forEach((filePath) => {
+                        deployFile(filePath);
+                    });
+                } else {
+                    fancyLog(
+                        chalk.red(
+                            'Your path did not match any files to upload. ',
+                        ) + args.path,
+                    );
+                }
             }
         } else {
-            // Upload all files
+            // No path was set (with or without --theme). Upload the root build folder.
+            fancyLog(
+                chalk.green(
+                    `No path set. Using the default build path: ${config.data.build.base}`,
+                ),
+            );
             deployDir(config.data.build.base);
         }
     } else if (action === 'download') {
@@ -435,12 +432,14 @@ const ftpHander = (action, args) => {
                 // A directory is set to be downloaded
                 downloadDir(args.path);
             }
-        } else if (args.theme) {
-            // Download the theme files
-            downloadDir(config.data.build.theme);
         } else {
-            // No valid command line options were set
-            showNoActionSpecified();
+            // No path was set (with or without --theme). Download the root build folder.
+            fancyLog(
+                chalk.green(
+                    `No path set. Using the default build path: ${config.data.build.base}`,
+                ),
+            );
+            downloadDir(config.data.build.base);
         }
     } else if (action === 'delete') {
         if (typeof args.path === 'string') {
