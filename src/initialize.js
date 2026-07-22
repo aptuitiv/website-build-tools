@@ -488,6 +488,7 @@ export const initialize = async (args, outputLog = true) => {
             themeArgs.packageName = name;
         }
         await downloadTheme(themeArgs, projectType, outputLog);
+        await setupEnvFile(name, outputLog);
     } else {
         // Not a theme site. Could be an existing site or a new website
         setupLicense(args);
