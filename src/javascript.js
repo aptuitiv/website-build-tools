@@ -420,20 +420,32 @@ const processBundle = async (
         signal: abortController.signal,
     });
 
-    stream.on('error', (error) => {
-        // There was an error writing the file.
-        // This was likely because it was aborted in the code below.
-        // eslint-disable-next-line no-console -- We need to output the error.
-        console.error(error);
-        // Remove the temp file
-    });
+    // Wrap the stream lifecycle in a promise so that we can wait for the write to
+    // finish (and the temp file to be copied to the destination) before returning.
+    // Otherwise the bundle could be reported as done, and FTP'd to the server,
+    // before the destination file actually exists on disk.
+    const streamFinished = new Promise((resolve, reject) => {
+        stream.on('error', (error) => {
+            // There was an error writing the file.
+            // This was likely because it was aborted in the code below.
+            // Remove the temp file so it isn't left orphaned.
+            fs.removeSync(tempDest);
+            reject(error);
+        });
 
-    stream.on('finish', () => {
-        // The stream successfully finished.
-        // Copy the temp file to the destination file
-        fs.copySync(tempDest, bundle.dest);
-        // Remove the temporary file
-        fs.removeSync(tempDest);
+        stream.on('finish', () => {
+            // The stream successfully finished.
+            try {
+                // Copy the temp file to the destination file
+                fs.copySync(tempDest, bundle.dest);
+                resolve();
+            } catch (error) {
+                reject(error);
+            } finally {
+                // Remove the temporary file
+                fs.removeSync(tempDest);
+            }
+        });
     });
 
     // Get the minify optins
@@ -482,17 +494,34 @@ const processBundle = async (
     // Close stream
     if (!hasError) {
         stream.end();
-        if (log) {
+        try {
+            // Wait for the stream to finish and for the temp file to be copied to
+            // the destination before reporting success.
+            await streamFinished;
+            if (log) {
+                fancyLog(
+                    logSymbols.success,
+                    chalk.green(
+                        'Javascript bundle processing finished',
+                        chalk.cyan(removeRootThemeBuildPrefix(bundle.dest)),
+                    ),
+                );
+            }
+        } catch (error) {
             fancyLog(
-                logSymbols.success,
-                chalk.green(
-                    'Javascript bundle processing finished',
-                    chalk.cyan(removeRootThemeBuildPrefix(bundle.dest)),
-                ),
+                logSymbols.error,
+                chalk.red('Javascript bundle processing failed'),
+                chalk.cyan(removeRootThemeBuildPrefix(bundle.dest)),
             );
+            // eslint-disable-next-line no-console -- We need to output the error.
+            console.error(error);
         }
     } else {
         stream.end();
+        // The write was aborted due to a minify error (already logged above).
+        // Swallow the resulting stream rejection so it isn't an unhandled rejection;
+        // the temp file is cleaned up in the stream 'error' handler.
+        streamFinished.catch(() => {});
         fancyLog(
             logSymbols.error,
             chalk.red('Javascript bundle processing failed'),

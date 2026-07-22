@@ -182,8 +182,20 @@ export const processImage = async (imageSrc) => {
                 img.webp(getWebPOptimizations());
             }
 
-            // Write the image to the build folder
-            img.toFile(destImagePath);
+            // Write the image to the build folder.
+            // This must be awaited so that the write is complete before the
+            // image is reported as processed (and potentially FTP'd).
+            try {
+                await img.toFile(destImagePath);
+            } catch (error) {
+                fancyLog(
+                    logSymbols.error,
+                    chalk.red('Error processing image'),
+                    chalk.cyan(removeRootPrefix(imageSrc)),
+                );
+                // eslint-disable-next-line no-console -- Need to output the error
+                console.error(error);
+            }
         } else {
             // const ext = parse(imageSrc).ext.replace('.', '').toLowerCase();
             const ext = parse(imageSrc).ext.toLowerCase();
