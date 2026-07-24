@@ -458,6 +458,9 @@ const ftpHandler = async (action, args) => {
                     );
                 }
             }
+        } else if (args.theme) {
+            // Deploy the theme files
+            deployDir(config.data.build.theme);
         } else {
             // No path was set (with or without --theme). Upload the root build folder.
             fancyLog(
@@ -478,6 +481,9 @@ const ftpHandler = async (action, args) => {
                 // A directory is set to be downloaded
                 await downloadDir(args.path);
             }
+        } else if (args.theme) {
+            // Download the theme files
+            downloadDir(config.data.build.theme);
         } else {
             // No path was set (with or without --theme). Download the root build folder.
             fancyLog(
