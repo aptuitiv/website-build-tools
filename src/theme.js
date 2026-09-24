@@ -399,8 +399,8 @@ export const formatThemeJson = async (fileName) => {
 export const copyThemeSrcToBuild = async (filePath) => {
     const fileName = path.basename(filePath);
     let isValid = true;
-    if (fileName !== 'theme-config.json') {
-        // @todo Validate the theme-config.json file.
+    // Only format the theme settings and styles files.
+    if (['theme-settings.json', 'theme-styles.json'].includes(fileName)) {
         try {
             isValid = await formatThemeJson(fileName);
         } catch (error) {
