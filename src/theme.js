@@ -151,21 +151,15 @@ const validateThemeJsonFields = (json, parentName, parentType) => {
         for (let i = 0; i < json.length; i++) {
             const item = json[i];
             if (isObject(item)) {
-                const hasName =
-                    objectHasValue(item, 'name') &&
-                    isStringWithValue(item.name);
-                const hasLabel =
-                    objectHasValue(item, 'label') &&
-                    isStringWithValue(item.label);
-                const hasType =
-                    objectHasValue(item, 'type') &&
-                    isStringWithValue(item.type);
+                const hasName = isStringWithValue(item.name);
+                const hasLabel = isStringWithValue(item.label);
+                const hasType = isStringWithValue(item.type);
                 // const type = hasType ? item.type : '_unknown_';
                 if (hasName && hasLabel && hasType) {
                     returnValue = true;
                 } else {
                     returnValue = false;
-                    let errorMessage = `One of the "fields" items ${parentError}`;
+                    let errorMessage = `One of the "fields" items ${parentError} is missing the following`;
                     const errorItems = [];
                     if (!hasName) {
                         errorItems.push('"name"');
@@ -177,9 +171,16 @@ const validateThemeJsonFields = (json, parentName, parentType) => {
                         errorItems.push('"type"');
                     }
                     if (errorItems.length > 1) {
-                        errorMessage += ` is missing the following properties: ${errorItems.join(', and ')}`;
+                        errorMessage += ` properties: ${
+                            errorItems.length < 3
+                                ? errorItems.join(' and ')
+                                : [
+                                      errorItems.slice(0, -1).join(', '),
+                                      errorItems.slice(-1),
+                                  ].join(', and ')
+                        }`;
                     } else if (errorItems.length === 1) {
-                        errorMessage += ` is missing the following property: ${errorItems[0]}`;
+                        errorMessage += ` property: ${errorItems.pop()}`;
                     }
                     logThemeValidationError(
                         `${errorMessage}. The item is:`,
