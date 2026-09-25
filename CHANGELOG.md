@@ -7,7 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
-## Changed
+## [1.38.0] - 2026-09-25
+
+### Changed
 
 - Changed the theme `pushTheme` method to copy all files recursively within the theme configuration folder to the dist folder. This opens the option for theme configuration files to reference other files.
 It also includes support for new types of theme configuration files without having to explicitely list them.
