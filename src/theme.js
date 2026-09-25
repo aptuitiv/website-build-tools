@@ -145,22 +145,63 @@ const validateThemeJsonFields = (json, parentName, parentType) => {
     let returnValue = false;
     let parentError = '';
     if (isStringWithValue(parentName) && isStringWithValue(parentType)) {
-        parentError = ` in the ${parentType} "${parentName}" `;
+        parentError = `in the ${parentType} "${parentName}"`;
     }
     if (Array.isArray(json)) {
+        if (json.length === 0) {
+            return true;
+        }
+        // Field types that don't require a name or label attribute.
+        const typesWithoutNameOrLabel = [
+            'fielddisplay',
+            'fieldgrid',
+            'horizontaltabs',
+            'messagebar',
+            'section',
+            'tab',
+            'verticaltabs',
+        ];
         for (let i = 0; i < json.length; i++) {
             const item = json[i];
             if (isObject(item)) {
+                const hasName = isStringWithValue(item.name);
+                const hasLabel = isStringWithValue(item.label);
+                const hasType = isStringWithValue(item.type);
+                const type = hasType ? item.type : '_unknown_';
                 if (
-                    objectHasValue(item, 'name') &&
-                    objectHasValue(item, 'label') &&
-                    objectHasValue(item, 'type')
+                    typesWithoutNameOrLabel.includes(
+                        type.toLowerCase().trim(),
+                    ) ||
+                    (hasName && hasLabel && hasType)
                 ) {
                     returnValue = true;
                 } else {
                     returnValue = false;
+                    let errorMessage = `One of the "fields" items ${parentError} is missing the following`;
+                    const errorItems = [];
+                    if (!hasName) {
+                        errorItems.push('"name"');
+                    }
+                    if (!hasLabel) {
+                        errorItems.push('"label"');
+                    }
+                    if (!hasType) {
+                        errorItems.push('"type"');
+                    }
+                    if (errorItems.length > 1) {
+                        errorMessage += ` properties: ${
+                            errorItems.length < 3
+                                ? errorItems.join(' and ')
+                                : [
+                                      errorItems.slice(0, -1).join(', '),
+                                      errorItems.at(-1),
+                                  ].join(', and ')
+                        }`;
+                    } else if (errorItems.length === 1) {
+                        errorMessage += ` property: ${errorItems.pop()}`;
+                    }
                     logThemeValidationError(
-                        `One of the "fields" items ${parentError} is missing a "name" property. The item is:`,
+                        `${errorMessage}. The item is:`,
                         item,
                     );
                     break;

@@ -7,6 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [1.39.0] - 2026-09-25
+
+### Changed
+
+- Fixed testing for JSON theme setting errors and outputting the correct error.
+- Allow certain field types to not require a name or label attribute. `fieldDisplay` does not need a name or label because it just wraps other fields.
+
 ## [1.38.0] - 2026-09-25
 
 ### Changed
@@ -55,7 +62,7 @@ It also includes support for new types of theme configuration files without havi
 ### Changed
 
 - Improved the resiliency of the FTP functionality. Also batch the notifications for file uploads to prevent overloading system notifications.
-- Updated packages. Could not update eslint to version 10 because `eslint-plugin-import-x` in `@aptuitiv/eslint-config-aptuitiv` doesn’t support it yet. 
+- Updated packages. Could not update eslint to version 10 because `eslint-plugin-import-x` in `@aptuitiv/eslint-config-aptuitiv` doesn’t support it yet.
 Could not upgrade to Stylelint 17 because `stylelint-selector-bem-pattern` does not support it yet.
 
 ## [1.34.0] - 2026-01-20
@@ -99,7 +106,8 @@ Could not upgrade to Stylelint 17 because `stylelint-selector-bem-pattern` does 
 
 ### Changed
 
-- When the `config/theme-settings.json` and `config/theme-styles.json` files are processed they will now be validated and formatted. This will help prevent JSON errors and keep the files in a consistent format.
+- When the `config/theme-settings.json` and `config/theme-styles.json` files are processed they will now be validated and formatted. 
+  This will help prevent JSON errors and keep the files in a consistent format.
 
 ## [1.29.0] - 2025-07-22
 
