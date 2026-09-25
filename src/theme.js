@@ -14,8 +14,12 @@ import { objectHasValue } from './lib/object.js';
 
 // Build files
 import config from './config.js';
-import { copySrcFileToThemeBuild, removeFileFromThemeBuild } from './files.js';
-import { prefixSrcPath } from './helpers.js';
+import {
+    copySrcFileToThemeBuild,
+    copySrcFolderToBuild,
+    removeFileFromThemeBuild,
+} from './files.js';
+import { prefixSrcPath, prefixThemeBuildPath } from './helpers.js';
 
 /**
  * Removes a deleted theme config file from the build directory
@@ -395,8 +399,8 @@ export const formatThemeJson = async (fileName) => {
 export const copyThemeSrcToBuild = async (filePath) => {
     const fileName = path.basename(filePath);
     let isValid = true;
-    if (fileName !== 'theme-config.json') {
-        // @todo Validate the theme-config.json file.
+    // Only format the theme settings and styles files.
+    if (['theme-settings.json', 'theme-styles.json'].includes(fileName)) {
         try {
             isValid = await formatThemeJson(fileName);
         } catch (error) {
@@ -433,19 +437,12 @@ export const pushTheme = async () => {
             'Copying theme config files from source folder to build folder',
         ),
     );
+
     // Copy the legacy theme.json file to the build directory if it exists.
     copySrcFileToThemeBuild(
         'theme.json',
         config.data.src,
         config.data.build.theme,
-    );
-
-    // Copy the theme config file to build directory.
-    // @todo Validate this file.
-    copySrcFileToThemeBuild(
-        'theme-config.json',
-        config.data.themeConfig.src,
-        config.data.themeConfig.build,
     );
 
     // Process and copy the theme-settings.json file to the build directory.
@@ -482,6 +479,15 @@ export const pushTheme = async () => {
             error,
         );
     }
+
+    // Copy all other theme files to the build directory.
+    await copySrcFolderToBuild(
+        prefixSrcPath(config.data.themeConfig.src),
+        prefixThemeBuildPath(config.data.themeConfig.build),
+        'theme',
+        ['theme-settings.json', 'theme-styles.json'], // Skip the files already copied above.
+    );
+
     fancyLog(
         logSymbols.success,
         chalk.green(
