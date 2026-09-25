@@ -151,16 +151,38 @@ const validateThemeJsonFields = (json, parentName, parentType) => {
         for (let i = 0; i < json.length; i++) {
             const item = json[i];
             if (isObject(item)) {
-                if (
+                const hasName =
                     objectHasValue(item, 'name') &&
+                    isStringWithValue(item.name);
+                const hasLabel =
                     objectHasValue(item, 'label') &&
-                    objectHasValue(item, 'type')
-                ) {
+                    isStringWithValue(item.label);
+                const hasType =
+                    objectHasValue(item, 'type') &&
+                    isStringWithValue(item.type);
+                // const type = hasType ? item.type : '_unknown_';
+                if (hasName && hasLabel && hasType) {
                     returnValue = true;
                 } else {
                     returnValue = false;
+                    let errorMessage = `One of the "fields" items ${parentError}`;
+                    const errorItems = [];
+                    if (!hasName) {
+                        errorItems.push('"name"');
+                    }
+                    if (!hasLabel) {
+                        errorItems.push('"label"');
+                    }
+                    if (!hasType) {
+                        errorItems.push('"type"');
+                    }
+                    if (errorItems.length > 1) {
+                        errorMessage += ` is missing the following properties: ${errorItems.join(', and ')}`;
+                    } else if (errorItems.length === 1) {
+                        errorMessage += ` is missing the following property: ${errorItems[0]}`;
+                    }
                     logThemeValidationError(
-                        `One of the "fields" items ${parentError} is missing a "name" property. The item is:`,
+                        `${errorMessage}. The item is:`,
                         item,
                     );
                     break;

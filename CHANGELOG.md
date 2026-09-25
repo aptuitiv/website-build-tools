@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+### Changed
+
+- Fixed testing for JSON theme setting errors and outputting the correct error.
+
 ## [1.38.0] - 2026-09-25
 
 ### Changed
