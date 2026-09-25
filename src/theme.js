@@ -145,7 +145,7 @@ const validateThemeJsonFields = (json, parentName, parentType) => {
     let returnValue = false;
     let parentError = '';
     if (isStringWithValue(parentName) && isStringWithValue(parentType)) {
-        parentError = ` in the ${parentType} "${parentName}" `;
+        parentError = `in the ${parentType} "${parentName}"`;
     }
     if (Array.isArray(json)) {
         for (let i = 0; i < json.length; i++) {
@@ -176,7 +176,7 @@ const validateThemeJsonFields = (json, parentName, parentType) => {
                                 ? errorItems.join(' and ')
                                 : [
                                       errorItems.slice(0, -1).join(', '),
-                                      errorItems.slice(-1),
+                                      errorItems.at(-1),
                                   ].join(', and ')
                         }`;
                     } else if (errorItems.length === 1) {
