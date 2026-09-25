@@ -148,6 +148,9 @@ const validateThemeJsonFields = (json, parentName, parentType) => {
         parentError = `in the ${parentType} "${parentName}"`;
     }
     if (Array.isArray(json)) {
+        if (json.length === 0) {
+            return true;
+        }
         for (let i = 0; i < json.length; i++) {
             const item = json[i];
             if (isObject(item)) {
