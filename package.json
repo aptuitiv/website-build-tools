@@ -8,7 +8,7 @@
         "ncu": "ncu -i --format group",
         "prettier": "prettier --write .",
         "updateBrowsersList": "npx update-browserslist-db@latest",
-        "watch": "watch-eslint  --fix --color ."
+        "watch": "watch-eslint --fix --color --no-warn-ignored --format ./eslint-formatter.js"
     },
     "repository": {
         "type": "git",
