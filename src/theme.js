@@ -151,14 +151,29 @@ const validateThemeJsonFields = (json, parentName, parentType) => {
         if (json.length === 0) {
             return true;
         }
+        // Field types that don't require a name or label attribute.
+        const typesWithoutNameOrLabel = [
+            'fielddisplay',
+            'fieldgrid',
+            'horizontaltabs',
+            'messagebar',
+            'section',
+            'tab',
+            'verticaltabs',
+        ];
         for (let i = 0; i < json.length; i++) {
             const item = json[i];
             if (isObject(item)) {
                 const hasName = isStringWithValue(item.name);
                 const hasLabel = isStringWithValue(item.label);
                 const hasType = isStringWithValue(item.type);
-                // const type = hasType ? item.type : '_unknown_';
-                if (hasName && hasLabel && hasType) {
+                const type = hasType ? item.type : '_unknown_';
+                if (
+                    typesWithoutNameOrLabel.includes(
+                        type.toLowerCase().trim(),
+                    ) ||
+                    (hasName && hasLabel && hasType)
+                ) {
                     returnValue = true;
                 } else {
                     returnValue = false;
