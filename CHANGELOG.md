@@ -106,7 +106,7 @@ Could not upgrade to Stylelint 17 because `stylelint-selector-bem-pattern` does 
 
 ### Changed
 
-- When the `config/theme-settings.json` and `config/theme-styles.json` files are processed they will now be validated and formatted. 
+- When the `config/theme-settings.json` and `config/theme-styles.json` files are processed they will now be validated and formatted.
   This will help prevent JSON errors and keep the files in a consistent format.
 
 ## [1.29.0] - 2025-07-22
