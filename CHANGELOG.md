@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [1.40.0] - 2026-10-09
+
 ### Added
 
 - Added `editorconfig` and Prettier configuration files to the list of files to set up when initializing a website.
