@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Added `editorconfig` and Prettier configuration files to the list of files to set up when initializing a website.
+- Added support for formatting files with Prettier. This covers JSON theme config files and other configuration files.
 
 ## [1.39.0] - 2026-09-25
 

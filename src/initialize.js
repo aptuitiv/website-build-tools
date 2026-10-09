@@ -39,6 +39,7 @@ import {
     setupLicense,
 } from './package-json.js';
 import { hasFilesByExtension } from './lib/files.js';
+import { writeFormattedFile, writeFormattedJson } from './lib/prettier.js';
 
 // Get the directory name of the current module
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -66,10 +67,11 @@ const convertJsonToJs = (content) => {
  *
  * @param {string} configFile The configuration file name
  * @param {object} content A JSON object containing different content to write into the file
+ * @returns {Promise<void>}
  */
-const createJsonConfigFile = (configFile, content) => {
-    const contents = `${JSON.stringify(content, null, 4)}`;
-    fs.writeFileSync(configFile, contents);
+const createJsonConfigFile = async (configFile, content) => {
+    // Set the parser because ".aptuitiv-buildrc" doesn't have a file extension
+    await writeFormattedJson(configFile, content, { parser: 'json' });
     fancyLog(
         logSymbols.success,
         chalk.green('Config file created'),
@@ -82,14 +84,15 @@ const createJsonConfigFile = (configFile, content) => {
  *
  * @param {string} configFile The configuration file name
  * @param {object} content A JSON object containing different content to write into the file
+ * @returns {Promise<void>}
  */
-const createCommonJsConfigFile = (configFile, content) => {
+const createCommonJsConfigFile = async (configFile, content) => {
     const contents = `/**
  * Configuration for the aptuitiv-build package.
  * See https://github.com/aptuitiv/website-build-tools/blob/main/docs/Configuration.md for more information.
  */
 module.exports = ${convertJsonToJs(content)};`;
-    fs.writeFileSync(configFile, contents);
+    await writeFormattedFile(configFile, contents);
     fancyLog(
         logSymbols.success,
         chalk.green('Config file created'),
@@ -102,14 +105,15 @@ module.exports = ${convertJsonToJs(content)};`;
  *
  * @param {string} configFile The configuration file name
  * @param {object} content A JSON object containing different content to write into the file
+ * @returns {Promise<void>}
  */
-const createEsModuleConfigFile = (configFile, content) => {
+const createEsModuleConfigFile = async (configFile, content) => {
     const contents = `/**
  * Configuration for the aptuitiv-build package.
  * See https://github.com/aptuitiv/website-build-tools/blob/main/docs/Configuration.md for more information.
  */
 export default ${convertJsonToJs(content)};`;
-    fs.writeFileSync(configFile, contents);
+    await writeFormattedFile(configFile, contents);
     fancyLog(
         logSymbols.success,
         chalk.green('Config file created'),
@@ -122,13 +126,14 @@ export default ${convertJsonToJs(content)};`;
  *
  * @param {string} configFile The configuration file name
  * @param {object} content A JSON object containing different content to write into the file
+ * @returns {Promise<void>}
  */
-const createYamlConfigFile = (configFile, content) => {
+const createYamlConfigFile = async (configFile, content) => {
     const yamlContent = yaml.stringify(content);
     const contents = `# Configuration for the aptuitiv-build package.
 # See https://github.com/aptuitiv/website-build-tools/blob/main/docs/Configuration.md for more information.
 ${yamlContent}`;
-    fs.writeFileSync(configFile, contents);
+    await writeFormattedFile(configFile, contents);
     fancyLog(
         logSymbols.success,
         chalk.green('Config file created'),
@@ -141,8 +146,9 @@ ${yamlContent}`;
  *
  * @param {string} configFile The config file name
  * @param {object} content An object containing different content to write into the file
+ * @returns {Promise<void>}
  */
-export const createConfigFile = (configFile, content) => {
+export const createConfigFile = async (configFile, content) => {
     const configContent = {
         copy: [],
         javascript: {
@@ -172,13 +178,13 @@ export const createConfigFile = (configFile, content) => {
 
     const { ext } = parse(configFile);
     if (ext === '.json' || configFile === '.aptuitiv-buildrc') {
-        createJsonConfigFile(configFile, sortedConfigContent);
+        await createJsonConfigFile(configFile, sortedConfigContent);
     } else if (ext === '.cjs') {
-        createCommonJsConfigFile(configFile, sortedConfigContent);
+        await createCommonJsConfigFile(configFile, sortedConfigContent);
     } else if (['.yaml', '.yml'].includes(ext)) {
-        createYamlConfigFile(configFile, sortedConfigContent);
+        await createYamlConfigFile(configFile, sortedConfigContent);
     } else {
-        createEsModuleConfigFile(configFile, sortedConfigContent);
+        await createEsModuleConfigFile(configFile, sortedConfigContent);
     }
 };
 
@@ -285,12 +291,13 @@ const setupEnvFile = async (name, outputLog = true) => {
 };
 
 /**
- * Checks to see if the .env file exists and creates it if it doesn't
+ * Checks to see if the configuration file exists and creates it if it doesn't
  *
  * @param {string} configFile The configuration file to check for
  * @param {boolean} [outputLog] Whether to output the log
+ * @returns {Promise<void>}
  */
-const setupConfigFile = (configFile, outputLog = true) => {
+const setupConfigFile = async (configFile, outputLog = true) => {
     if (fs.existsSync(configFile)) {
         logConditionalSuccess(
             outputLog,
@@ -298,7 +305,7 @@ const setupConfigFile = (configFile, outputLog = true) => {
             configFile,
         );
     } else {
-        createConfigFile(configFile);
+        await createConfigFile(configFile);
     }
 };
 
@@ -402,7 +409,7 @@ const setupBasicWebsite = async (outputLog) => {
     if (cssFiles.length === 0) {
         const { stdout: cacaoVersion } =
             await execa`npm view cacao-css version`;
-        addDependency('cacao-css', cacaoVersion);
+        await addDependency('cacao-css', cacaoVersion);
         fs.copySync(`${__dirname}/source-files/css`, 'src/css');
     }
 
@@ -483,8 +490,7 @@ const downloadTheme = async (args, theme, outputLog = true) => {
                 `These files/folders already exist and would be overwritten by the theme: ${conflicts.join(', ')}`,
             );
             overwrite = await confirm({
-                message:
-                    'Overwrite the existing files with the theme files?',
+                message: 'Overwrite the existing files with the theme files?',
                 default: false,
             });
             if (!overwrite) {
@@ -587,7 +593,7 @@ export const initialize = async (args, outputLog = true) => {
         await setupPackageJson(args, name, outputLog);
         setupGitIgnore();
         await setupEnvFile(name, outputLog);
-        setupConfigFile(args.config || '.aptuitiv-buildrc.js', outputLog);
+        await setupConfigFile(args.config || '.aptuitiv-buildrc.js', outputLog);
         removeFiles(outputLog);
         if (projectType === 'basic') {
             await setupBasicWebsite(outputLog);

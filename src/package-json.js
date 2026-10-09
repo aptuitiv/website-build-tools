@@ -11,6 +11,7 @@ import { fileURLToPath } from 'url';
 
 // Build scripts
 import { setupRoot, sortObjectByKeys } from './helpers.js';
+import { writeFormattedJson } from './lib/prettier.js';
 
 // Get the directory name of the current module
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -124,14 +125,15 @@ const getDevDependencies = (currentDevDependencies) => {
  *
  * @param {string} name The dev dependency name
  * @param {string} version The package version
+ * @returns {Promise<void>}
  */
-export const addDependency = (name, version) => {
+export const addDependency = async (name, version) => {
     const packageJson = fs.readJsonSync('package.json');
     // Ensure the dependencies object exists so we don't throw on a package.json
     // that has no "dependencies" key yet.
     packageJson.dependencies = packageJson.dependencies || {};
     packageJson.dependencies[name] = version;
-    fs.writeJSONSync('package.json', packageJson, { spaces: 4 });
+    await writeFormattedJson('package.json', packageJson);
 };
 
 /**
@@ -228,7 +230,7 @@ export const setupPackageJsonScripts = async (args) => {
     );
 
     // Write the updated package.json back to the file
-    fs.writeJSONSync('package.json', packageJson, { spaces: 4 });
+    await writeFormattedJson('package.json', packageJson);
     fancyLog(
         logSymbols.success,
         chalk.green('Updated the scripts in the package.json file'),
@@ -387,7 +389,7 @@ export const formatPackageJson = async (args) => {
         }
     });
 
-    fs.writeJSONSync('package.json', newPackageJson, { spaces: 4 });
+    await writeFormattedJson('package.json', newPackageJson);
     fancyLog(logSymbols.success, chalk.green('Updated the package.json file'));
 };
 
