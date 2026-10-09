@@ -188,14 +188,8 @@ export const createConfigFile = async (configFile, content) => {
     }
 };
 
-/**
- * Set up the .gitignore file
- *
- * Make sure that it has all of the necessary patterns
- */
-const setupGitIgnore = () => {
-    if (!fs.existsSync('.gitignore')) {
-        const content = `# This includes files that will be ignored by git
+// The default .gitignore file content
+const gitIgnoreContent = `# This includes files that will be ignored by git
 # We want to include the package-lock.json file in git so that everyone is working with the same package files.
 # The package-lock.json should not be included in this file.
 # Web projects are not dependencies in other projects so this is ok. Reference for that decision:
@@ -218,9 +212,53 @@ node_modules/
 
 # Claude Code local settings
 .claude/*.local.json
-claude.local.md`;
-        fs.writeFileSync('.gitignore', content);
-        fancyLog(logSymbols.success, chalk.green('Updated .gitignore file'));
+claude.local.md
+`;
+
+/**
+ * Set up the .gitignore file
+ *
+ * Creates the file if it doesn't exist. If "update" is true and the file exists then
+ * any missing patterns are added to the end of the file. Existing patterns are not changed.
+ *
+ * @param {boolean} [update] Whether to add missing patterns to an existing .gitignore file
+ * @param {boolean} [outputLog] Whether to output the log
+ */
+export const setupGitIgnore = (update = false, outputLog = true) => {
+    if (!fs.existsSync('.gitignore')) {
+        fs.writeFileSync('.gitignore', gitIgnoreContent);
+        logConditionalSuccess(outputLog, 'Created the .gitignore file');
+    } else if (update) {
+        const currentContent = fs.readFileSync('.gitignore', 'utf8');
+        const currentPatterns = currentContent
+            .split('\n')
+            .map((line) => line.trim());
+        const missingPatterns = gitIgnoreContent
+            .split('\n')
+            .map((line) => line.trim())
+            .filter(
+                (line) =>
+                    line.length > 0 &&
+                    !line.startsWith('#') &&
+                    !currentPatterns.includes(line),
+            );
+        if (missingPatterns.length > 0) {
+            const separator = currentContent.endsWith('\n') ? '\n' : '\n\n';
+            fs.writeFileSync(
+                '.gitignore',
+                `${currentContent}${separator}${missingPatterns.join('\n')}\n`,
+            );
+            logConditionalSuccess(
+                outputLog,
+                'Added patterns to the .gitignore file',
+                missingPatterns.join(', '),
+            );
+        } else {
+            logConditionalSuccess(
+                outputLog,
+                'The .gitignore file is up to date',
+            );
+        }
     }
 };
 
@@ -229,13 +267,19 @@ claude.local.md`;
  * into the project.
  *
  * This gives all projects consistent formatting rules. By default, existing files are not overwritten.
- * If "force" is true then the existing files are overwritten and any other Prettier configuration
- * files are removed so that they don't conflict with the .prettierrc.cjs file.
+ * If "force" is true then the existing files are overwritten.
+ * If "removeOtherConfigs" is true then any other Prettier configuration files are removed so that
+ * they don't conflict with the .prettierrc.cjs file. Otherwise a warning is shown if they exist.
  *
  * @param {boolean} [outputLog] Whether to output the log
  * @param {boolean} [force] Whether to overwrite the existing files
+ * @param {boolean} [removeOtherConfigs] Whether to remove other Prettier configuration files. Defaults to the "force" value.
  */
-const setupFormattingFiles = (outputLog = true, force = false) => {
+export const setupFormattingFiles = (
+    outputLog = true,
+    force = false,
+    removeOtherConfigs = force,
+) => {
     const files = ['.editorconfig', '.prettierignore', '.prettierrc.cjs'];
     // Other Prettier config files. If one of these exists, and we're not forcing the update,
     // then we don't add .prettierrc.cjs.
@@ -260,22 +304,28 @@ const setupFormattingFiles = (outputLog = true, force = false) => {
         'prettier.config.cts',
     ];
 
-    if (force) {
-        // Remove the other Prettier config files so that only .prettierrc.cjs is used
-        otherPrettierConfigFiles.forEach((file) => {
-            if (fs.existsSync(file)) {
+    // Handle the other Prettier config files. Prettier uses them before .prettierrc.cjs.
+    otherPrettierConfigFiles.forEach((file) => {
+        if (fs.existsSync(file)) {
+            if (removeOtherConfigs) {
                 fs.removeSync(file);
                 logConditionalSuccess(
                     outputLog,
                     'Removed the Prettier configuration file',
                     file,
                 );
+            } else if (force) {
+                logConditionalWarning(
+                    outputLog,
+                    `The ${file} file exists. Prettier will use it instead of .prettierrc.cjs. Remove it to use .prettierrc.cjs.`,
+                );
             }
-        });
-    }
+        }
+    });
 
     files.forEach((file) => {
-        let exists = fs.existsSync(file);
+        const fileExists = fs.existsSync(file);
+        let exists = fileExists;
         if (!exists && file === '.prettierrc.cjs') {
             exists = otherPrettierConfigFiles.some((configFile) =>
                 fs.existsSync(configFile),
@@ -287,7 +337,7 @@ const setupFormattingFiles = (outputLog = true, force = false) => {
             fs.copyFileSync(`${__dirname}/source-files/${file}`, file);
             logConditionalSuccess(
                 outputLog,
-                exists
+                fileExists
                     ? 'Updated the formatting file'
                     : 'Created the formatting file',
                 file,
@@ -548,7 +598,7 @@ const downloadTheme = async (args, theme, outputLog = true) => {
 /**
  * Install NPM packages
  */
-const installNpm = async () => {
+export const installNpm = async () => {
     logMessage('Installing NPM packages');
     await execa`npm install`;
 };
@@ -626,7 +676,7 @@ export const initialize = async (args, outputLog = true) => {
         setupFormattingFiles(outputLog, forceFormattingFiles);
         setupLicense(args);
         await setupPackageJson(args, name, outputLog);
-        setupGitIgnore();
+        setupGitIgnore(false, outputLog);
         await setupEnvFile(name, outputLog);
         await setupConfigFile(args.config || '.aptuitiv-buildrc.js', outputLog);
         removeFiles(outputLog);

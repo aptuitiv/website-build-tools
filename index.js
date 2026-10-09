@@ -35,6 +35,7 @@ import {
     pullThemeConfig,
 } from './src/pull.js';
 import { pushTemplates } from './src/template.js';
+import { updateConfigHandler } from './src/update-config.js';
 import { formatThemeJson, pushTheme } from './src/theme.js';
 import watchHandler from './src/watch.js';
 import { hasFiles } from './src/lib/files.js';
@@ -373,6 +374,30 @@ program
                 );
             }
         }
+    });
+
+/**
+ * Update config command
+ */
+program
+    .command('update-config')
+    .description(
+        'Update the configuration files (formatting config, package.json, .gitignore, and LICENSE) from the build tools. Files are updated in place and added if they are missing.',
+    )
+    .option(
+        '-l, --license <license>',
+        'The license for the project. Defaults to the license in the package.json file.',
+    )
+    .option(
+        '-t, --theme <themeName>',
+        'Set the theme name for the package.json scripts. Defaults to the theme folder name in the theme build path.',
+    )
+    .option('--no-install', 'Do not run "npm install" after updating')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        await config.init(args);
+        await updateConfigHandler(args);
     });
 
 /**

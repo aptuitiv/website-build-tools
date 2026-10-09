@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added support for formatting files with Prettier. This covers JSON theme config files and other configuration files.
 - Added `update-formatting-config` CLI command to update the `.editorconfig` and Prettier configuration in a website.
 - Added `--update-formatting-config` option to the `initialize` command to force updating the `.editorconfig` and Prettier configuration if they already exist in the website.
+- Added `update-config` command to update the configuration files in a project.
 
 ### Changed
 

@@ -21,3 +21,5 @@ Any other Prettier configuration files, like `.prettierrc`, `.prettierrc.json`, 
 Prettier also reads configuration from the `prettier` key in the `package.json` file, and that takes precedence over `.prettierrc.cjs`. The `package.json` file isn't changed, but you'll see a warning if it has a `prettier` key.
 
 The [init](initialize) action also adds these files, but by default it only adds files that don't already exist. Use the `--update-formatting-config` option with the init action to overwrite them.
+
+The [update config](update-config) action also updates these files, along with the `package.json`, `.gitignore`, and `LICENSE` files. It doesn't remove other Prettier configuration files.
