@@ -303,7 +303,7 @@ export const formatPackageJson = async (args) => {
             ];
         } else if (section === 'engines') {
             newPackageJson.engines = {
-                node: '^12.20.0 || ^14.13.1 || >=16.0.0',
+                node: '>=24.13.0',
             };
         } else if (section === 'license') {
             newPackageJson[section] = license;

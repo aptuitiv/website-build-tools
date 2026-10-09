@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added `update-formatting-config` CLI command to update the `.editorconfig` and Prettier configuration in a website.
 - Added `--update-formatting-config` option to the `initialize` command to force updating the `.editorconfig` and Prettier configuration if they already exist in the website.
 
+### Changed
+
+- Updated the `engines` value for node in the package.json file that gets added to websites.
+
 ## [1.39.0] - 2026-09-25
 
 ### Changed
