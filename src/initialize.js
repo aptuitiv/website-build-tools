@@ -226,17 +226,21 @@ claude.local.md`;
 
 /**
  * Copy the formatting configuration files (.editorconfig, .prettierignore, .prettierrc.cjs)
- * into the project if they don't already exist.
+ * into the project.
  *
- * This gives all projects consistent formatting rules. Existing files are not overwritten.
+ * This gives all projects consistent formatting rules. By default, existing files are not overwritten.
+ * If "force" is true then the existing files are overwritten and any other Prettier configuration
+ * files are removed so that they don't conflict with the .prettierrc.cjs file.
  *
  * @param {boolean} [outputLog] Whether to output the log
+ * @param {boolean} [force] Whether to overwrite the existing files
  */
-const setupFormattingFiles = (outputLog = true) => {
+const setupFormattingFiles = (outputLog = true, force = false) => {
     const files = ['.editorconfig', '.prettierignore', '.prettierrc.cjs'];
-    // Prettier config files that, if they exist, mean we shouldn't add .prettierrc.cjs
+    // Other Prettier config files. If one of these exists, and we're not forcing the update,
+    // then we don't add .prettierrc.cjs.
     // https://prettier.io/docs/configuration
-    const prettierConfigFiles = [
+    const otherPrettierConfigFiles = [
         '.prettierrc',
         '.prettierrc.json',
         '.prettierrc.yml',
@@ -244,7 +248,6 @@ const setupFormattingFiles = (outputLog = true) => {
         '.prettierrc.json5',
         '.prettierrc.js',
         '.prettierrc.mjs',
-        '.prettierrc.cjs',
         '.prettierrc.toml',
         '.prettierrc.ts',
         '.prettierrc.mts',
@@ -256,24 +259,53 @@ const setupFormattingFiles = (outputLog = true) => {
         'prettier.config.mts',
         'prettier.config.cts',
     ];
+
+    if (force) {
+        // Remove the other Prettier config files so that only .prettierrc.cjs is used
+        otherPrettierConfigFiles.forEach((file) => {
+            if (fs.existsSync(file)) {
+                fs.removeSync(file);
+                logConditionalSuccess(
+                    outputLog,
+                    'Removed the Prettier configuration file',
+                    file,
+                );
+            }
+        });
+    }
+
     files.forEach((file) => {
-        const exists =
-            file === '.prettierrc.cjs'
-                ? prettierConfigFiles.some((configFile) =>
-                      fs.existsSync(configFile),
-                  )
-                : fs.existsSync(file);
-        if (exists) {
+        let exists = fs.existsSync(file);
+        if (!exists && file === '.prettierrc.cjs') {
+            exists = otherPrettierConfigFiles.some((configFile) =>
+                fs.existsSync(configFile),
+            );
+        }
+        if (exists && !force) {
             logConditionalSuccess(outputLog, 'Found the formatting file', file);
         } else {
             fs.copyFileSync(`${__dirname}/source-files/${file}`, file);
             logConditionalSuccess(
                 outputLog,
-                'Created the formatting file',
+                exists
+                    ? 'Updated the formatting file'
+                    : 'Created the formatting file',
                 file,
             );
         }
     });
+
+    // Prettier also reads configuration from the "prettier" key in package.json.
+    // It takes precedence over .prettierrc.cjs so warn about it instead of changing package.json.
+    if (fs.existsSync('package.json')) {
+        const packageJson = fs.readJsonSync('package.json', { throws: false });
+        if (isObject(packageJson) && packageJson.prettier !== undefined) {
+            logConditionalWarning(
+                outputLog,
+                'The package.json file has a "prettier" key. Prettier will use it instead of .prettierrc.cjs. Remove it to use .prettierrc.cjs.',
+            );
+        }
+    }
 };
 
 /**
@@ -577,18 +609,21 @@ export const initialize = async (args, outputLog = true) => {
     }
     projectType = projectType.toLowerCase();
 
+    // Whether to overwrite the existing formatting configuration files
+    const forceFormattingFiles = args.updateFormattingConfig === true;
+
     if (projectType.substring(0, 6) === 'theme-') {
         const themeArgs = isObject(args) ? args : {};
         if (name) {
             themeArgs.packageName = name;
         }
         await downloadTheme(themeArgs, projectType, outputLog);
-        setupFormattingFiles(outputLog);
+        setupFormattingFiles(outputLog, forceFormattingFiles);
         await setupEnvFile(name, outputLog);
     } else {
         // Not a theme site. Could be an existing site or a new website
         // Set up the formatting files first so that the files created below are formatted with them.
-        setupFormattingFiles(outputLog);
+        setupFormattingFiles(outputLog, forceFormattingFiles);
         setupLicense(args);
         await setupPackageJson(args, name, outputLog);
         setupGitIgnore();
@@ -631,4 +666,21 @@ export const initializeHandler = async (args) => {
         }
     }
     return returnValue;
+};
+
+/**
+ * Process the request to update the formatting configuration files
+ *
+ * Copies the .editorconfig, .prettierignore, and .prettierrc.cjs files into the project,
+ * overwriting the existing files.
+ *
+ * @param {object} args The command line arguments
+ */
+export const updateFormattingConfigHandler = (args) => {
+    setupRoot(args.root);
+    setupFormattingFiles(true, true);
+    fancyLog(
+        logSymbols.success,
+        chalk.green('The formatting configuration files are updated.'),
+    );
 };

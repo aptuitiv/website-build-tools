@@ -1,0 +1,23 @@
+---
+title: Update formatting config
+---
+
+# Update formatting config action
+
+This action copies the formatting configuration files from the build tools into the project. It overwrites the project's existing files. Use it to keep a project's formatting rules in sync with the build tools.
+
+```bash
+aptuitiv-build update-formatting-config
+```
+
+The following files are copied into the project root:
+
+- `.editorconfig`
+- `.prettierignore`
+- `.prettierrc.cjs`
+
+Any other Prettier configuration files, like `.prettierrc`, `.prettierrc.json`, or `prettier.config.js`, are removed so that they don't conflict with the `.prettierrc.cjs` file.
+
+Prettier also reads configuration from the `prettier` key in the `package.json` file, and that takes precedence over `.prettierrc.cjs`. The `package.json` file isn't changed, but you'll see a warning if it has a `prettier` key.
+
+The [init](initialize) action also adds these files, but by default it only adds files that don't already exist. Use the `--update-formatting-config` option with the init action to overwrite them.
