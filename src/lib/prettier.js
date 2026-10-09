@@ -3,7 +3,7 @@
 =========================================================================== */
 
 import fs from 'fs-extra';
-import { resolve } from 'path';
+import { extname, resolve } from 'path';
 import prettier from 'prettier';
 
 // Build scripts
@@ -19,6 +19,13 @@ const defaultOptions = {
     semi: true,
     singleQuote: true,
     tabWidth: 4,
+};
+
+/**
+ * Default Prettier options for JSON files. These match the "*.json" override in the .prettierrc.cjs file.
+ */
+const defaultJsonOptions = {
+    printWidth: 120,
 };
 
 /**
@@ -40,8 +47,11 @@ export const formatWithPrettier = async (content, filePath, options = {}) => {
             editorconfig: true,
             useCache: false,
         });
+        const isJson =
+            extname(absolutePath) === '.json' || options.parser === 'json';
         return await prettier.format(content, {
             ...defaultOptions,
+            ...(isJson ? defaultJsonOptions : {}),
             ...(projectOptions ?? {}),
             ...options,
             filepath: absolutePath,

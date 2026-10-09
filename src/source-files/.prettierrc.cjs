@@ -24,5 +24,13 @@ module.exports = {
                 printWidth: 120,
             },
         },
+        {
+            files: '*.json',
+            options: {
+                // Match the CSS print width.
+                // https://prettier.io/docs/en/options.html#print-width
+                printWidth: 120,
+            },
+        },
     ],
 };
