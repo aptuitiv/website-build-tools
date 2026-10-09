@@ -187,6 +187,7 @@ const getScripts = (currentScripts, theme) => {
         ncu: 'ncu -i --format group',
         'package-json-format': 'aptuitiv-build package-json format',
         'package-json-scripts': 'aptuitiv-build package-json scripts',
+        prettier: 'prettier --write .',
         'pull-templates': 'aptuitiv-build pull-templates',
         'pull-theme-config': 'aptuitiv-build pull-theme-config',
         'pull-theme-fonts': 'aptuitiv-build pull-theme-fonts',
