@@ -196,8 +196,9 @@ const parseGulpConfigSrc = (node, variables) => {
  * in the build tools configuration.
  *
  * @param {string} configFile The config file name
+ * @returns {Promise<void>}
  */
-const parseGulpConfig = (configFile) => {
+const parseGulpConfig = async (configFile) => {
     let contents = '';
     if (fs.existsSync('gulp/config.js')) {
         // Newer Gulp configuration file
@@ -452,7 +453,7 @@ const parseGulpConfig = (configFile) => {
         }
 
         // Create the aptuitiv-build configuration file
-        createConfigFile(configFile, configContents);
+        await createConfigFile(configFile, configContents);
     }
 };
 
@@ -498,7 +499,7 @@ const gulpConvertHandler = async (args) => {
     setupRoot(args.root);
     // Remove the files that are not needed
     removeFiles();
-    parseGulpConfig(configFile);
+    await parseGulpConfig(configFile);
     // Format the package.json file
     await formatPackageJson(args);
     setupLicense(args);

@@ -1,0 +1,37 @@
+---
+title: Update config
+---
+
+# Update config action
+
+This action updates an existing project's configuration files to match the current version of the build tools. Run it after you upgrade the `@aptuitiv/website-build-tools` package to pick up the latest configuration.
+
+```bash
+aptuitiv-build update-config
+```
+
+Or use the `package.json` script:
+
+```bash
+npm run update-config
+```
+
+This action only updates configuration files. It doesn't build the site or upload any files.
+
+## What gets updated
+
+Each file is updated in place. If a file doesn't exist then it's created. No files are removed.
+
+- **Formatting configuration**: The `.editorconfig`, `.prettierignore`, and `.prettierrc.cjs` files are overwritten with the versions from the build tools. If the project has another Prettier configuration file, like `.prettierrc.json`, it's left in place and you'll see a warning. Prettier uses those files before `.prettierrc.cjs`, so remove them to use the build tools configuration. Also see the [Update formatting config](update-formatting-config) action.
+- **`package.json`**: The file is formatted the same way as the [package-json format](package-json#format-the-packagejson-file) action. This reorders the contents, updates the [scripts](/configuration/package-json-scripts), removes outdated dependencies, and sets the build tools version in the dev dependencies.
+- **`.gitignore`**: Any missing patterns from the default `.gitignore` file are added to the end of the file. Your existing patterns aren't changed.
+- **`LICENSE`**: If the project uses the `Apache-2.0` license then the `LICENSE` file is updated with the current license text. Other licenses are left alone.
+
+After the files are updated, `npm install` runs to install the updated packages.
+
+## Options
+
+- `--license` or `-l`: The license for the project. Defaults to the `license` value in the `package.json` file.
+- `--theme` or `-t`: The theme name to use in the `package.json` scripts. Defaults to the theme folder name from the `build.theme` [configuration](/configuration) value. For example, `dist/theme/carmine` uses `carmine`. If the theme name can't be found then `custom` is used.
+- `--no-install`: Don't run `npm install` after the files are updated.
+- `--config` or `-c`: Specify a different name for the configuration file.

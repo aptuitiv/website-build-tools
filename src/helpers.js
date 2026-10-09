@@ -8,7 +8,11 @@ import { isAbsolute, resolve } from 'path';
 
 // Build scripts
 import config from './config.js';
-import { isString, isStringWithValue, isObjectWithValues } from './lib/types.js';
+import {
+    isString,
+    isStringWithValue,
+    isObjectWithValues,
+} from './lib/types.js';
 
 /**
  * Get the processed glob path

@@ -21,7 +21,10 @@ import ftpHandler from './src/ftp.js';
 import gulpConvertHandler from './src/gulp-convert.js';
 import { iconHandler } from './src/icons.js';
 import { imageHandler } from './src/image.js';
-import { initializeHandler } from './src/initialize.js';
+import {
+    initializeHandler,
+    updateFormattingConfigHandler,
+} from './src/initialize.js';
 import { jsHandler } from './src/javascript.js';
 import { packageJsonHandler } from './src/package-json.js';
 import {
@@ -32,6 +35,7 @@ import {
     pullThemeConfig,
 } from './src/pull.js';
 import { pushTemplates } from './src/template.js';
+import { updateConfigHandler } from './src/update-config.js';
 import { formatThemeJson, pushTheme } from './src/theme.js';
 import watchHandler from './src/watch.js';
 import { hasFiles } from './src/lib/files.js';
@@ -339,6 +343,10 @@ program
     )
     .option('-n, --name <name>', 'The name of the project')
     .option('-t, --type <name>', 'The type of project')
+    .option(
+        '--update-formatting-config',
+        'Overwrite the existing .editorconfig, .prettierignore, and Prettier configuration files',
+    )
     .addOption(configFileOption)
     .addOption(rootOption)
     .action(async (args) => {
@@ -366,6 +374,43 @@ program
                 );
             }
         }
+    });
+
+/**
+ * Update config command
+ */
+program
+    .command('update-config')
+    .description(
+        'Update the configuration files (formatting config, package.json, .gitignore, and LICENSE) from the build tools. Files are updated in place and added if they are missing.',
+    )
+    .option(
+        '-l, --license <license>',
+        'The license for the project. Defaults to the license in the package.json file.',
+    )
+    .option(
+        '-t, --theme <themeName>',
+        'Set the theme name for the package.json scripts. Defaults to the theme folder name in the theme build path.',
+    )
+    .option('--no-install', 'Do not run "npm install" after updating')
+    .addOption(configFileOption)
+    .addOption(rootOption)
+    .action(async (args) => {
+        await config.init(args);
+        await updateConfigHandler(args);
+    });
+
+/**
+ * Update formatting config command
+ */
+program
+    .command('update-formatting-config')
+    .description(
+        'Copy the .editorconfig, .prettierignore, and .prettierrc.cjs files into the project, overwriting the existing files',
+    )
+    .addOption(rootOption)
+    .action((args) => {
+        updateFormattingConfigHandler(args);
     });
 
 /**

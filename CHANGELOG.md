@@ -7,6 +7,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [1.40.0] - 2026-10-09
+
+### Added
+
+- Added `editorconfig` and Prettier configuration files to the list of files to set up when initializing a website.
+- Added support for formatting files with Prettier. This covers JSON theme config files and other configuration files.
+- Added `update-formatting-config` CLI command to update the `.editorconfig` and Prettier configuration in a website.
+- Added `--update-formatting-config` option to the `initialize` command to force updating the `.editorconfig` and Prettier configuration if they already exist in the website.
+- Added `update-config` command to update the configuration files in a project.
+- Added `prettier` script to the package.json file for websites.
+
+### Changed
+
+- Updated the `engines` value for node in the package.json file that gets added to websites.
+
 ## [1.39.0] - 2026-09-25
 
 ### Changed
@@ -106,7 +121,7 @@ Could not upgrade to Stylelint 17 because `stylelint-selector-bem-pattern` does 
 
 ### Changed
 
-- When the `config/theme-settings.json` and `config/theme-styles.json` files are processed they will now be validated and formatted. 
+- When the `config/theme-settings.json` and `config/theme-styles.json` files are processed they will now be validated and formatted.
   This will help prevent JSON errors and keep the files in a consistent format.
 
 ## [1.29.0] - 2025-07-22

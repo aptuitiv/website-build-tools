@@ -11,6 +11,7 @@ import path from 'path';
 // Lib
 import { isObject, isStringWithValue } from './lib/types.js';
 import { objectHasValue } from './lib/object.js';
+import { formatWithPrettier } from './lib/prettier.js';
 
 // Build files
 import config from './config.js';
@@ -374,9 +375,14 @@ const processThemeJsonFile = async (fileName) => {
                     logSymbols.success,
                     chalk.green(`${fileName} file is valid`),
                 );
-                const formattedJson = reorderThemeConfig(json);
-                if (JSON.stringify(json) !== JSON.stringify(formattedJson)) {
-                    fs.writeJSONSync(filePath, formattedJson, { spaces: 4 });
+                const formattedJson = await formatWithPrettier(
+                    JSON.stringify(reorderThemeConfig(json), null, 4),
+                    filePath,
+                );
+                // Compare against the raw file content so that the file is rewritten
+                // when either the order or the formatting is different.
+                if (content !== formattedJson) {
+                    await fs.writeFile(filePath, formattedJson);
                     fancyLog(
                         logSymbols.success,
                         chalk.green(`Formatted the ${fileName} file`),

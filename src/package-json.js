@@ -11,6 +11,7 @@ import { fileURLToPath } from 'url';
 
 // Build scripts
 import { setupRoot, sortObjectByKeys } from './helpers.js';
+import { writeFormattedJson } from './lib/prettier.js';
 
 // Get the directory name of the current module
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -124,14 +125,15 @@ const getDevDependencies = (currentDevDependencies) => {
  *
  * @param {string} name The dev dependency name
  * @param {string} version The package version
+ * @returns {Promise<void>}
  */
-export const addDependency = (name, version) => {
+export const addDependency = async (name, version) => {
     const packageJson = fs.readJsonSync('package.json');
     // Ensure the dependencies object exists so we don't throw on a package.json
     // that has no "dependencies" key yet.
     packageJson.dependencies = packageJson.dependencies || {};
     packageJson.dependencies[name] = version;
-    fs.writeJSONSync('package.json', packageJson, { spaces: 4 });
+    await writeFormattedJson('package.json', packageJson);
 };
 
 /**
@@ -185,6 +187,7 @@ const getScripts = (currentScripts, theme) => {
         ncu: 'ncu -i --format group',
         'package-json-format': 'aptuitiv-build package-json format',
         'package-json-scripts': 'aptuitiv-build package-json scripts',
+        prettier: 'prettier --write .',
         'pull-templates': 'aptuitiv-build pull-templates',
         'pull-theme-config': 'aptuitiv-build pull-theme-config',
         'pull-theme-fonts': 'aptuitiv-build pull-theme-fonts',
@@ -193,6 +196,7 @@ const getScripts = (currentScripts, theme) => {
         stylelint: 'aptuitiv-build stylelint',
         templates: 'aptuitiv-build push-templates',
         'theme-config': 'aptuitiv-build push-theme-config',
+        'update-config': 'aptuitiv-build update-config',
         upload: 'aptuitiv-build upload',
         'upload-docs': `aptuitiv-build upload -p docs`,
         'upload-images': `aptuitiv-build upload -p images`,
@@ -228,7 +232,7 @@ export const setupPackageJsonScripts = async (args) => {
     );
 
     // Write the updated package.json back to the file
-    fs.writeJSONSync('package.json', packageJson, { spaces: 4 });
+    await writeFormattedJson('package.json', packageJson);
     fancyLog(
         logSymbols.success,
         chalk.green('Updated the scripts in the package.json file'),
@@ -301,7 +305,7 @@ export const formatPackageJson = async (args) => {
             ];
         } else if (section === 'engines') {
             newPackageJson.engines = {
-                node: '^12.20.0 || ^14.13.1 || >=16.0.0',
+                node: '>=24.13.0',
             };
         } else if (section === 'license') {
             newPackageJson[section] = license;
@@ -387,18 +391,23 @@ export const formatPackageJson = async (args) => {
         }
     });
 
-    fs.writeJSONSync('package.json', newPackageJson, { spaces: 4 });
+    await writeFormattedJson('package.json', newPackageJson);
     fancyLog(logSymbols.success, chalk.green('Updated the package.json file'));
 };
 
 /**
  * Set up the license file to go with the license in the package.json file
  *
+ * Only the Apache-2.0 license file is provided. Other licenses are left alone.
+ *
  * @param {object} args The command line arguments.
  *  - license: The license to use
+ * @param {boolean} [force] Whether to overwrite an existing LICENSE file
+ * @returns {boolean} Whether the LICENSE file was written
  */
-export const setupLicense = (args) => {
-    if (!fs.existsSync('LICENSE')) {
+export const setupLicense = (args, force = false) => {
+    let written = false;
+    if (force || !fs.existsSync('LICENSE')) {
         const license = args?.license || defaultLicense;
         if (license === 'Apache-2.0') {
             // Copy the LICENSE file
@@ -406,8 +415,10 @@ export const setupLicense = (args) => {
                 `${__dirname}/source-files/apache-license.txt`,
             );
             fs.writeFileSync('LICENSE', licenseContent);
+            written = true;
         }
     }
+    return written;
 };
 
 /**
