@@ -219,6 +219,58 @@ claude.local.md`;
 };
 
 /**
+ * Copy the formatting configuration files (.editorconfig, .prettierignore, .prettierrc.cjs)
+ * into the project if they don't already exist.
+ *
+ * This gives all projects consistent formatting rules. Existing files are not overwritten.
+ *
+ * @param {boolean} [outputLog] Whether to output the log
+ */
+const setupFormattingFiles = (outputLog = true) => {
+    const files = ['.editorconfig', '.prettierignore', '.prettierrc.cjs'];
+    // Prettier config files that, if they exist, mean we shouldn't add .prettierrc.cjs
+    // https://prettier.io/docs/configuration
+    const prettierConfigFiles = [
+        '.prettierrc',
+        '.prettierrc.json',
+        '.prettierrc.yml',
+        '.prettierrc.yaml',
+        '.prettierrc.json5',
+        '.prettierrc.js',
+        '.prettierrc.mjs',
+        '.prettierrc.cjs',
+        '.prettierrc.toml',
+        '.prettierrc.ts',
+        '.prettierrc.mts',
+        '.prettierrc.cts',
+        'prettier.config.js',
+        'prettier.config.mjs',
+        'prettier.config.cjs',
+        'prettier.config.ts',
+        'prettier.config.mts',
+        'prettier.config.cts',
+    ];
+    files.forEach((file) => {
+        const exists =
+            file === '.prettierrc.cjs'
+                ? prettierConfigFiles.some((configFile) =>
+                      fs.existsSync(configFile),
+                  )
+                : fs.existsSync(file);
+        if (exists) {
+            logConditionalSuccess(outputLog, 'Found the formatting file', file);
+        } else {
+            fs.copyFileSync(`${__dirname}/source-files/${file}`, file);
+            logConditionalSuccess(
+                outputLog,
+                'Created the formatting file',
+                file,
+            );
+        }
+    });
+};
+
+/**
  * Checks to see if the .env file exists and creates it if it doesn't
  *
  * @param {string} [name] The project name
@@ -525,9 +577,12 @@ export const initialize = async (args, outputLog = true) => {
             themeArgs.packageName = name;
         }
         await downloadTheme(themeArgs, projectType, outputLog);
+        setupFormattingFiles(outputLog);
         await setupEnvFile(name, outputLog);
     } else {
         // Not a theme site. Could be an existing site or a new website
+        // Set up the formatting files first so that the files created below are formatted with them.
+        setupFormattingFiles(outputLog);
         setupLicense(args);
         await setupPackageJson(args, name, outputLog);
         setupGitIgnore();
